@@ -1,10 +1,10 @@
-23:40:40 **** Incremental Build of configuration Debug for project MDP_grp13 ****
+00:21:51 **** Incremental Build of configuration Debug for project MDP_grp13 ****
 make -j8 all 
 arm-none-eabi-size   MDP_grp13.elf 
    text	   data	    bss	    dec	    hex	filename
-  20400	     24	  20424	  40848	   9f90	MDP_grp13.elf
+  24408	     24	  21448	  45880	   b338	MDP_grp13.elf
 Finished building: default.size.stdout
  
 
-23:40:40 Build Finished. 0 errors, 0 warnings. (took 549ms)
+00:21:51 Build Finished. 0 errors, 0 warnings. (took 585ms)
 
