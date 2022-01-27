@@ -207,3 +207,41 @@ Command-line arguments:  -os win32 -ws win32 -arch x86_64
 !ENTRY org.eclipse.core.net 4 0 2022-01-20 21:24:02.362
 !MESSAGE WinHttp.GetProxyForUrl for pac failed with error 'The URL does not use a recognized protocol
 ' #12006.
+!SESSION 2022-01-24 21:51:51.105 -----------------------------------------------
+eclipse.buildId=Version 1.8.0
+java.version=11.0.11
+java.vendor=AdoptOpenJDK
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=en_US
+Command-line arguments:  -os win32 -ws win32 -arch x86_64
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 4 4 2022-01-24 21:53:32.916
+!MESSAGE CubeMX plugin appears to be active, Log4j initialization might be too late.
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 1 1 2022-01-24 21:53:33.004
+!MESSAGE Log4j initialized with config file D:\MDPWorkSpace\.metadata\.log4j.xml
+
+!ENTRY com.st.stm32cube.ide.mcu.ide 1 1 2022-01-24 21:53:40.299
+!MESSAGE Started RMI Server, listening on port 41337
+
+!ENTRY org.eclipse.core.net 4 0 2022-01-24 21:54:00.937
+!MESSAGE WinHttp.GetProxyForUrl for pac failed with error 'The URL does not use a recognized protocol
+' #12006.
+!SESSION 2022-01-27 20:38:05.783 -----------------------------------------------
+eclipse.buildId=Version 1.8.0
+java.version=11.0.11
+java.vendor=AdoptOpenJDK
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=en_US
+Command-line arguments:  -os win32 -ws win32 -arch x86_64
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 4 4 2022-01-27 20:42:57.987
+!MESSAGE CubeMX plugin appears to be active, Log4j initialization might be too late.
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 1 1 2022-01-27 20:42:58.058
+!MESSAGE Log4j initialized with config file D:\MDPWorkSpace\.metadata\.log4j.xml
+
+!ENTRY com.st.stm32cube.ide.mcu.ide 1 1 2022-01-27 20:43:03.814
+!MESSAGE Started RMI Server, listening on port 41337
+
+!ENTRY org.eclipse.core.net 4 0 2022-01-27 20:43:24.528
+!MESSAGE WinHttp.GetProxyForUrl for pac failed with error 'The URL does not use a recognized protocol
+' #12006.

@@ -42,6 +42,7 @@
 /* Private variables ---------------------------------------------------------*/
 TIM_HandleTypeDef htim1;
 TIM_HandleTypeDef htim2;
+TIM_HandleTypeDef htim3;
 TIM_HandleTypeDef htim8;
 
 /* Definitions for LED_Toggle */
@@ -51,31 +52,10 @@ const osThreadAttr_t LED_Toggle_attributes = {
   .stack_size = 128 * 4,
   .priority = (osPriority_t) osPriorityNormal,
 };
-/* Definitions for OLED */
-osThreadId_t OLEDHandle;
-const osThreadAttr_t OLED_attributes = {
-  .name = "OLED",
-  .stack_size = 128 * 4,
-  .priority = (osPriority_t) osPriorityLow,
-};
 /* Definitions for MotorTask */
 osThreadId_t MotorTaskHandle;
 const osThreadAttr_t MotorTask_attributes = {
   .name = "MotorTask",
-  .stack_size = 128 * 4,
-  .priority = (osPriority_t) osPriorityLow,
-};
-/* Definitions for MotorEncoder_Ta */
-osThreadId_t MotorEncoder_TaHandle;
-const osThreadAttr_t MotorEncoder_Ta_attributes = {
-  .name = "MotorEncoder_Ta",
-  .stack_size = 128 * 4,
-  .priority = (osPriority_t) osPriorityLow,
-};
-/* Definitions for servo_Task */
-osThreadId_t servo_TaskHandle;
-const osThreadAttr_t servo_Task_attributes = {
-  .name = "servo_Task",
   .stack_size = 128 * 4,
   .priority = (osPriority_t) osPriorityLow,
 };
@@ -89,18 +69,122 @@ static void MX_GPIO_Init(void);
 static void MX_TIM8_Init(void);
 static void MX_TIM2_Init(void);
 static void MX_TIM1_Init(void);
+static void MX_TIM3_Init(void);
 void StartDefaultTask(void *argument);
-void show(void *argument);
 void motor(void *argument);
-void encoderMotor(void *argument);
-void servo(void *argument);
 
 /* USER CODE BEGIN PFP */
-
+int motorControl(int, int, char, char, int, int, int);
+void left(int);
+void right(int);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+
+int16_t cntl1, cntl2, cntr1, cntr2;
+int16_t diffl = 0, diffr = 0, avg = 0;
+int32_t tick = 0;
+uint8_t display[20];
+
+//Master function for all motor functions
+int motorControl(int speedL, int speedR, char dirL, char dirR, int turn, int time, int dist){
+
+	//declaration
+	HAL_TIM_Encoder_Start(&htim2, TIM_CHANNEL_ALL);		//left encoder(MotorA) start
+	HAL_TIM_Encoder_Start(&htim3, TIM_CHANNEL_ALL);		//right encoder(MotorB) start
+	int cntl1 = __HAL_TIM_GET_COUNTER(&htim2);
+	int cntr1 = __HAL_TIM_GET_COUNTER(&htim3);
+	tick = HAL_GetTick();
+	int encDist = dist * 75;
+	speedR = speedR *0.92;
+
+	int currTime = 0;
+
+	//Select direction of motor//
+
+	switch(dirL){
+		case 'F':
+			HAL_GPIO_WritePin(GPIOA, AIN1_Pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(GPIOA, AIN2_Pin, GPIO_PIN_RESET);
+			break;
+
+		case 'R':
+			HAL_GPIO_WritePin(GPIOA, AIN1_Pin, GPIO_PIN_RESET);
+			HAL_GPIO_WritePin(GPIOA, AIN2_Pin, GPIO_PIN_SET);
+			break;
+	}
+
+	switch(dirR){
+		case 'F':
+			HAL_GPIO_WritePin(GPIOA, BIN1_Pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(GPIOA, BIN2_Pin, GPIO_PIN_RESET);
+			break;
+
+		case 'R':
+			HAL_GPIO_WritePin(GPIOA, BIN1_Pin, GPIO_PIN_RESET);
+			HAL_GPIO_WritePin(GPIOA, BIN2_Pin, GPIO_PIN_SET);
+			break;
+	}
+	//End of motor direction selection//
+
+	__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_1, speedL);
+	__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_2, speedR);
+
+
+	while(currTime<time){
+		if(HAL_GetTick()-tick > 100L){
+				cntl2 = __HAL_TIM_GET_COUNTER(&htim2);
+				cntr2 = __HAL_TIM_GET_COUNTER(&htim3);
+				if(__HAL_TIM_IS_TIM_COUNTING_DOWN(&htim2))
+					diffl = cntl1 - cntl2;
+				else
+					diffl = cntl2 - cntl1;
+				if(__HAL_TIM_IS_TIM_COUNTING_DOWN(&htim3))
+					diffr = cntr1 - cntr2;
+				else
+					diffr = cntr2 - cntr1;
+				avg = (diffl+diffr)/2;
+				sprintf(display,"Distance:%5d\0", avg/75);
+				OLED_ShowString(10,20,display);
+
+			}
+
+			if(diffl>diffr&&turn==0){
+				speedL = (speedL-100);
+				speedR = (speedR+100);
+				__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_1, speedL);
+				__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_2, speedR);
+			}
+			if(diffl<diffr&&turn==0){
+				speedL = (speedL+100);
+				speedR = (speedR-100);
+				__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_1, speedL);
+				__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_2, speedR);
+			}
+			if(avg>=encDist){
+				__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_1, 0);
+				__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_2, 0);
+				osDelay(500);
+				break;
+			}
+		currTime++;
+		osDelay(1);
+		}
+		__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_1, 0);
+		__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_2, 0);
+		speedL=speedR=tick=diffl=diffr=0;
+		OLED_Refresh_Gram();
+}
+
+void left(int deg){
+	int dist = 0.4*deg;
+	htim1.Instance->CCR4 = 56;
+	osDelay(100);
+	motorControl(0, 5000, 'F', 'F', 1, 1000, dist);
+}
+
+
 
 /* USER CODE END 0 */
 
@@ -135,6 +219,7 @@ int main(void)
   MX_TIM8_Init();
   MX_TIM2_Init();
   MX_TIM1_Init();
+  MX_TIM3_Init();
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
@@ -162,17 +247,8 @@ int main(void)
   /* creation of LED_Toggle */
   LED_ToggleHandle = osThreadNew(StartDefaultTask, NULL, &LED_Toggle_attributes);
 
-  /* creation of OLED */
-  OLEDHandle = osThreadNew(show, NULL, &OLED_attributes);
-
   /* creation of MotorTask */
   MotorTaskHandle = osThreadNew(motor, NULL, &MotorTask_attributes);
-
-  /* creation of MotorEncoder_Ta */
-  MotorEncoder_TaHandle = osThreadNew(encoderMotor, NULL, &MotorEncoder_Ta_attributes);
-
-  /* creation of servo_Task */
-  servo_TaskHandle = osThreadNew(servo, NULL, &servo_Task_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -360,6 +436,55 @@ static void MX_TIM2_Init(void)
 }
 
 /**
+  * @brief TIM3 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_TIM3_Init(void)
+{
+
+  /* USER CODE BEGIN TIM3_Init 0 */
+
+  /* USER CODE END TIM3_Init 0 */
+
+  TIM_Encoder_InitTypeDef sConfig = {0};
+  TIM_MasterConfigTypeDef sMasterConfig = {0};
+
+  /* USER CODE BEGIN TIM3_Init 1 */
+
+  /* USER CODE END TIM3_Init 1 */
+  htim3.Instance = TIM3;
+  htim3.Init.Prescaler = 0;
+  htim3.Init.CounterMode = TIM_COUNTERMODE_UP;
+  htim3.Init.Period = 65535;
+  htim3.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+  htim3.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+  sConfig.EncoderMode = TIM_ENCODERMODE_TI12;
+  sConfig.IC1Polarity = TIM_ICPOLARITY_RISING;
+  sConfig.IC1Selection = TIM_ICSELECTION_DIRECTTI;
+  sConfig.IC1Prescaler = TIM_ICPSC_DIV1;
+  sConfig.IC1Filter = 10;
+  sConfig.IC2Polarity = TIM_ICPOLARITY_RISING;
+  sConfig.IC2Selection = TIM_ICSELECTION_DIRECTTI;
+  sConfig.IC2Prescaler = TIM_ICPSC_DIV1;
+  sConfig.IC2Filter = 10;
+  if (HAL_TIM_Encoder_Init(&htim3, &sConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+  if (HAL_TIMEx_MasterConfigSynchronization(&htim3, &sMasterConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN TIM3_Init 2 */
+
+  /* USER CODE END TIM3_Init 2 */
+
+}
+
+/**
   * @brief TIM8 Initialization Function
   * @param None
   * @retval None
@@ -484,32 +609,11 @@ void StartDefaultTask(void *argument)
   /* Infinite loop */
   for(;;)
   {
+	  OLED_Refresh_Gram();
 	  HAL_GPIO_TogglePin(LED3_GPIO_Port, LED3_Pin);
 	  osDelay(5000);
   }
   /* USER CODE END 5 */
-}
-
-/* USER CODE BEGIN Header_show */
-/**
-* @brief Function implementing the myTask02 thread.
-* @param argument: Not used
-* @retval None
-*/
-/* USER CODE END Header_show */
-void show(void *argument)
-{
-  /* USER CODE BEGIN show */
-	OLED_Init();
-	uint8_t hello[20] = "Testing :D\0";
-  /* Infinite loop */
-  for(;;)
-  {
-    OLED_ShowString(10,10,hello);
-    OLED_Refresh_Gram();
-    osDelay(1000);
-  }
-  /* USER CODE END show */
 }
 
 /* USER CODE BEGIN Header_motor */
@@ -521,118 +625,16 @@ void show(void *argument)
 /* USER CODE END Header_motor */
 void motor(void *argument)
 {
-   //USER CODE BEGIN motor
-	uint64_t pwmVal = 0;
+  /* USER CODE BEGIN motor */
+	OLED_Init();
 	HAL_TIM_PWM_Start(&htim8, TIM_CHANNEL_1);
 	HAL_TIM_PWM_Start(&htim8, TIM_CHANNEL_2);
-
-   /*Infinite loop*/
-  for(;;)
-  {
-	  while(pwmVal<4000)
-	  {
-		  HAL_GPIO_WritePin(GPIOA,AIN2_Pin,GPIO_PIN_SET);
-		  HAL_GPIO_WritePin(GPIOA,AIN1_Pin,GPIO_PIN_RESET);
-		  HAL_GPIO_WritePin(GPIOA,BIN2_Pin,GPIO_PIN_SET);
-		  HAL_GPIO_WritePin(GPIOA,BIN1_Pin,GPIO_PIN_RESET);
-		  pwmVal++;
-		  __HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_1,pwmVal); //Modify comparison value for duty cycle
-		  __HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_2,pwmVal); //Modify comparison value for duty cycle
-		  osDelay(10);
-	  }
-	  while(pwmVal>0)
-	  {
-		  HAL_GPIO_WritePin(GPIOA,AIN2_Pin,GPIO_PIN_RESET);
-		  HAL_GPIO_WritePin(GPIOA,AIN1_Pin,GPIO_PIN_SET);
-		  HAL_GPIO_WritePin(GPIOA,BIN2_Pin,GPIO_PIN_RESET);
-		  HAL_GPIO_WritePin(GPIOA,BIN1_Pin,GPIO_PIN_SET);
-		  pwmVal--;
-		  __HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_1,pwmVal); //Modify comparison value for duty cycle
-		  __HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_2,pwmVal); //Modify comparison value for duty cycle
-		  osDelay(10);
-	  }
-
-	  osDelay(10);
-  }
-   //USER CODE END motor
-}
-
-/* USER CODE BEGIN Header_encoderMotor */
-/**
-* @brief Function implementing the MotorEncoder_Ta thread.
-* @param argument: Not used
-* @retval None
-*/
-/* USER CODE END Header_encoderMotor */
-void encoderMotor(void *argument)
-{
-  /* USER CODE BEGIN encoderMotor */
-	  HAL_TIM_Encoder_Start(&htim2, TIM_CHANNEL_ALL);
-	  int cnt1, cnt2, diff;
-	  uint32_t tick;
-	  cnt1 = __HAL_TIM_GET_COUNTER(&htim2);
-	  tick = HAL_GetTick();
-	  uint8_t hello[20];
-	  uint16_t dir;
-
-  /* Infinite loop */
-  for(;;)
-  {
-	if(HAL_GetTick()-tick > 1000L)
-	{
-		cnt2 = __HAL_TIM_GET_COUNTER(&htim2);
-		if(__HAL_TIM_IS_TIM_COUNTING_DOWN(&htim2))
-		{
-			if(cnt2<cnt1)
-				diff = cnt1 - cnt2;
-			else
-				diff = (65535 - cnt2)+cnt1;
-		}
-		else
-		{
-
-
-			if(cnt2>cnt1)
-				diff = cnt2 - cnt1;
-			else
-				diff =  (65535 - cnt1)+cnt2;
-		}
-		sprintf(hello,"Speed:%5d\0", diff);
-		OLED_ShowString(10,20,hello);
-		dir = __HAL_TIM_IS_TIM_COUNTING_DOWN(&htim2);
-		sprintf(hello,"Direction:%5d\0", dir);
-		OLED_ShowString(10,30,hello);
-		cnt1 = __HAL_TIM_GET_COUNTER(&htim2);
-		tick = HAL_GetTick();
-	}
-
-  }
-  /* USER CODE END encoderMotor */
-}
-
-/* USER CODE BEGIN Header_servo */
-/**
-* @brief Function implementing the servo_Task thread.
-* @param argument: Not used
-* @retval None
-*/
-/* USER CODE END Header_servo */
-void servo(void *argument)
-{
-  /* USER CODE BEGIN servo */
 	HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_4);
-  /* Infinite loop */
-  for(;;)
-  {
 
-	htim1.Instance->CCR4 = 75;
-    osDelay(5000);
-    htim1.Instance->CCR4 = 60;
-    osDelay(5000);
-    htim1.Instance->CCR4 = 85;
-    osDelay(5000);
-  }
-  /* USER CODE END servo */
+	htim1.Instance->CCR4 = 74;
+	osDelay(500);
+	//motorControl(5000, 5000, 'F', 'F', 'S', 10000, 130);
+	left(180);
 }
 
 /**

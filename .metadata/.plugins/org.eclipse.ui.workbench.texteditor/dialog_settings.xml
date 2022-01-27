@@ -1,21 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <section name="Workbench">
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
-		<item key="selection" value="OLED_Init"/>
+		<item key="selection" value=""/>
 		<item key="wrap" value="true"/>
 		<item key="casesensitive" value="false"/>
 		<item key="wholeword" value="false"/>
 		<item key="incremental" value="false"/>
 		<item key="isRegEx" value="false"/>
 		<list key="findhistory">
-			<item value="OLED_Init"/>
-			<item value="include"/>
-			<item value="PC"/>
-			<item value="PWMC"/>
-			<item value="PWMA"/>
-			<item value="TIM"/>
-			<item value="TIM3"/>
-			<item value="GPIOA"/>
+			<item value="motorcontrol"/>
+			<item value="main"/>
+			<item value="HAL_TIM_SET_C"/>
+			<item value="HAL_TIM_SET"/>
+			<item value="set"/>
+			<item value="HAL_TIM_"/>
+			<item value="HAL"/>
+			<item value="Compare"/>
+			<item value="__HAL_TIM_SET"/>
+			<item value="__HAL_TIM_Set"/>
+			<item value="__HAL_TIM_SetCompare"/>
+			<item value="__HAL_TIM"/>
+			<item value="__HAL_"/>
+			<item value="__HAL"/>
+			<item value="setCompare"/>
 		</list>
 		<list key="replacehistory">
 		</list>
