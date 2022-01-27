@@ -183,12 +183,6 @@ void left(int deg){
 	osDelay(100);
 	motorControl(0, 5000, 'F', 'F', 1, 1000, dist);
 }
-void right(int deg){
-	int dist = 0.4*deg;
-	htim1.Instance->CCR4 = 98;
-	osDelay(100);
-	motorControl(5000, 1000, 'F', 'F', 1, 1000, dist);
-}
 
 
 
@@ -640,7 +634,7 @@ void motor(void *argument)
 	htim1.Instance->CCR4 = 74;
 	osDelay(500);
 	//motorControl(5000, 5000, 'F', 'F', 'S', 10000, 130);
-	right(180);
+	left(180);
 }
 
 /**

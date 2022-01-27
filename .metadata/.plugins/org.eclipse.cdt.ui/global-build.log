@@ -5503,3 +5503,189 @@ Finished building: MDP_grp13.hex
  
 Finished building: MDP_grp13.list
  
+23:49:04 **** Incremental Build of configuration Debug for project MDP_grp13 ****
+make -j8 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F407xx -c -I"D:/MDPWorkSpace/MDP_grp13/PeripheralDrivers/inc" -I"D:/MDPWorkSpace/MDP_grp13/PeripheralDrivers" -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c: In function 'motorControl':
+../Core/Src/main.c:148:5: warning: implicit declaration of function 'sprintf' [-Wimplicit-function-declaration]
+  148 |     sprintf(display,"Distance:%5d\0", avg/75);
+      |     ^~~~~~~
+../Core/Src/main.c:148:5: warning: incompatible implicit declaration of built-in function 'sprintf'
+../Core/Src/main.c:26:1: note: include '<stdio.h>' or provide a declaration of 'sprintf'
+   25 | #include "oled.h"
+  +++ |+#include <stdio.h>
+   26 | /* USER CODE END Includes */
+../Core/Src/main.c:148:13: warning: pointer targets in passing argument 1 of 'sprintf' differ in signedness [-Wpointer-sign]
+  148 |     sprintf(display,"Distance:%5d\0", avg/75);
+      |             ^~~~~~~
+      |             |
+      |             uint8_t * {aka unsigned char *}
+../Core/Src/main.c:148:13: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+../Core/Src/main.c:148:34: warning: embedded '\0' in format [-Wformat-contains-nul]
+  148 |     sprintf(display,"Distance:%5d\0", avg/75);
+      |                                  ^~
+../Core/Src/main.c: At top level:
+../Core/Src/main.c:186:6: error: redefinition of 'left'
+  186 | void left(int deg){
+      |      ^~~~
+../Core/Src/main.c:180:6: note: previous definition of 'left' was here
+  180 | void left(int deg){
+      |      ^~~~
+../Core/Src/main.c: In function 'motorControl':
+../Core/Src/main.c:178:1: warning: control reaches end of non-void function [-Wreturn-type]
+  178 | }
+      | ^
+make: *** [Core/Src/subdir.mk:37: Core/Src/main.o] Error 1
+"make -j8 all" terminated with exit code 2. Build might be incomplete.
+23:49:32 **** Incremental Build of configuration Debug for project MDP_grp13 ****
+make -j8 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F407xx -c -I"D:/MDPWorkSpace/MDP_grp13/PeripheralDrivers/inc" -I"D:/MDPWorkSpace/MDP_grp13/PeripheralDrivers" -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c: In function 'motorControl':
+../Core/Src/main.c:148:5: warning: implicit declaration of function 'sprintf' [-Wimplicit-function-declaration]
+  148 |     sprintf(display,"Distance:%5d\0", avg/75);
+      |     ^~~~~~~
+../Core/Src/main.c:148:5: warning: incompatible implicit declaration of built-in function 'sprintf'
+../Core/Src/main.c:26:1: note: include '<stdio.h>' or provide a declaration of 'sprintf'
+   25 | #include "oled.h"
+  +++ |+#include <stdio.h>
+   26 | /* USER CODE END Includes */
+../Core/Src/main.c:148:13: warning: pointer targets in passing argument 1 of 'sprintf' differ in signedness [-Wpointer-sign]
+  148 |     sprintf(display,"Distance:%5d\0", avg/75);
+      |             ^~~~~~~
+      |             |
+      |             uint8_t * {aka unsigned char *}
+../Core/Src/main.c:148:13: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+../Core/Src/main.c:148:34: warning: embedded '\0' in format [-Wformat-contains-nul]
+  148 |     sprintf(display,"Distance:%5d\0", avg/75);
+      |                                  ^~
+../Core/Src/main.c:178:1: warning: control reaches end of non-void function [-Wreturn-type]
+  178 | }
+      | ^
+arm-none-eabi-gcc -o "MDP_grp13.elf" @"objects.list"   -mcpu=cortex-m4 -T"D:\MDPWorkSpace\MDP_grp13\STM32F407VETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="MDP_grp13.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: MDP_grp13.elf
+ 
+arm-none-eabi-size   MDP_grp13.elf 
+arm-none-eabi-objdump -h -S  MDP_grp13.elf  > "MDP_grp13.list"
+arm-none-eabi-objcopy  -O ihex  MDP_grp13.elf  "MDP_grp13.hex"
+   text	   data	    bss	    dec	    hex	filename
+  31672	    124	  21732	  53528	   d118	MDP_grp13.elf
+Finished building: default.size.stdout
+ 
+Finished building: MDP_grp13.hex
+ 
+Finished building: MDP_grp13.list
+ 
+23:51:36 **** Incremental Build of configuration Debug for project MDP_grp13 ****
+make -j8 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F407xx -c -I"D:/MDPWorkSpace/MDP_grp13/PeripheralDrivers/inc" -I"D:/MDPWorkSpace/MDP_grp13/PeripheralDrivers" -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c: In function 'motorControl':
+../Core/Src/main.c:148:5: warning: implicit declaration of function 'sprintf' [-Wimplicit-function-declaration]
+  148 |     sprintf(display,"Distance:%5d\0", avg/75);
+      |     ^~~~~~~
+../Core/Src/main.c:148:5: warning: incompatible implicit declaration of built-in function 'sprintf'
+../Core/Src/main.c:26:1: note: include '<stdio.h>' or provide a declaration of 'sprintf'
+   25 | #include "oled.h"
+  +++ |+#include <stdio.h>
+   26 | /* USER CODE END Includes */
+../Core/Src/main.c:148:13: warning: pointer targets in passing argument 1 of 'sprintf' differ in signedness [-Wpointer-sign]
+  148 |     sprintf(display,"Distance:%5d\0", avg/75);
+      |             ^~~~~~~
+      |             |
+      |             uint8_t * {aka unsigned char *}
+../Core/Src/main.c:148:13: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+../Core/Src/main.c:148:34: warning: embedded '\0' in format [-Wformat-contains-nul]
+  148 |     sprintf(display,"Distance:%5d\0", avg/75);
+      |                                  ^~
+../Core/Src/main.c:178:1: warning: control reaches end of non-void function [-Wreturn-type]
+  178 | }
+      | ^
+arm-none-eabi-gcc -o "MDP_grp13.elf" @"objects.list"   -mcpu=cortex-m4 -T"D:\MDPWorkSpace\MDP_grp13\STM32F407VETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="MDP_grp13.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: MDP_grp13.elf
+ 
+arm-none-eabi-size   MDP_grp13.elf 
+arm-none-eabi-objdump -h -S  MDP_grp13.elf  > "MDP_grp13.list"
+arm-none-eabi-objcopy  -O ihex  MDP_grp13.elf  "MDP_grp13.hex"
+   text	   data	    bss	    dec	    hex	filename
+  31672	    124	  21732	  53528	   d118	MDP_grp13.elf
+Finished building: default.size.stdout
+ 
+Finished building: MDP_grp13.hex
+ 
+Finished building: MDP_grp13.list
+ 
+23:53:40 **** Incremental Build of configuration Debug for project MDP_grp13 ****
+make -j8 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F407xx -c -I"D:/MDPWorkSpace/MDP_grp13/PeripheralDrivers/inc" -I"D:/MDPWorkSpace/MDP_grp13/PeripheralDrivers" -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c: In function 'motorControl':
+../Core/Src/main.c:148:5: warning: implicit declaration of function 'sprintf' [-Wimplicit-function-declaration]
+  148 |     sprintf(display,"Distance:%5d\0", avg/75);
+      |     ^~~~~~~
+../Core/Src/main.c:148:5: warning: incompatible implicit declaration of built-in function 'sprintf'
+../Core/Src/main.c:26:1: note: include '<stdio.h>' or provide a declaration of 'sprintf'
+   25 | #include "oled.h"
+  +++ |+#include <stdio.h>
+   26 | /* USER CODE END Includes */
+../Core/Src/main.c:148:13: warning: pointer targets in passing argument 1 of 'sprintf' differ in signedness [-Wpointer-sign]
+  148 |     sprintf(display,"Distance:%5d\0", avg/75);
+      |             ^~~~~~~
+      |             |
+      |             uint8_t * {aka unsigned char *}
+../Core/Src/main.c:148:13: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+../Core/Src/main.c:148:34: warning: embedded '\0' in format [-Wformat-contains-nul]
+  148 |     sprintf(display,"Distance:%5d\0", avg/75);
+      |                                  ^~
+../Core/Src/main.c:178:1: warning: control reaches end of non-void function [-Wreturn-type]
+  178 | }
+      | ^
+arm-none-eabi-gcc -o "MDP_grp13.elf" @"objects.list"   -mcpu=cortex-m4 -T"D:\MDPWorkSpace\MDP_grp13\STM32F407VETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="MDP_grp13.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: MDP_grp13.elf
+ 
+arm-none-eabi-size   MDP_grp13.elf 
+arm-none-eabi-objdump -h -S  MDP_grp13.elf  > "MDP_grp13.list"
+arm-none-eabi-objcopy  -O ihex  MDP_grp13.elf  "MDP_grp13.hex"
+   text	   data	    bss	    dec	    hex	filename
+  31672	    124	  21732	  53528	   d118	MDP_grp13.elf
+Finished building: default.size.stdout
+ 
+Finished building: MDP_grp13.hex
+ 
+Finished building: MDP_grp13.list
+ 
+23:55:32 **** Incremental Build of configuration Debug for project MDP_grp13 ****
+make -j8 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F407xx -c -I"D:/MDPWorkSpace/MDP_grp13/PeripheralDrivers/inc" -I"D:/MDPWorkSpace/MDP_grp13/PeripheralDrivers" -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c: In function 'motorControl':
+../Core/Src/main.c:148:5: warning: implicit declaration of function 'sprintf' [-Wimplicit-function-declaration]
+  148 |     sprintf(display,"Distance:%5d\0", avg/75);
+      |     ^~~~~~~
+../Core/Src/main.c:148:5: warning: incompatible implicit declaration of built-in function 'sprintf'
+../Core/Src/main.c:26:1: note: include '<stdio.h>' or provide a declaration of 'sprintf'
+   25 | #include "oled.h"
+  +++ |+#include <stdio.h>
+   26 | /* USER CODE END Includes */
+../Core/Src/main.c:148:13: warning: pointer targets in passing argument 1 of 'sprintf' differ in signedness [-Wpointer-sign]
+  148 |     sprintf(display,"Distance:%5d\0", avg/75);
+      |             ^~~~~~~
+      |             |
+      |             uint8_t * {aka unsigned char *}
+../Core/Src/main.c:148:13: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+../Core/Src/main.c:148:34: warning: embedded '\0' in format [-Wformat-contains-nul]
+  148 |     sprintf(display,"Distance:%5d\0", avg/75);
+      |                                  ^~
+../Core/Src/main.c:178:1: warning: control reaches end of non-void function [-Wreturn-type]
+  178 | }
+      | ^
+arm-none-eabi-gcc -o "MDP_grp13.elf" @"objects.list"   -mcpu=cortex-m4 -T"D:\MDPWorkSpace\MDP_grp13\STM32F407VETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="MDP_grp13.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: MDP_grp13.elf
+ 
+arm-none-eabi-size   MDP_grp13.elf 
+arm-none-eabi-objdump -h -S  MDP_grp13.elf  > "MDP_grp13.list"
+arm-none-eabi-objcopy  -O ihex  MDP_grp13.elf  "MDP_grp13.hex"
+   text	   data	    bss	    dec	    hex	filename
+  31672	    124	  21732	  53528	   d118	MDP_grp13.elf
+Finished building: default.size.stdout
+ 
+Finished building: MDP_grp13.hex
+ 
+Finished building: MDP_grp13.list
+ 
