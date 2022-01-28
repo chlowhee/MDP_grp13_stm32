@@ -97,7 +97,6 @@ int motorControl(int speedL, int speedR, char dirL, char dirR, int turn, int tim
 	int cntr1 = __HAL_TIM_GET_COUNTER(&htim3);
 	tick = HAL_GetTick();
 	int encDist = dist * 75;
-	speedR = speedR *0.92;
 
 	int currTime = 0;
 
@@ -145,29 +144,43 @@ int motorControl(int speedL, int speedR, char dirL, char dirR, int turn, int tim
 				else
 					diffr = cntr2 - cntr1;
 				avg = (diffl+diffr)/2;
-				sprintf(display,"Distance:%5d\0", avg/75);
+				sprintf(display,"Distance:%5d\0", diffl/75);
 				OLED_ShowString(10,20,display);
-
+				sprintf(display,"Distance:%5d\0", diffr/75);
+				OLED_ShowString(10,30,display);
 			}
 
-			if(diffl>diffr&&turn==0){
-				speedL = (speedL-100);
-				speedR = (speedR+100);
+//			if(diffl>diffr&&turn==0){
+//				speedL = (speedL-20);
+//				speedR = (speedR+20);
+//				__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_1, speedL);
+//				__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_2, speedR);
+//			}
+//			if(diffl<diffr&&turn==0){
+//				speedL = (speedL+20);
+//				speedR = (speedR-20);
+//				__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_1, speedL);
+//				__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_2, speedR);
+//			}
+			if(avg>=encDist*0.8&&turn==0){
+				speedL = speedL*0.95;
+				speedR = speedR*0.95;
 				__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_1, speedL);
 				__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_2, speedR);
 			}
-			if(diffl<diffr&&turn==0){
-				speedL = (speedL+100);
-				speedR = (speedR-100);
-				__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_1, speedL);
-				__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_2, speedR);
-			}
-			if(avg>=encDist){
+			if(avg>=encDist && turn==0){
 				__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_1, 0);
 				__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_2, 0);
 				osDelay(500);
 				break;
 			}
+			if((diffl>=encDist || diffr>=encDist)&&turn==1){
+				__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_1, 0);
+				__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_2, 0);
+				osDelay(500);
+				break;
+			}
+
 		currTime++;
 		osDelay(1);
 		}
@@ -178,12 +191,17 @@ int motorControl(int speedL, int speedR, char dirL, char dirR, int turn, int tim
 }
 
 void left(int deg){
-	int dist = 0.4*deg;
+	int dist = 0.6*deg;
 	htim1.Instance->CCR4 = 56;
 	osDelay(100);
-	motorControl(0, 5000, 'F', 'F', 1, 1000, dist);
+	motorControl(1000, 5000, 'F', 'F', 1, 1000, dist);
 }
-
+void right(int deg){
+	int dist = 0.6*deg;
+	htim1.Instance->CCR4 = 84;
+	osDelay(100);
+	motorControl(5000, 1000, 'F', 'F', 1, 1000, dist);
+}
 
 
 /* USER CODE END 0 */
@@ -611,7 +629,7 @@ void StartDefaultTask(void *argument)
   {
 	  OLED_Refresh_Gram();
 	  HAL_GPIO_TogglePin(LED3_GPIO_Port, LED3_Pin);
-	  osDelay(5000);
+	  osDelay(1000);
   }
   /* USER CODE END 5 */
 }
@@ -625,7 +643,7 @@ void StartDefaultTask(void *argument)
 /* USER CODE END Header_motor */
 void motor(void *argument)
 {
-  /* USER CODE BEGIN motor */
+/* USER CODE BEGIN motor */
 	OLED_Init();
 	HAL_TIM_PWM_Start(&htim8, TIM_CHANNEL_1);
 	HAL_TIM_PWM_Start(&htim8, TIM_CHANNEL_2);
@@ -633,8 +651,9 @@ void motor(void *argument)
 
 	htim1.Instance->CCR4 = 74;
 	osDelay(500);
-	//motorControl(5000, 5000, 'F', 'F', 'S', 10000, 130);
-	left(180);
+	motorControl(4000, 4000, 'F', 'F', 0, 10000, 90);
+	//left(90);
+  /* USER CODE END motor */
 }
 
 /**
