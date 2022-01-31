@@ -43,6 +43,7 @@
 TIM_HandleTypeDef htim1;
 TIM_HandleTypeDef htim2;
 TIM_HandleTypeDef htim3;
+TIM_HandleTypeDef htim4;
 TIM_HandleTypeDef htim8;
 
 /* Definitions for LED_Toggle */
@@ -70,6 +71,7 @@ static void MX_TIM8_Init(void);
 static void MX_TIM2_Init(void);
 static void MX_TIM1_Init(void);
 static void MX_TIM3_Init(void);
+static void MX_TIM4_Init(void);
 void StartDefaultTask(void *argument);
 void motor(void *argument);
 
@@ -86,6 +88,62 @@ int16_t cntl1, cntl2, cntr1, cntr2;
 int16_t diffl = 0, diffr = 0, avg = 0;
 int32_t tick = 0;
 uint8_t display[20];
+uint32_t IC_Val1 = 0;
+uint32_t IC_Val2 = 0;
+uint32_t Difference = 0;
+int Is_First_Captured = 0;  // boolean function
+uint16_t Distance = 0;
+uint16_t uDist = 0;
+
+void delay(uint16_t time){  //provide us delay
+	__HAL_TIM_SET_COUNTER(&htim4, 0);
+	while(__HAL_TIM_GET_COUNTER(&htim4) < time);
+}
+
+void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)		//For HCSR04_Read();
+{
+	if (htim->Channel == HAL_TIM_ACTIVE_CHANNEL_1)  // if the interrupt source is channel1
+	{
+		if (Is_First_Captured==0) // if the first value is not captured
+		{
+			IC_Val1 = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_1); // read the first value
+			Is_First_Captured = 1;  // set the first captured as true
+			// Now change the polarity to falling edge
+			__HAL_TIM_SET_CAPTUREPOLARITY(htim, TIM_CHANNEL_1, TIM_INPUTCHANNELPOLARITY_FALLING);
+		}
+
+		else if (Is_First_Captured==1)   // if the first is already captured
+		{
+			IC_Val2 = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_1);  // read second value
+			__HAL_TIM_SET_COUNTER(htim, 0);  // reset the counter
+
+			if (IC_Val2 > IC_Val1) {
+				Difference = IC_Val2-IC_Val1;
+			}
+
+			else if (IC_Val1 > IC_Val2) {
+				Difference = (0xffff - IC_Val1) + IC_Val2;
+			}
+
+			Distance = Difference * .034/2;
+			Is_First_Captured = 0; // set it back to false
+
+			// set polarity to rising edge
+			__HAL_TIM_SET_CAPTUREPOLARITY(htim, TIM_CHANNEL_1, TIM_INPUTCHANNELPOLARITY_RISING);
+			__HAL_TIM_DISABLE_IT(&htim4, TIM_IT_CC1);
+		}
+	}
+}
+
+uint16_t HCSR04_Read (void)		//Read Ultrasonic Distance
+{
+	HAL_GPIO_WritePin(TRIG_GPIO_Port, TRIG_Pin, GPIO_PIN_SET);  // pull the TRIG pin HIGH
+	delay(10);  // wait for 10 us
+	HAL_GPIO_WritePin(TRIG_GPIO_Port, TRIG_Pin, GPIO_PIN_RESET);  // pull the TRIG pin low
+
+	__HAL_TIM_ENABLE_IT(&htim4, TIM_IT_CC1);
+	return Distance;
+}
 
 //Master function for all motor functions
 int motorControl(int speedL, int speedR, char dirL, char dirR, int turn, int time, int dist){
@@ -145,9 +203,9 @@ int motorControl(int speedL, int speedR, char dirL, char dirR, int turn, int tim
 					diffr = cntr2 - cntr1;
 				avg = (diffl+diffr)/2;
 				sprintf(display,"Distance:%5d\0", diffl/75);
-				OLED_ShowString(10,20,display);
-				sprintf(display,"Distance:%5d\0", diffr/75);
 				OLED_ShowString(10,30,display);
+				sprintf(display,"Distance:%5d\0", diffr/75);
+				OLED_ShowString(10,40,display);
 			}
 
 //			if(diffl>diffr&&turn==0){
@@ -238,8 +296,10 @@ int main(void)
   MX_TIM2_Init();
   MX_TIM1_Init();
   MX_TIM3_Init();
+  MX_TIM4_Init();
+  OLED_Init();
   /* USER CODE BEGIN 2 */
-
+  HAL_TIM_IC_Start_IT(&htim4, TIM_CHANNEL_1);
   /* USER CODE END 2 */
 
   /* Init scheduler */
@@ -503,6 +563,54 @@ static void MX_TIM3_Init(void)
 }
 
 /**
+  * @brief TIM4 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_TIM4_Init(void)
+{
+
+  /* USER CODE BEGIN TIM4_Init 0 */
+
+  /* USER CODE END TIM4_Init 0 */
+
+  TIM_MasterConfigTypeDef sMasterConfig = {0};
+  TIM_IC_InitTypeDef sConfigIC = {0};
+
+  /* USER CODE BEGIN TIM4_Init 1 */
+
+  /* USER CODE END TIM4_Init 1 */
+  htim4.Instance = TIM4;
+  htim4.Init.Prescaler = 16-1;
+  htim4.Init.CounterMode = TIM_COUNTERMODE_UP;
+  htim4.Init.Period = 0xffff-1;
+  htim4.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+  htim4.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+  if (HAL_TIM_IC_Init(&htim4) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+  if (HAL_TIMEx_MasterConfigSynchronization(&htim4, &sMasterConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sConfigIC.ICPolarity = TIM_INPUTCHANNELPOLARITY_RISING;
+  sConfigIC.ICSelection = TIM_ICSELECTION_DIRECTTI;
+  sConfigIC.ICPrescaler = TIM_ICPSC_DIV1;
+  sConfigIC.ICFilter = 0;
+  if (HAL_TIM_IC_ConfigChannel(&htim4, &sConfigIC, TIM_CHANNEL_1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN TIM4_Init 2 */
+
+  /* USER CODE END TIM4_Init 2 */
+
+}
+
+/**
   * @brief TIM8 Initialization Function
   * @param None
   * @retval None
@@ -582,6 +690,7 @@ static void MX_GPIO_Init(void)
   /* GPIO Ports Clock Enable */
   __HAL_RCC_GPIOE_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
+  __HAL_RCC_GPIOD_CLK_ENABLE();
   __HAL_RCC_GPIOC_CLK_ENABLE();
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
@@ -591,6 +700,9 @@ static void MX_GPIO_Init(void)
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOA, AIN2_Pin|AIN1_Pin|BIN1_Pin|BIN2_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(TRIG_GPIO_Port, TRIG_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pins : OLED_SCL_Pin OLED_SDA_Pin OLED_RST_Pin OLED_DC_Pin
                            LED3_Pin */
@@ -608,6 +720,13 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
+  /*Configure GPIO pin : TRIG_Pin */
+  GPIO_InitStruct.Pin = TRIG_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(TRIG_GPIO_Port, &GPIO_InitStruct);
+
 }
 
 /* USER CODE BEGIN 4 */
@@ -624,11 +743,20 @@ static void MX_GPIO_Init(void)
 void StartDefaultTask(void *argument)
 {
   /* USER CODE BEGIN 5 */
+	uint8_t test[20] = "testing";
+	uint8_t ultra[20];
   /* Infinite loop */
   for(;;)
   {
+	  OLED_ShowString(10,10,test);
+
+	  uDist = HCSR04_Read();
+	  HAL_Delay(200);
+	  sprintf(ultra, "uDist: %u\0", uDist);
+	  OLED_ShowString(10, 20, ultra);
+
 	  OLED_Refresh_Gram();
-	  HAL_GPIO_TogglePin(LED3_GPIO_Port, LED3_Pin);
+//	  HAL_GPIO_TogglePin(LED3_GPIO_Port, LED3_Pin);
 	  osDelay(1000);
   }
   /* USER CODE END 5 */
@@ -643,8 +771,7 @@ void StartDefaultTask(void *argument)
 /* USER CODE END Header_motor */
 void motor(void *argument)
 {
-/* USER CODE BEGIN motor */
-	OLED_Init();
+  /* USER CODE BEGIN motor */
 	HAL_TIM_PWM_Start(&htim8, TIM_CHANNEL_1);
 	HAL_TIM_PWM_Start(&htim8, TIM_CHANNEL_2);
 	HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_4);
@@ -654,6 +781,11 @@ void motor(void *argument)
 	motorControl(4000, 4000, 'F', 'F', 0, 10000, 90);
 	//left(90);
   /* USER CODE END motor */
+//	for(;;)
+//	{
+//		HAL_GPIO_TogglePin(LED3_GPIO_Port, LED3_Pin);
+//		osDelay(2000);
+//	}
 }
 
 /**
