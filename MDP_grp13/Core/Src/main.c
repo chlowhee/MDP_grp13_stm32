@@ -93,7 +93,7 @@ uint32_t IC_Val2 = 0;
 uint32_t Difference = 0;
 int Is_First_Captured = 0;  // boolean function
 uint16_t Distance = 0;
-uint16_t uDist = 0;
+uint16_t uDistCheck1 = 0; uDistCheck2 = 0; uDistFinal = 0;
 
 void delay(uint16_t time){  //provide us delay
 	__HAL_TIM_SET_COUNTER(&htim4, 0);
@@ -143,6 +143,26 @@ uint16_t HCSR04_Read (void)		//Read Ultrasonic Distance
 
 	__HAL_TIM_ENABLE_IT(&htim4, TIM_IT_CC1);
 	return Distance;
+}
+
+void ultraDistCheck (void)
+{
+	uDistCheck1 = HCSR04_Read();
+	HAL_Delay(100);
+	uDistCheck2 = HCSR04_Read();
+	HAL_Delay(100);
+
+	while (uDistCheck1 - uDistCheck2 >= 5 || uDistCheck2 - uDistCheck1 >= 5) {
+		uDistCheck1 = HCSR04_Read();
+		HAL_Delay(100);
+		uDistCheck2 = HCSR04_Read();
+		HAL_Delay(100);
+
+		if (uDistCheck1 - uDistCheck2 < 5 || uDistCheck2 - uDistCheck1 < 5) {
+			break;
+		}
+	}
+	uDistFinal = (uDistCheck1 + uDistCheck2)/2;
 }
 
 //Master function for all motor functions
@@ -203,9 +223,9 @@ int motorControl(int speedL, int speedR, char dirL, char dirR, int turn, int tim
 					diffr = cntr2 - cntr1;
 				avg = (diffl+diffr)/2;
 				sprintf(display,"Distance:%5d\0", diffl/75);
-				OLED_ShowString(10,30,display);
+				OLED_ShowString(10,35,display);
 				sprintf(display,"Distance:%5d\0", diffr/75);
-				OLED_ShowString(10,40,display);
+				OLED_ShowString(10,50,display);
 			}
 
 //			if(diffl>diffr&&turn==0){
@@ -750,9 +770,9 @@ void StartDefaultTask(void *argument)
   {
 	  OLED_ShowString(10,10,test);
 
-	  uDist = HCSR04_Read();
+	  ultraDistCheck();
 	  HAL_Delay(200);
-	  sprintf(ultra, "uDist: %u\0", uDist);
+	  sprintf(ultra, "uDist: %ucm\0", uDistFinal);
 	  OLED_ShowString(10, 20, ultra);
 
 	  OLED_Refresh_Gram();
