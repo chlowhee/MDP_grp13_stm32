@@ -29,23 +29,23 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   ALLOC
  12 .ARM.attributes 00000030  00000000  00000000  00020074  2**0
                   CONTENTS, READONLY
- 13 .debug_info   000188e2  00000000  00000000  000200a4  2**0
+ 13 .debug_info   00018069  00000000  00000000  000200a4  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 14 .debug_abbrev 00003259  00000000  00000000  00038986  2**0
+ 14 .debug_abbrev 00003136  00000000  00000000  0003810d  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 15 .debug_aranges 00001318  00000000  00000000  0003bbe0  2**3
+ 15 .debug_aranges 000012d8  00000000  00000000  0003b248  2**3
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 16 .debug_ranges 000011d0  00000000  00000000  0003cef8  2**3
+ 16 .debug_ranges 00001190  00000000  00000000  0003c520  2**3
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 17 .debug_macro  000035ef  00000000  00000000  0003e0c8  2**0
+ 17 .debug_macro  000035ef  00000000  00000000  0003d6b0  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 18 .debug_line   00013aed  00000000  00000000  000416b7  2**0
+ 18 .debug_line   000138ec  00000000  00000000  00040c9f  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 19 .debug_str    000d2ba7  00000000  00000000  000551a4  2**0
+ 19 .debug_str    000d2ab5  00000000  00000000  0005458b  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 20 .comment      00000053  00000000  00000000  00127d4b  2**0
+ 20 .comment      00000053  00000000  00000000  00127040  2**0
                   CONTENTS, READONLY
- 21 .debug_frame  0000559c  00000000  00000000  00127da0  2**2
+ 21 .debug_frame  00005384  00000000  00000000  00127094  2**2
                   CONTENTS, READONLY, DEBUGGING, OCTETS
 
 Disassembly of section .text:
@@ -2011,20 +2011,74 @@ int motorControl(int speedL, int speedR, char dirL, char dirR, int turn, int tim
  8001478:	68bb      	ldr	r3, [r7, #8]
  800147a:	60fb      	str	r3, [r7, #12]
 		OLED_Refresh_Gram();
- 800147c:	f006 f81e 	bl	80074bc <OLED_Refresh_Gram>
+ 8000e78:	f005 fa68 	bl	800634c <OLED_Refresh_Gram>
 }
- 8001480:	bf00      	nop
- 8001482:	4618      	mov	r0, r3
- 8001484:	3720      	adds	r7, #32
- 8001486:	46bd      	mov	sp, r7
- 8001488:	bdb0      	pop	{r4, r5, r7, pc}
- 800148a:	bf00      	nop
- 800148c:	20000090 	.word	0x20000090
- 8001490:	20000092 	.word	0x20000092
- 8001494:	200049d8 	.word	0x200049d8
- 8001498:	20000098 	.word	0x20000098
+ 8000e7c:	bf00      	nop
+ 8000e7e:	4618      	mov	r0, r3
+ 8000e80:	3720      	adds	r7, #32
+ 8000e82:	46bd      	mov	sp, r7
+ 8000e84:	bd80      	pop	{r7, pc}
+ 8000e86:	bf00      	nop
+ 8000e88:	200049bc 	.word	0x200049bc
+ 8000e8c:	20000092 	.word	0x20000092
+ 8000e90:	20000090 	.word	0x20000090
+ 8000e94:	20000098 	.word	0x20000098
 
-0800149c <main>:
+08000e98 <right>:
+	int dist = 0.4*deg;
+	htim1.Instance->CCR4 = 56;
+	osDelay(100);
+	motorControl(0, 5000, 'F', 'F', 1, 1000, dist);
+}
+void right(int deg){
+ 8000e98:	b580      	push	{r7, lr}
+ 8000e9a:	b088      	sub	sp, #32
+ 8000e9c:	af04      	add	r7, sp, #16
+ 8000e9e:	6078      	str	r0, [r7, #4]
+	int dist = 0.4*deg;
+ 8000ea0:	6878      	ldr	r0, [r7, #4]
+ 8000ea2:	f7ff fc61 	bl	8000768 <__aeabi_i2d>
+ 8000ea6:	a315      	add	r3, pc, #84	; (adr r3, 8000efc <right+0x64>)
+ 8000ea8:	e9d3 2300 	ldrd	r2, r3, [r3]
+ 8000eac:	f7ff f9e0 	bl	8000270 <__aeabi_dmul>
+ 8000eb0:	4602      	mov	r2, r0
+ 8000eb2:	460b      	mov	r3, r1
+ 8000eb4:	4610      	mov	r0, r2
+ 8000eb6:	4619      	mov	r1, r3
+ 8000eb8:	f7ff fcc0 	bl	800083c <__aeabi_d2iz>
+ 8000ebc:	4603      	mov	r3, r0
+ 8000ebe:	60fb      	str	r3, [r7, #12]
+	htim1.Instance->CCR4 = 98;
+ 8000ec0:	4b0d      	ldr	r3, [pc, #52]	; (8000ef8 <right+0x60>)
+ 8000ec2:	681b      	ldr	r3, [r3, #0]
+ 8000ec4:	2262      	movs	r2, #98	; 0x62
+ 8000ec6:	641a      	str	r2, [r3, #64]	; 0x40
+	osDelay(100);
+ 8000ec8:	2064      	movs	r0, #100	; 0x64
+ 8000eca:	f002 fdcd 	bl	8003a68 <osDelay>
+	motorControl(5000, 1000, 'F', 'F', 1, 1000, dist);
+ 8000ece:	68fb      	ldr	r3, [r7, #12]
+ 8000ed0:	9302      	str	r3, [sp, #8]
+ 8000ed2:	f44f 737a 	mov.w	r3, #1000	; 0x3e8
+ 8000ed6:	9301      	str	r3, [sp, #4]
+ 8000ed8:	2301      	movs	r3, #1
+ 8000eda:	9300      	str	r3, [sp, #0]
+ 8000edc:	2346      	movs	r3, #70	; 0x46
+ 8000ede:	2246      	movs	r2, #70	; 0x46
+ 8000ee0:	f44f 717a 	mov.w	r1, #1000	; 0x3e8
+ 8000ee4:	f241 3088 	movw	r0, #5000	; 0x1388
+ 8000ee8:	f7ff fe4e 	bl	8000b88 <motorControl>
+}
+ 8000eec:	bf00      	nop
+ 8000eee:	3710      	adds	r7, #16
+ 8000ef0:	46bd      	mov	sp, r7
+ 8000ef2:	bd80      	pop	{r7, pc}
+ 8000ef4:	f3af 8000 	nop.w
+ 8000ef8:	20004a70 	.word	0x20004a70
+ 8000efc:	9999999a 	.word	0x9999999a
+ 8000f00:	3fd99999 	.word	0x3fd99999
+
+08000f04 <main>:
 /**
   * @brief  The application entry point.
   * @retval int
@@ -3276,25 +3330,12 @@ void motor(void *argument)
  8001bec:	224a      	movs	r2, #74	; 0x4a
  8001bee:	641a      	str	r2, [r3, #64]	; 0x40
 	osDelay(500);
- 8001bf0:	f44f 70fa 	mov.w	r0, #500	; 0x1f4
- 8001bf4:	f002 ffea 	bl	8004bcc <osDelay>
-	motorControl(4000, 4000, 'F', 'F', 0, 10000, 90);
- 8001bf8:	235a      	movs	r3, #90	; 0x5a
- 8001bfa:	9302      	str	r3, [sp, #8]
- 8001bfc:	f242 7310 	movw	r3, #10000	; 0x2710
- 8001c00:	9301      	str	r3, [sp, #4]
- 8001c02:	2300      	movs	r3, #0
- 8001c04:	9300      	str	r3, [sp, #0]
- 8001c06:	2346      	movs	r3, #70	; 0x46
- 8001c08:	2246      	movs	r2, #70	; 0x46
- 8001c0a:	f44f 617a 	mov.w	r1, #4000	; 0xfa0
- 8001c0e:	f44f 607a 	mov.w	r0, #4000	; 0xfa0
- 8001c12:	f7ff fa81 	bl	8001118 <motorControl>
-//	for(;;)
-//	{
-//		HAL_GPIO_TogglePin(LED3_GPIO_Port, LED3_Pin);
-//		osDelay(2000);
-//	}
+ 8001508:	f44f 70fa 	mov.w	r0, #500	; 0x1f4
+ 800150c:	f002 faac 	bl	8003a68 <osDelay>
+	//motorControl(5000, 5000, 'F', 'F', 'S', 10000, 130);
+	right(180);
+ 8001510:	20b4      	movs	r0, #180	; 0xb4
+ 8001512:	f7ff fcc1 	bl	8000e98 <right>
 }
  8001c16:	bf00      	nop
  8001c18:	3708      	adds	r7, #8

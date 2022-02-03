@@ -1,4 +1,4 @@
-16:53:35 **** Incremental Build of configuration Debug for project MDP_grp13 ****
+23:55:32 **** Incremental Build of configuration Debug for project MDP_grp13 ****
 make -j8 all 
 arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F407xx -c -I"C:/Users/limke/OneDrive/Desktop/MDP/MDP_grp13/PeripheralDrivers/inc" -I"C:/Users/limke/OneDrive/Desktop/MDP/MDP_grp13/PeripheralDrivers" -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
 ../Core/Src/main.c:96:27: warning: data definition has no type or storage class
@@ -69,5 +69,5 @@ Finished building: MDP_grp13.hex
 Finished building: MDP_grp13.list
  
 
-16:53:40 Build Finished. 0 errors, 14 warnings. (took 5s.92ms)
+23:55:33 Build Finished. 0 errors, 5 warnings. (took 1s.258ms)
 
