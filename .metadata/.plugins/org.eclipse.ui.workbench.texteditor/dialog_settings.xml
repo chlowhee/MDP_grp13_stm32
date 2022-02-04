@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <section name="Workbench">
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
-		<item key="selection" value="htim4"/>
+		<item key="selection" value="osDelay"/>
 		<item key="wrap" value="true"/>
 		<item key="casesensitive" value="false"/>
-		<item key="wholeword" value="false"/>
+		<item key="wholeword" value="true"/>
 		<item key="incremental" value="false"/>
 		<item key="isRegEx" value="false"/>
 		<list key="findhistory">
+			<item value="osdelay"/>
 			<item value="htim4"/>
 			<item value="motorcontrol"/>
 			<item value="main"/>
@@ -22,7 +23,6 @@
 			<item value="__HAL_TIM_SetCompare"/>
 			<item value="__HAL_TIM"/>
 			<item value="__HAL_"/>
-			<item value="__HAL"/>
 		</list>
 		<list key="replacehistory">
 		</list>

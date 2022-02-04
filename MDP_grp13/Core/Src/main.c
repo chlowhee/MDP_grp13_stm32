@@ -19,6 +19,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "cmsis_os.h"
+#include "math.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -46,6 +47,8 @@ TIM_HandleTypeDef htim3;
 TIM_HandleTypeDef htim4;
 TIM_HandleTypeDef htim8;
 
+UART_HandleTypeDef huart3;
+
 /* Definitions for LED_Toggle */
 osThreadId_t LED_ToggleHandle;
 const osThreadAttr_t LED_Toggle_attributes = {
@@ -72,6 +75,7 @@ static void MX_TIM2_Init(void);
 static void MX_TIM1_Init(void);
 static void MX_TIM3_Init(void);
 static void MX_TIM4_Init(void);
+static void MX_USART3_UART_Init(void);
 void StartDefaultTask(void *argument);
 void motor(void *argument);
 
@@ -84,16 +88,19 @@ void right(int);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
-int16_t cntl1, cntl2, cntr1, cntr2;
-int16_t diffl = 0, diffr = 0, avg = 0;
+float cntl1, cntl2, cntr1, cntr2;
+float diffl = 0, diffr = 0, avg = 0;
 int32_t tick = 0;
 uint8_t display[20];
+/* Ultrasonic sensor */
 uint32_t IC_Val1 = 0;
 uint32_t IC_Val2 = 0;
 uint32_t Difference = 0;
 int Is_First_Captured = 0;  // boolean function
 uint16_t Distance = 0;
 uint16_t uDistCheck1 = 0; uDistCheck2 = 0; uDistFinal = 0;
+/* UART */
+uint8_t aRxBuffer[20];
 
 void delay(uint16_t time){  //provide us delay
 	__HAL_TIM_SET_COUNTER(&htim4, 0);
@@ -171,8 +178,8 @@ int motorControl(int speedL, int speedR, char dirL, char dirR, int turn, int tim
 	//declaration
 	HAL_TIM_Encoder_Start(&htim2, TIM_CHANNEL_ALL);		//left encoder(MotorA) start
 	HAL_TIM_Encoder_Start(&htim3, TIM_CHANNEL_ALL);		//right encoder(MotorB) start
-	int cntl1 = __HAL_TIM_GET_COUNTER(&htim2);
-	int cntr1 = __HAL_TIM_GET_COUNTER(&htim3);
+	float cntl1 = __HAL_TIM_GET_COUNTER(&htim2);
+	float cntr1 = __HAL_TIM_GET_COUNTER(&htim3);
 	tick = HAL_GetTick();
 	int encDist = dist * 75;
 
@@ -228,21 +235,10 @@ int motorControl(int speedL, int speedR, char dirL, char dirR, int turn, int tim
 				OLED_ShowString(10,50,display);
 			}
 
-//			if(diffl>diffr&&turn==0){
-//				speedL = (speedL-20);
-//				speedR = (speedR+20);
-//				__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_1, speedL);
-//				__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_2, speedR);
-//			}
-//			if(diffl<diffr&&turn==0){
-//				speedL = (speedL+20);
-//				speedR = (speedR-20);
-//				__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_1, speedL);
-//				__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_2, speedR);
-//			}
+//
 			if(avg>=encDist*0.8&&turn==0){
-				speedL = speedL*0.95;
-				speedR = speedR*0.95;
+				speedL = speedL*0.96;
+				speedR = speedR*0.96;
 				__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_1, speedL);
 				__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_2, speedR);
 			}
@@ -252,6 +248,14 @@ int motorControl(int speedL, int speedR, char dirL, char dirR, int turn, int tim
 				osDelay(500);
 				break;
 			}
+
+			if((diffl>=encDist*0.8 || diffr>=encDist*0.8)&&turn==1){
+				speedL = speedL*0.96;
+				speedR = speedR*0.96;
+				__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_1, speedL);
+				__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_2, speedR);
+			}
+
 			if((diffl>=encDist || diffr>=encDist)&&turn==1){
 				__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_1, 0);
 				__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_2, 0);
@@ -269,14 +273,14 @@ int motorControl(int speedL, int speedR, char dirL, char dirR, int turn, int tim
 }
 
 void left(int deg){
-	int dist = 0.6*deg;
+	int dist = 0.63*(pow(deg,1.001));
 	htim1.Instance->CCR4 = 56;
 	osDelay(100);
 	motorControl(1000, 5000, 'F', 'F', 1, 1000, dist);
 }
 void right(int deg){
-	int dist = 0.6*deg;
-	htim1.Instance->CCR4 = 84;
+	int dist = 0.63*deg;
+	htim1.Instance->CCR4 = 102;
 	osDelay(100);
 	motorControl(5000, 1000, 'F', 'F', 1, 1000, dist);
 }
@@ -316,9 +320,11 @@ int main(void)
   MX_TIM1_Init();
   MX_TIM3_Init();
   MX_TIM4_Init();
+  MX_USART3_UART_Init();
   OLED_Init();
   /* USER CODE BEGIN 2 */
   HAL_TIM_IC_Start_IT(&htim4, TIM_CHANNEL_1);
+  HAL_UART_Receive_IT(&huart3, (uint8_t *) aRxBuffer, 10);
   /* USER CODE END 2 */
 
   /* Init scheduler */
@@ -698,6 +704,39 @@ static void MX_TIM8_Init(void)
 }
 
 /**
+  * @brief USART3 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_USART3_UART_Init(void)
+{
+
+  /* USER CODE BEGIN USART3_Init 0 */
+
+  /* USER CODE END USART3_Init 0 */
+
+  /* USER CODE BEGIN USART3_Init 1 */
+
+  /* USER CODE END USART3_Init 1 */
+  huart3.Instance = USART3;
+  huart3.Init.BaudRate = 115200;
+  huart3.Init.WordLength = UART_WORDLENGTH_8B;
+  huart3.Init.StopBits = UART_STOPBITS_1;
+  huart3.Init.Parity = UART_PARITY_NONE;
+  huart3.Init.Mode = UART_MODE_TX_RX;
+  huart3.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  huart3.Init.OverSampling = UART_OVERSAMPLING_16;
+  if (HAL_UART_Init(&huart3) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN USART3_Init 2 */
+
+  /* USER CODE END USART3_Init 2 */
+
+}
+
+/**
   * @brief GPIO Initialization Function
   * @param None
   * @retval None
@@ -749,7 +788,12 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
-
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+{
+	/*Prevent unused argument(s) compilation warning*/
+	UNUSED(huart);
+	HAL_UART_Transmit(&huart3,(uint8_t *)aRxBuffer,10,0xFFFF); //might not nd since we not rly transmitting
+}
 /* USER CODE END 4 */
 
 /* USER CODE BEGIN Header_StartDefaultTask */
@@ -762,21 +806,27 @@ static void MX_GPIO_Init(void)
 void StartDefaultTask(void *argument)
 {
   /* USER CODE BEGIN 5 */
-	uint8_t test[20] = "testing";
-	uint8_t ultra[20];
+	uint8_t test[20] = "Testing";
+//	uint8_t ultra[20];
+//	uint8_t ch = 'A';
   /* Infinite loop */
   for(;;)
   {
-	  OLED_ShowString(10,10,test);
+	  //OLED_ShowString(5,5,test);
 
-	  ultraDistCheck();
-	  HAL_Delay(200);
-	  sprintf(ultra, "uDist: %ucm\0", uDistFinal);
-	  OLED_ShowString(10, 20, ultra);
+//	  HAL_UART_Transmit(&huart3,(uint8_t *)&ch,1,0xFFFF);  //STM transmitting to RPi
+//	  if(ch < 'Z'){
+//		  ch++;
+//	  } else ch = 'A';
 
-	  OLED_Refresh_Gram();
+//	  ultraDistCheck();
+//	  HAL_Delay(200);
+//	  sprintf(ultra, "uDist: %ucm\0", uDistFinal);
+//	  OLED_ShowString(10, 20, ultra);
+
+//	  OLED_Refresh_Gram();
 //	  HAL_GPIO_TogglePin(LED3_GPIO_Port, LED3_Pin);
-	  osDelay(1000);
+	  osDelay(500);
   }
   /* USER CODE END 5 */
 }
@@ -797,8 +847,18 @@ void motor(void *argument)
 
 	htim1.Instance->CCR4 = 74;
 	osDelay(500);
-	//motorControl(5000, 5000, 'F', 'F', 'S', 10000, 130);
-	right(180);
+//	motorControl(3000, 3000, 'F', 'F', 0, 10000, 120);
+	left(360);
+  /* USER CODE END motor */
+
+//	uint8_t test[20] = "aRxBuffer Test";
+//	for(;;)
+//	  {
+//		sprintf(test, "%s\0", aRxBuffer);  //NOT SURE if it's receiving or transmitting. me is confused??
+//		OLED_ShowString(5,5,test);
+//		OLED_Refresh_Gram();
+//		osDelay(1000);
+//	  }
 }
 
 /**
