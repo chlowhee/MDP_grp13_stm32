@@ -77,6 +77,8 @@ void Error_Handler(void);
 #define OLED_DC_GPIO_Port GPIOE
 #define LED3_Pin GPIO_PIN_10
 #define LED3_GPIO_Port GPIOE
+#define USRBUT_Pin GPIO_PIN_8
+#define USRBUT_GPIO_Port GPIOD
 #define TRIG_Pin GPIO_PIN_13
 #define TRIG_GPIO_Port GPIOD
 #define PWMA_Pin GPIO_PIN_6

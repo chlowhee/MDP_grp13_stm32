@@ -19,11 +19,11 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "cmsis_os.h"
-#include "math.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "oled.h"
+#include "math.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -33,6 +33,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+const double turnvar = 0.6;
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -88,8 +89,8 @@ void right(int);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
-float cntl1, cntl2, cntr1, cntr2;
-float diffl = 0, diffr = 0, avg = 0;
+int16_t cntl1, cntl2, cntr1, cntr2;
+int16_t diffl = 0, diffr = 0, avg = 0;
 int32_t tick = 0;
 uint8_t display[20];
 /* Ultrasonic sensor */
@@ -178,10 +179,10 @@ int motorControl(int speedL, int speedR, char dirL, char dirR, int turn, int tim
 	//declaration
 	HAL_TIM_Encoder_Start(&htim2, TIM_CHANNEL_ALL);		//left encoder(MotorA) start
 	HAL_TIM_Encoder_Start(&htim3, TIM_CHANNEL_ALL);		//right encoder(MotorB) start
-	float cntl1 = __HAL_TIM_GET_COUNTER(&htim2);
-	float cntr1 = __HAL_TIM_GET_COUNTER(&htim3);
+	cntl1 = __HAL_TIM_GET_COUNTER(&htim2);
+	cntr1 = __HAL_TIM_GET_COUNTER(&htim3);
 	tick = HAL_GetTick();
-	int encDist = dist * 75;
+	int encDist = dist * 68;
 
 	int currTime = 0;
 
@@ -212,37 +213,40 @@ int motorControl(int speedL, int speedR, char dirL, char dirR, int turn, int tim
 	}
 	//End of motor direction selection//
 
-	__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_1, speedL);
+	__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_1, speedL*1.08);
 	__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_2, speedR);
 
 
 	while(currTime<time){
-		if(HAL_GetTick()-tick > 100L){
-				cntl2 = __HAL_TIM_GET_COUNTER(&htim2);
-				cntr2 = __HAL_TIM_GET_COUNTER(&htim3);
-				if(__HAL_TIM_IS_TIM_COUNTING_DOWN(&htim2))
-					diffl = cntl1 - cntl2;
-				else
-					diffl = cntl2 - cntl1;
-				if(__HAL_TIM_IS_TIM_COUNTING_DOWN(&htim3))
-					diffr = cntr1 - cntr2;
-				else
-					diffr = cntr2 - cntr1;
-				avg = (diffl+diffr)/2;
-				sprintf(display,"Distance:%5d\0", diffl/75);
-				OLED_ShowString(10,35,display);
-				sprintf(display,"Distance:%5d\0", diffr/75);
-				OLED_ShowString(10,50,display);
-			}
+			cntl2 = __HAL_TIM_GET_COUNTER(&htim2);
+			cntr2 = __HAL_TIM_GET_COUNTER(&htim3);
+			if(__HAL_TIM_IS_TIM_COUNTING_DOWN(&htim2))
+				diffl = -cntl2;
+			else
+				diffl = cntl2;
+			if(__HAL_TIM_IS_TIM_COUNTING_DOWN(&htim3))
+				diffr =-cntr2;
+			else
+				diffr =cntr2;
+			avg = (diffl+diffr)/2;
+			sprintf(display,"Left:%5d\0", diffl/68);
+			OLED_ShowString(10,35,display);
+			sprintf(display,"Right:%5d\0", diffr/68);
+			OLED_ShowString(10,50,display);
+			OLED_Refresh_Gram();
 
-//
-			if(avg>=encDist*0.8&&turn==0){
-				speedL = speedL*0.96;
-				speedR = speedR*0.96;
+			if(avg>=encDist*pow(0.8,120/dist)&&turn==0){
+				speedL = speedL*pow(0.9,1+speedL/1000);
+				speedR = speedR*pow(0.9,1+speedR/1000);
 				__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_1, speedL);
 				__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_2, speedR);
 			}
 			if(avg>=encDist && turn==0){
+				HAL_GPIO_WritePin(GPIOA, AIN1_Pin, GPIO_PIN_RESET);
+				HAL_GPIO_WritePin(GPIOA, AIN2_Pin, GPIO_PIN_SET);
+				HAL_GPIO_WritePin(GPIOA, BIN1_Pin, GPIO_PIN_RESET);
+				HAL_GPIO_WritePin(GPIOA, BIN2_Pin, GPIO_PIN_SET);
+				HAL_Delay(100);
 				__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_1, 0);
 				__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_2, 0);
 				osDelay(500);
@@ -250,8 +254,8 @@ int motorControl(int speedL, int speedR, char dirL, char dirR, int turn, int tim
 			}
 
 			if((diffl>=encDist*0.8 || diffr>=encDist*0.8)&&turn==1){
-				speedL = speedL*0.96;
-				speedR = speedR*0.96;
+				speedL = speedL*0.9;
+				speedR = speedR*0.9;
 				__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_1, speedL);
 				__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_2, speedR);
 			}
@@ -263,26 +267,27 @@ int motorControl(int speedL, int speedR, char dirL, char dirR, int turn, int tim
 				break;
 			}
 
-		currTime++;
-		osDelay(1);
 		}
 		__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_1, 0);
 		__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_2, 0);
+		__HAL_TIM_SET_COUNTER(&htim2,0);
+		__HAL_TIM_SET_COUNTER(&htim3,0);
+
 		speedL=speedR=tick=diffl=diffr=0;
 		OLED_Refresh_Gram();
 }
 
 void left(int deg){
-	int dist = 0.63*(pow(deg,1.001));
+	int dist = turnvar * deg;
 	htim1.Instance->CCR4 = 56;
-	osDelay(100);
-	motorControl(1000, 5000, 'F', 'F', 1, 1000, dist);
+	osDelay(500);
+	motorControl(500, 4000, 'F', 'F', 1, 1000, dist);
 }
 void right(int deg){
-	int dist = 0.63*deg;
-	htim1.Instance->CCR4 = 102;
-	osDelay(100);
-	motorControl(5000, 1000, 'F', 'F', 1, 1000, dist);
+	int dist = turnvar * deg;
+	htim1.Instance->CCR4 = 108;
+	osDelay(500);
+	motorControl(4000, 500, 'F', 'F', 1, 1000, dist);
 }
 
 /* USER CODE END 0 */
@@ -321,10 +326,10 @@ int main(void)
   MX_TIM3_Init();
   MX_TIM4_Init();
   MX_USART3_UART_Init();
-  OLED_Init();
   /* USER CODE BEGIN 2 */
   HAL_TIM_IC_Start_IT(&htim4, TIM_CHANNEL_1);
   HAL_UART_Receive_IT(&huart3, (uint8_t *) aRxBuffer, 10);
+  OLED_Init();
   /* USER CODE END 2 */
 
   /* Init scheduler */
@@ -778,6 +783,12 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
+  /*Configure GPIO pin : USRBUT_Pin */
+  GPIO_InitStruct.Pin = USRBUT_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(USRBUT_GPIO_Port, &GPIO_InitStruct);
+
   /*Configure GPIO pin : TRIG_Pin */
   GPIO_InitStruct.Pin = TRIG_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
@@ -824,7 +835,7 @@ void StartDefaultTask(void *argument)
 //	  sprintf(ultra, "uDist: %ucm\0", uDistFinal);
 //	  OLED_ShowString(10, 20, ultra);
 
-//	  OLED_Refresh_Gram();
+	  //OLED_Refresh_Gram();
 //	  HAL_GPIO_TogglePin(LED3_GPIO_Port, LED3_Pin);
 	  osDelay(500);
   }
@@ -844,21 +855,31 @@ void motor(void *argument)
 	HAL_TIM_PWM_Start(&htim8, TIM_CHANNEL_1);
 	HAL_TIM_PWM_Start(&htim8, TIM_CHANNEL_2);
 	HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_4);
-
-	htim1.Instance->CCR4 = 74;
-	osDelay(500);
-//	motorControl(3000, 3000, 'F', 'F', 0, 10000, 120);
-	left(360);
-  /* USER CODE END motor */
-
-//	uint8_t test[20] = "aRxBuffer Test";
-//	for(;;)
-//	  {
-//		sprintf(test, "%s\0", aRxBuffer);  //NOT SURE if it's receiving or transmitting. me is confused??
-//		OLED_ShowString(5,5,test);
-//		OLED_Refresh_Gram();
-//		osDelay(1000);
-//	  }
+	int x = 0;
+	for(;;){
+//		if(HAL_GPIO_ReadPin(USRBUT_GPIO_Port,USRBUT_Pin)==0 && x==0){ //Start only if USER_BUTTON is presssed
+//			htim1.Instance->CCR4 = 74;
+//			osDelay(500);
+//			//motorControl(3000, 3000, 'R', 'R', 0, 10000, 120);
+//			left(90);
+//			x++;
+//		}
+//		if(HAL_GPIO_ReadPin(USRBUT_GPIO_Port,USRBUT_Pin)==0 && x==1){ //Start only if USER_BUTTON is presssed
+//			htim1.Instance->CCR4 = 74;
+//			osDelay(500);
+//			//motorControl(3000, 3000, 'R', 'R', 0, 10000, 120);
+//			right(90);
+//			x++;
+//		}
+		if(HAL_GPIO_ReadPin(USRBUT_GPIO_Port,USRBUT_Pin)==0){ //Start only if USER_BUTTON is presssed
+			htim1.Instance->CCR4 = 74;
+			osDelay(500);
+			motorControl(4000, 4000, 'F', 'F', 0, 10000, 80);
+			x=0;
+		}
+		HAL_Delay(100);
+	}
+		/* USER CODE END motor */
 }
 
 /**
