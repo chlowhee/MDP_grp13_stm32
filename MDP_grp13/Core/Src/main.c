@@ -33,7 +33,8 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-const double turnvar = 0.6;
+const double Fturnvar = 0.588;
+const double Rturnvar = 0.66;
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -55,14 +56,14 @@ osThreadId_t LED_ToggleHandle;
 const osThreadAttr_t LED_Toggle_attributes = {
   .name = "LED_Toggle",
   .stack_size = 128 * 4,
-  .priority = (osPriority_t) osPriorityNormal,
+  .priority = (osPriority_t) osPriorityLow,
 };
 /* Definitions for MotorTask */
 osThreadId_t MotorTaskHandle;
 const osThreadAttr_t MotorTask_attributes = {
   .name = "MotorTask",
   .stack_size = 128 * 4,
-  .priority = (osPriority_t) osPriorityLow,
+  .priority = (osPriority_t) osPriorityHigh7,
 };
 /* USER CODE BEGIN PV */
 
@@ -81,9 +82,11 @@ void StartDefaultTask(void *argument);
 void motor(void *argument);
 
 /* USER CODE BEGIN PFP */
-int motorControl(int, int, char, char, int, int, int);
-void left(int);
-void right(int);
+int motorControl(int, int, char, char, int, int, double);
+void Fleft(int);
+void Rleft(int);
+void Fright(int);
+void Rright(int);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -174,7 +177,7 @@ void ultraDistCheck (void)
 }
 
 //Master function for all motor functions
-int motorControl(int speedL, int speedR, char dirL, char dirR, int turn, int time, int dist){
+int motorControl(int speedL, int speedR, char dirL, char dirR, int turn, int time, double dist){
 
 	//declaration
 	HAL_TIM_Encoder_Start(&htim2, TIM_CHANNEL_ALL);		//left encoder(MotorA) start
@@ -182,7 +185,7 @@ int motorControl(int speedL, int speedR, char dirL, char dirR, int turn, int tim
 	cntl1 = __HAL_TIM_GET_COUNTER(&htim2);
 	cntr1 = __HAL_TIM_GET_COUNTER(&htim3);
 	tick = HAL_GetTick();
-	int encDist = dist * 68;
+	double encDist = dist * 68;
 
 	int currTime = 0;
 
@@ -220,28 +223,23 @@ int motorControl(int speedL, int speedR, char dirL, char dirR, int turn, int tim
 	while(currTime<time){
 			cntl2 = __HAL_TIM_GET_COUNTER(&htim2);
 			cntr2 = __HAL_TIM_GET_COUNTER(&htim3);
-			if(__HAL_TIM_IS_TIM_COUNTING_DOWN(&htim2))
-				diffl = -cntl2;
-			else
-				diffl = cntl2;
-			if(__HAL_TIM_IS_TIM_COUNTING_DOWN(&htim3))
-				diffr =-cntr2;
-			else
-				diffr =cntr2;
-			avg = (diffl+diffr)/2;
+			diffl = abs(cntl2);
+			diffr =abs(cntr2);
+			diffr =abs(cntr2);
+			avg = abs((diffl+diffr)/2);
 			sprintf(display,"Left:%5d\0", diffl/68);
 			OLED_ShowString(10,35,display);
 			sprintf(display,"Right:%5d\0", diffr/68);
 			OLED_ShowString(10,50,display);
 			OLED_Refresh_Gram();
 
-			if(avg>=encDist*pow(0.8,120/dist)&&turn==0){
+			if(avg>=encDist*pow(0.8,30/dist)&&turn==0){
 				speedL = speedL*pow(0.9,1+speedL/1000);
 				speedR = speedR*pow(0.9,1+speedR/1000);
 				__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_1, speedL);
 				__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_2, speedR);
 			}
-			if(avg>=encDist && turn==0){
+			if(avg>=encDist && turn==0 && dirL=='F'){
 				HAL_GPIO_WritePin(GPIOA, AIN1_Pin, GPIO_PIN_RESET);
 				HAL_GPIO_WritePin(GPIOA, AIN2_Pin, GPIO_PIN_SET);
 				HAL_GPIO_WritePin(GPIOA, BIN1_Pin, GPIO_PIN_RESET);
@@ -249,27 +247,35 @@ int motorControl(int speedL, int speedR, char dirL, char dirR, int turn, int tim
 				HAL_Delay(100);
 				__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_1, 0);
 				__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_2, 0);
-				osDelay(500);
+				HAL_Delay(500);
 				break;
 			}
 
-			if((diffl>=encDist*0.8 || diffr>=encDist*0.8)&&turn==1){
+			if(avg>=encDist && turn==0 && dirL=='R'){
+				HAL_GPIO_WritePin(GPIOA, AIN1_Pin, GPIO_PIN_SET);
+				HAL_GPIO_WritePin(GPIOA, AIN2_Pin, GPIO_PIN_RESET);
+				HAL_GPIO_WritePin(GPIOA, BIN1_Pin, GPIO_PIN_SET);
+				HAL_GPIO_WritePin(GPIOA, BIN2_Pin, GPIO_PIN_RESET);
+				HAL_Delay(100);
+				__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_1, 0);
+				__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_2, 0);
+				HAL_Delay(500);
+				break;
+			}
+
+			if((diffl>=encDist*0.7 || diffr>=encDist*0.8)&&turn==1){
 				speedL = speedL*0.9;
 				speedR = speedR*0.9;
 				__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_1, speedL);
 				__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_2, speedR);
 			}
 
-			if((diffl>=encDist || diffr>=encDist)&&turn==1){
-				__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_1, 0);
-				__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_2, 0);
-				osDelay(500);
+			if((diffl>=encDist*0.9 || diffr>=encDist*0.9)&&turn==1){
+
 				break;
 			}
 
 		}
-		__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_1, 0);
-		__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_2, 0);
 		__HAL_TIM_SET_COUNTER(&htim2,0);
 		__HAL_TIM_SET_COUNTER(&htim3,0);
 
@@ -277,18 +283,44 @@ int motorControl(int speedL, int speedR, char dirL, char dirR, int turn, int tim
 		OLED_Refresh_Gram();
 }
 
-void left(int deg){
-	int dist = turnvar * deg;
+void Fleft(int deg){
+	double dist = 0.585 * deg;
 	htim1.Instance->CCR4 = 56;
-	osDelay(500);
-	motorControl(500, 4000, 'F', 'F', 1, 1000, dist);
+	HAL_Delay(500);
+	motorControl(800, 4000, 'F', 'F', 1, 1000, dist);
+	htim1.Instance->CCR4 = 74;
+	motorControl(2000, 2000, 'F', 'F', 0, 1000, 13);
 }
-void right(int deg){
-	int dist = turnvar * deg;
+void Rleft(int deg){
+	double dist = (Rturnvar-0.05) * deg;
+	htim1.Instance->CCR4 = 56;
+	HAL_Delay(500);
+	motorControl(700, 3500, 'R', 'R', 1, 1000, dist);
+	__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_1, 0);
+	__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_2, 0);
+}
+
+void Fright(int deg){
+	double dist = Fturnvar * deg;
 	htim1.Instance->CCR4 = 108;
-	osDelay(500);
-	motorControl(4000, 500, 'F', 'F', 1, 1000, dist);
+	HAL_Delay(500);
+	motorControl(4000, 1000, 'F', 'F', 1, 1000, dist);
+	htim1.Instance->CCR4 = 74;
+	motorControl(2000, 2000, 'F', 'F', 0, 1000, 13);
 }
+void Rright(int deg){
+	double dist = Rturnvar * deg;
+	htim1.Instance->CCR4 = 108;
+	HAL_Delay(500);
+	motorControl(3700, 1000, 'R', 'R', 1, 1000, dist);
+	__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_1, 0);
+	__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_2, 0);
+//	HAL_Delay(50);
+//	htim1.Instance->CCR4 = 74;
+//	HAL_Delay(50);
+//	motorControl(1000, 1000, 'F', 'F', 0, 1000, 2);
+}
+
 
 /* USER CODE END 0 */
 
@@ -837,7 +869,7 @@ void StartDefaultTask(void *argument)
 
 	  //OLED_Refresh_Gram();
 //	  HAL_GPIO_TogglePin(LED3_GPIO_Port, LED3_Pin);
-	  osDelay(500);
+	  osDelay(1000000);
   }
   /* USER CODE END 5 */
 }
@@ -857,29 +889,15 @@ void motor(void *argument)
 	HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_4);
 	int x = 0;
 	for(;;){
-//		if(HAL_GPIO_ReadPin(USRBUT_GPIO_Port,USRBUT_Pin)==0 && x==0){ //Start only if USER_BUTTON is presssed
-//			htim1.Instance->CCR4 = 74;
-//			osDelay(500);
-//			//motorControl(3000, 3000, 'R', 'R', 0, 10000, 120);
-//			left(90);
-//			x++;
-//		}
-//		if(HAL_GPIO_ReadPin(USRBUT_GPIO_Port,USRBUT_Pin)==0 && x==1){ //Start only if USER_BUTTON is presssed
-//			htim1.Instance->CCR4 = 74;
-//			osDelay(500);
-//			//motorControl(3000, 3000, 'R', 'R', 0, 10000, 120);
-//			right(90);
-//			x++;
-//		}
-		if(HAL_GPIO_ReadPin(USRBUT_GPIO_Port,USRBUT_Pin)==0){ //Start only if USER_BUTTON is presssed
-			htim1.Instance->CCR4 = 74;
-			osDelay(500);
-			motorControl(4000, 4000, 'F', 'F', 0, 10000, 80);
-			x=0;
-		}
+		if(HAL_GPIO_ReadPin(USRBUT_GPIO_Port,USRBUT_Pin)==0){
+		htim1.Instance->CCR4 = 74;
 		HAL_Delay(100);
+		Fleft(90);
+		HAL_Delay(5000);
+		Fright(90);
+		}
 	}
-		/* USER CODE END motor */
+  /* USER CODE END motor */
 }
 
 /**

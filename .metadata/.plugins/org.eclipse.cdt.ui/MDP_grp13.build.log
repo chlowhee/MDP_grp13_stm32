@@ -1,10 +1,70 @@
-00:12:36 **** Incremental Build of configuration Debug for project MDP_grp13 ****
+00:08:13 **** Incremental Build of configuration Debug for project MDP_grp13 ****
 make -j7 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F407xx -c -I"/Users/le/Documents/GitHub/MDP_grp13_stm32/MDP_grp13/PeripheralDrivers/inc" -I"/Users/le/Documents/GitHub/MDP_grp13_stm32/MDP_grp13/PeripheralDrivers" -I../Core/Inc -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F -I../Drivers/CMSIS/Include -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c:105:27: warning: data definition has no type or storage class
+  105 | uint16_t uDistCheck1 = 0; uDistCheck2 = 0; uDistFinal = 0;
+      |                           ^~~~~~~~~~~
+../Core/Src/main.c:105:27: warning: type defaults to 'int' in declaration of 'uDistCheck2' [-Wimplicit-int]
+../Core/Src/main.c:105:44: warning: data definition has no type or storage class
+  105 | uint16_t uDistCheck1 = 0; uDistCheck2 = 0; uDistFinal = 0;
+      |                                            ^~~~~~~~~~
+../Core/Src/main.c:105:44: warning: type defaults to 'int' in declaration of 'uDistFinal' [-Wimplicit-int]
+../Core/Src/main.c: In function 'motorControl':
+../Core/Src/main.c:226:12: warning: implicit declaration of function 'abs' [-Wimplicit-function-declaration]
+  226 |    diffl = abs(cntl2);
+      |            ^~~
+../Core/Src/main.c:230:4: warning: implicit declaration of function 'sprintf' [-Wimplicit-function-declaration]
+  230 |    sprintf(display,"Left:%5d\0", diffl/68);
+      |    ^~~~~~~
+../Core/Src/main.c:230:4: warning: incompatible implicit declaration of built-in function 'sprintf'
+../Core/Src/main.c:27:1: note: include '<stdio.h>' or provide a declaration of 'sprintf'
+   26 | #include "math.h"
+  +++ |+#include <stdio.h>
+   27 | /* USER CODE END Includes */
+../Core/Src/main.c:230:12: warning: pointer targets in passing argument 1 of 'sprintf' differ in signedness [-Wpointer-sign]
+  230 |    sprintf(display,"Left:%5d\0", diffl/68);
+      |            ^~~~~~~
+      |            |
+      |            uint8_t * {aka unsigned char *}
+../Core/Src/main.c:230:12: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+../Core/Src/main.c:230:29: warning: embedded '\0' in format [-Wformat-contains-nul]
+  230 |    sprintf(display,"Left:%5d\0", diffl/68);
+      |                             ^~
+../Core/Src/main.c:232:12: warning: pointer targets in passing argument 1 of 'sprintf' differ in signedness [-Wpointer-sign]
+  232 |    sprintf(display,"Right:%5d\0", diffr/68);
+      |            ^~~~~~~
+      |            |
+      |            uint8_t * {aka unsigned char *}
+../Core/Src/main.c:232:12: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+../Core/Src/main.c:232:30: warning: embedded '\0' in format [-Wformat-contains-nul]
+  232 |    sprintf(display,"Right:%5d\0", diffr/68);
+      |                              ^~
+../Core/Src/main.c: In function 'StartDefaultTask':
+../Core/Src/main.c:852:10: warning: unused variable 'test' [-Wunused-variable]
+  852 |  uint8_t test[20] = "Testing";
+      |          ^~~~
+../Core/Src/main.c: In function 'motor':
+../Core/Src/main.c:890:6: warning: unused variable 'x' [-Wunused-variable]
+  890 |  int x = 0;
+      |      ^
+../Core/Src/main.c: In function 'motorControl':
+../Core/Src/main.c:284:1: warning: control reaches end of non-void function [-Wreturn-type]
+  284 | }
+      | ^
+arm-none-eabi-gcc -o "MDP_grp13.elf" @"objects.list"   -mcpu=cortex-m4 -T"/Users/le/Documents/GitHub/MDP_grp13_stm32/MDP_grp13/STM32F407VETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="MDP_grp13.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: MDP_grp13.elf
+ 
 arm-none-eabi-size   MDP_grp13.elf 
+arm-none-eabi-objdump -h -S  MDP_grp13.elf  > "MDP_grp13.list"
+arm-none-eabi-objcopy  -O ihex  MDP_grp13.elf  "MDP_grp13.hex"
    text	   data	    bss	    dec	    hex	filename
-  45068	    128	  21912	  67108	  10624	MDP_grp13.elf
+  45532	    128	  21912	  67572	  107f4	MDP_grp13.elf
 Finished building: default.size.stdout
  
+Finished building: MDP_grp13.hex
+ 
+Finished building: MDP_grp13.list
+ 
 
-00:12:36 Build Finished. 0 errors, 0 warnings. (took 355ms)
+00:08:14 Build Finished. 0 errors, 14 warnings. (took 820ms)
 

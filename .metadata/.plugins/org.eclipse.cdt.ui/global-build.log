@@ -1,52 +1,51 @@
-23:26:12 **** Incremental Build of configuration Debug for project MDP_grp13 ****
+22:53:28 **** Incremental Build of configuration Debug for project MDP_grp13 ****
 make -j7 all 
 arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F407xx -c -I"/Users/le/Documents/GitHub/MDP_grp13_stm32/MDP_grp13/PeripheralDrivers/inc" -I"/Users/le/Documents/GitHub/MDP_grp13_stm32/MDP_grp13/PeripheralDrivers" -I../Core/Inc -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F -I../Drivers/CMSIS/Include -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
-../Core/Src/main.c:102:27: warning: data definition has no type or storage class
-  102 | uint16_t uDistCheck1 = 0; uDistCheck2 = 0; uDistFinal = 0;
+../Core/Src/main.c:105:27: warning: data definition has no type or storage class
+  105 | uint16_t uDistCheck1 = 0; uDistCheck2 = 0; uDistFinal = 0;
       |                           ^~~~~~~~~~~
-../Core/Src/main.c:102:27: warning: type defaults to 'int' in declaration of 'uDistCheck2' [-Wimplicit-int]
-../Core/Src/main.c:102:44: warning: data definition has no type or storage class
-  102 | uint16_t uDistCheck1 = 0; uDistCheck2 = 0; uDistFinal = 0;
+../Core/Src/main.c:105:27: warning: type defaults to 'int' in declaration of 'uDistCheck2' [-Wimplicit-int]
+../Core/Src/main.c:105:44: warning: data definition has no type or storage class
+  105 | uint16_t uDistCheck1 = 0; uDistCheck2 = 0; uDistFinal = 0;
       |                                            ^~~~~~~~~~
-../Core/Src/main.c:102:44: warning: type defaults to 'int' in declaration of 'uDistFinal' [-Wimplicit-int]
+../Core/Src/main.c:105:44: warning: type defaults to 'int' in declaration of 'uDistFinal' [-Wimplicit-int]
 ../Core/Src/main.c: In function 'motorControl':
-../Core/Src/main.c:232:4: warning: implicit declaration of function 'sprintf' [-Wimplicit-function-declaration]
-  232 |    sprintf(display,"Left:%5d\0", diffl/68);
+../Core/Src/main.c:234:10: warning: implicit declaration of function 'abs' [-Wimplicit-function-declaration]
+  234 |    avg = abs((diffl+diffr)/2);
+      |          ^~~
+../Core/Src/main.c:235:4: warning: implicit declaration of function 'sprintf' [-Wimplicit-function-declaration]
+  235 |    sprintf(display,"Left:%5d\0", diffl/68);
       |    ^~~~~~~
-../Core/Src/main.c:232:4: warning: incompatible implicit declaration of built-in function 'sprintf'
+../Core/Src/main.c:235:4: warning: incompatible implicit declaration of built-in function 'sprintf'
 ../Core/Src/main.c:27:1: note: include '<stdio.h>' or provide a declaration of 'sprintf'
    26 | #include "math.h"
   +++ |+#include <stdio.h>
    27 | /* USER CODE END Includes */
-../Core/Src/main.c:232:12: warning: pointer targets in passing argument 1 of 'sprintf' differ in signedness [-Wpointer-sign]
-  232 |    sprintf(display,"Left:%5d\0", diffl/68);
+../Core/Src/main.c:235:12: warning: pointer targets in passing argument 1 of 'sprintf' differ in signedness [-Wpointer-sign]
+  235 |    sprintf(display,"Left:%5d\0", diffl/68);
       |            ^~~~~~~
       |            |
       |            uint8_t * {aka unsigned char *}
-../Core/Src/main.c:232:12: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
-../Core/Src/main.c:232:29: warning: embedded '\0' in format [-Wformat-contains-nul]
-  232 |    sprintf(display,"Left:%5d\0", diffl/68);
+../Core/Src/main.c:235:12: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+../Core/Src/main.c:235:29: warning: embedded '\0' in format [-Wformat-contains-nul]
+  235 |    sprintf(display,"Left:%5d\0", diffl/68);
       |                             ^~
-../Core/Src/main.c:234:12: warning: pointer targets in passing argument 1 of 'sprintf' differ in signedness [-Wpointer-sign]
-  234 |    sprintf(display,"Right:%5d\0", diffr/68);
+../Core/Src/main.c:237:12: warning: pointer targets in passing argument 1 of 'sprintf' differ in signedness [-Wpointer-sign]
+  237 |    sprintf(display,"Right:%5d\0", diffr/68);
       |            ^~~~~~~
       |            |
       |            uint8_t * {aka unsigned char *}
-../Core/Src/main.c:234:12: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
-../Core/Src/main.c:234:30: warning: embedded '\0' in format [-Wformat-contains-nul]
-  234 |    sprintf(display,"Right:%5d\0", diffr/68);
+../Core/Src/main.c:237:12: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+../Core/Src/main.c:237:30: warning: embedded '\0' in format [-Wformat-contains-nul]
+  237 |    sprintf(display,"Right:%5d\0", diffr/68);
       |                              ^~
 ../Core/Src/main.c: In function 'StartDefaultTask':
-../Core/Src/main.c:819:10: warning: unused variable 'test' [-Wunused-variable]
-  819 |  uint8_t test[20] = "Testing";
+../Core/Src/main.c:857:10: warning: unused variable 'test' [-Wunused-variable]
+  857 |  uint8_t test[20] = "Testing";
       |          ^~~~
-../Core/Src/main.c: In function 'motor':
-../Core/Src/main.c:857:6: warning: variable 'x' set but not used [-Wunused-but-set-variable]
-  857 |  int x = 0;
-      |      ^
 ../Core/Src/main.c: In function 'motorControl':
-../Core/Src/main.c:277:1: warning: control reaches end of non-void function [-Wreturn-type]
-  277 | }
+../Core/Src/main.c:289:1: warning: control reaches end of non-void function [-Wreturn-type]
+  289 | }
       | ^
 arm-none-eabi-gcc -o "MDP_grp13.elf" @"objects.list"   -mcpu=cortex-m4 -T"/Users/le/Documents/GitHub/MDP_grp13_stm32/MDP_grp13/STM32F407VETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="MDP_grp13.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 Finished building target: MDP_grp13.elf
@@ -55,90 +54,65 @@ arm-none-eabi-size   MDP_grp13.elf
 arm-none-eabi-objdump -h -S  MDP_grp13.elf  > "MDP_grp13.list"
 arm-none-eabi-objcopy  -O ihex  MDP_grp13.elf  "MDP_grp13.hex"
    text	   data	    bss	    dec	    hex	filename
-  40876	    124	  21916	  62916	   f5c4	MDP_grp13.elf
+  45532	    128	  21912	  67572	  107f4	MDP_grp13.elf
 Finished building: default.size.stdout
  
 Finished building: MDP_grp13.hex
  
 Finished building: MDP_grp13.list
  
-23:26:21 **** Incremental Build of configuration Debug for project MDP_grp13 ****
-make -j7 all 
-arm-none-eabi-size   MDP_grp13.elf 
-   text	   data	    bss	    dec	    hex	filename
-  40876	    124	  21916	  62916	   f5c4	MDP_grp13.elf
-Finished building: default.size.stdout
- 
-23:26:43 **** Incremental Build of configuration Debug for project MDP_grp13 ****
-make -j7 all 
-arm-none-eabi-size   MDP_grp13.elf 
-   text	   data	    bss	    dec	    hex	filename
-  40876	    124	  21916	  62916	   f5c4	MDP_grp13.elf
-Finished building: default.size.stdout
- 
-23:27:05 **** Incremental Build of configuration Debug for project MDP_grp13 ****
-make -j7 all 
-arm-none-eabi-size   MDP_grp13.elf 
-   text	   data	    bss	    dec	    hex	filename
-  40876	    124	  21916	  62916	   f5c4	MDP_grp13.elf
-Finished building: default.size.stdout
- 
-23:27:19 **** Incremental Build of configuration Debug for project MDP_grp13 ****
-make -j7 all 
-arm-none-eabi-size   MDP_grp13.elf 
-   text	   data	    bss	    dec	    hex	filename
-  40876	    124	  21916	  62916	   f5c4	MDP_grp13.elf
-Finished building: default.size.stdout
- 
-23:28:47 **** Incremental Build of configuration Debug for project MDP_grp13 ****
+22:55:19 **** Incremental Build of configuration Debug for project MDP_grp13 ****
 make -j7 all 
 arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F407xx -c -I"/Users/le/Documents/GitHub/MDP_grp13_stm32/MDP_grp13/PeripheralDrivers/inc" -I"/Users/le/Documents/GitHub/MDP_grp13_stm32/MDP_grp13/PeripheralDrivers" -I../Core/Inc -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F -I../Drivers/CMSIS/Include -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
-../Core/Src/main.c:102:27: warning: data definition has no type or storage class
-  102 | uint16_t uDistCheck1 = 0; uDistCheck2 = 0; uDistFinal = 0;
+../Core/Src/main.c:105:27: warning: data definition has no type or storage class
+  105 | uint16_t uDistCheck1 = 0; uDistCheck2 = 0; uDistFinal = 0;
       |                           ^~~~~~~~~~~
-../Core/Src/main.c:102:27: warning: type defaults to 'int' in declaration of 'uDistCheck2' [-Wimplicit-int]
-../Core/Src/main.c:102:44: warning: data definition has no type or storage class
-  102 | uint16_t uDistCheck1 = 0; uDistCheck2 = 0; uDistFinal = 0;
+../Core/Src/main.c:105:27: warning: type defaults to 'int' in declaration of 'uDistCheck2' [-Wimplicit-int]
+../Core/Src/main.c:105:44: warning: data definition has no type or storage class
+  105 | uint16_t uDistCheck1 = 0; uDistCheck2 = 0; uDistFinal = 0;
       |                                            ^~~~~~~~~~
-../Core/Src/main.c:102:44: warning: type defaults to 'int' in declaration of 'uDistFinal' [-Wimplicit-int]
+../Core/Src/main.c:105:44: warning: type defaults to 'int' in declaration of 'uDistFinal' [-Wimplicit-int]
 ../Core/Src/main.c: In function 'motorControl':
-../Core/Src/main.c:232:4: warning: implicit declaration of function 'sprintf' [-Wimplicit-function-declaration]
-  232 |    sprintf(display,"Left:%5d\0", diffl/68);
+../Core/Src/main.c:234:10: warning: implicit declaration of function 'abs' [-Wimplicit-function-declaration]
+  234 |    avg = abs((diffl+diffr)/2);
+      |          ^~~
+../Core/Src/main.c:235:4: warning: implicit declaration of function 'sprintf' [-Wimplicit-function-declaration]
+  235 |    sprintf(display,"Left:%5d\0", diffl/68);
       |    ^~~~~~~
-../Core/Src/main.c:232:4: warning: incompatible implicit declaration of built-in function 'sprintf'
+../Core/Src/main.c:235:4: warning: incompatible implicit declaration of built-in function 'sprintf'
 ../Core/Src/main.c:27:1: note: include '<stdio.h>' or provide a declaration of 'sprintf'
    26 | #include "math.h"
   +++ |+#include <stdio.h>
    27 | /* USER CODE END Includes */
-../Core/Src/main.c:232:12: warning: pointer targets in passing argument 1 of 'sprintf' differ in signedness [-Wpointer-sign]
-  232 |    sprintf(display,"Left:%5d\0", diffl/68);
+../Core/Src/main.c:235:12: warning: pointer targets in passing argument 1 of 'sprintf' differ in signedness [-Wpointer-sign]
+  235 |    sprintf(display,"Left:%5d\0", diffl/68);
       |            ^~~~~~~
       |            |
       |            uint8_t * {aka unsigned char *}
-../Core/Src/main.c:232:12: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
-../Core/Src/main.c:232:29: warning: embedded '\0' in format [-Wformat-contains-nul]
-  232 |    sprintf(display,"Left:%5d\0", diffl/68);
+../Core/Src/main.c:235:12: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+../Core/Src/main.c:235:29: warning: embedded '\0' in format [-Wformat-contains-nul]
+  235 |    sprintf(display,"Left:%5d\0", diffl/68);
       |                             ^~
-../Core/Src/main.c:234:12: warning: pointer targets in passing argument 1 of 'sprintf' differ in signedness [-Wpointer-sign]
-  234 |    sprintf(display,"Right:%5d\0", diffr/68);
+../Core/Src/main.c:237:12: warning: pointer targets in passing argument 1 of 'sprintf' differ in signedness [-Wpointer-sign]
+  237 |    sprintf(display,"Right:%5d\0", diffr/68);
       |            ^~~~~~~
       |            |
       |            uint8_t * {aka unsigned char *}
-../Core/Src/main.c:234:12: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
-../Core/Src/main.c:234:30: warning: embedded '\0' in format [-Wformat-contains-nul]
-  234 |    sprintf(display,"Right:%5d\0", diffr/68);
+../Core/Src/main.c:237:12: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+../Core/Src/main.c:237:30: warning: embedded '\0' in format [-Wformat-contains-nul]
+  237 |    sprintf(display,"Right:%5d\0", diffr/68);
       |                              ^~
 ../Core/Src/main.c: In function 'StartDefaultTask':
-../Core/Src/main.c:820:10: warning: unused variable 'test' [-Wunused-variable]
-  820 |  uint8_t test[20] = "Testing";
+../Core/Src/main.c:857:10: warning: unused variable 'test' [-Wunused-variable]
+  857 |  uint8_t test[20] = "Testing";
       |          ^~~~
 ../Core/Src/main.c: In function 'motor':
-../Core/Src/main.c:858:6: warning: variable 'x' set but not used [-Wunused-but-set-variable]
-  858 |  int x = 0;
+../Core/Src/main.c:895:6: warning: unused variable 'x' [-Wunused-variable]
+  895 |  int x = 0;
       |      ^
 ../Core/Src/main.c: In function 'motorControl':
-../Core/Src/main.c:278:1: warning: control reaches end of non-void function [-Wreturn-type]
-  278 | }
+../Core/Src/main.c:289:1: warning: control reaches end of non-void function [-Wreturn-type]
+  289 | }
       | ^
 arm-none-eabi-gcc -o "MDP_grp13.elf" @"objects.list"   -mcpu=cortex-m4 -T"/Users/le/Documents/GitHub/MDP_grp13_stm32/MDP_grp13/STM32F407VETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="MDP_grp13.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 Finished building target: MDP_grp13.elf
@@ -147,62 +121,72 @@ arm-none-eabi-size   MDP_grp13.elf
 arm-none-eabi-objdump -h -S  MDP_grp13.elf  > "MDP_grp13.list"
 arm-none-eabi-objcopy  -O ihex  MDP_grp13.elf  "MDP_grp13.hex"
    text	   data	    bss	    dec	    hex	filename
-  40876	    124	  21916	  62916	   f5c4	MDP_grp13.elf
+  45180	    128	  21912	  67220	  10694	MDP_grp13.elf
 Finished building: default.size.stdout
  
 Finished building: MDP_grp13.hex
  
 Finished building: MDP_grp13.list
  
-23:31:39 **** Incremental Build of configuration Debug for project MDP_grp13 ****
+22:56:14 **** Incremental Build of configuration Debug for project MDP_grp13 ****
+make -j7 all 
+arm-none-eabi-size   MDP_grp13.elf 
+   text	   data	    bss	    dec	    hex	filename
+  45180	    128	  21912	  67220	  10694	MDP_grp13.elf
+Finished building: default.size.stdout
+ 
+22:58:56 **** Incremental Build of configuration Debug for project MDP_grp13 ****
 make -j7 all 
 arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F407xx -c -I"/Users/le/Documents/GitHub/MDP_grp13_stm32/MDP_grp13/PeripheralDrivers/inc" -I"/Users/le/Documents/GitHub/MDP_grp13_stm32/MDP_grp13/PeripheralDrivers" -I../Core/Inc -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F -I../Drivers/CMSIS/Include -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
-../Core/Src/main.c:102:27: warning: data definition has no type or storage class
-  102 | uint16_t uDistCheck1 = 0; uDistCheck2 = 0; uDistFinal = 0;
+../Core/Src/main.c:105:27: warning: data definition has no type or storage class
+  105 | uint16_t uDistCheck1 = 0; uDistCheck2 = 0; uDistFinal = 0;
       |                           ^~~~~~~~~~~
-../Core/Src/main.c:102:27: warning: type defaults to 'int' in declaration of 'uDistCheck2' [-Wimplicit-int]
-../Core/Src/main.c:102:44: warning: data definition has no type or storage class
-  102 | uint16_t uDistCheck1 = 0; uDistCheck2 = 0; uDistFinal = 0;
+../Core/Src/main.c:105:27: warning: type defaults to 'int' in declaration of 'uDistCheck2' [-Wimplicit-int]
+../Core/Src/main.c:105:44: warning: data definition has no type or storage class
+  105 | uint16_t uDistCheck1 = 0; uDistCheck2 = 0; uDistFinal = 0;
       |                                            ^~~~~~~~~~
-../Core/Src/main.c:102:44: warning: type defaults to 'int' in declaration of 'uDistFinal' [-Wimplicit-int]
+../Core/Src/main.c:105:44: warning: type defaults to 'int' in declaration of 'uDistFinal' [-Wimplicit-int]
 ../Core/Src/main.c: In function 'motorControl':
-../Core/Src/main.c:232:4: warning: implicit declaration of function 'sprintf' [-Wimplicit-function-declaration]
-  232 |    sprintf(display,"Left:%5d\0", diffl/68);
+../Core/Src/main.c:227:13: warning: implicit declaration of function 'abs' [-Wimplicit-function-declaration]
+  227 |     diffl = abs(cntl2);
+      |             ^~~
+../Core/Src/main.c:235:4: warning: implicit declaration of function 'sprintf' [-Wimplicit-function-declaration]
+  235 |    sprintf(display,"Left:%5d\0", diffl/68);
       |    ^~~~~~~
-../Core/Src/main.c:232:4: warning: incompatible implicit declaration of built-in function 'sprintf'
+../Core/Src/main.c:235:4: warning: incompatible implicit declaration of built-in function 'sprintf'
 ../Core/Src/main.c:27:1: note: include '<stdio.h>' or provide a declaration of 'sprintf'
    26 | #include "math.h"
   +++ |+#include <stdio.h>
    27 | /* USER CODE END Includes */
-../Core/Src/main.c:232:12: warning: pointer targets in passing argument 1 of 'sprintf' differ in signedness [-Wpointer-sign]
-  232 |    sprintf(display,"Left:%5d\0", diffl/68);
+../Core/Src/main.c:235:12: warning: pointer targets in passing argument 1 of 'sprintf' differ in signedness [-Wpointer-sign]
+  235 |    sprintf(display,"Left:%5d\0", diffl/68);
       |            ^~~~~~~
       |            |
       |            uint8_t * {aka unsigned char *}
-../Core/Src/main.c:232:12: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
-../Core/Src/main.c:232:29: warning: embedded '\0' in format [-Wformat-contains-nul]
-  232 |    sprintf(display,"Left:%5d\0", diffl/68);
+../Core/Src/main.c:235:12: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+../Core/Src/main.c:235:29: warning: embedded '\0' in format [-Wformat-contains-nul]
+  235 |    sprintf(display,"Left:%5d\0", diffl/68);
       |                             ^~
-../Core/Src/main.c:234:12: warning: pointer targets in passing argument 1 of 'sprintf' differ in signedness [-Wpointer-sign]
-  234 |    sprintf(display,"Right:%5d\0", diffr/68);
+../Core/Src/main.c:237:12: warning: pointer targets in passing argument 1 of 'sprintf' differ in signedness [-Wpointer-sign]
+  237 |    sprintf(display,"Right:%5d\0", diffr/68);
       |            ^~~~~~~
       |            |
       |            uint8_t * {aka unsigned char *}
-../Core/Src/main.c:234:12: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
-../Core/Src/main.c:234:30: warning: embedded '\0' in format [-Wformat-contains-nul]
-  234 |    sprintf(display,"Right:%5d\0", diffr/68);
+../Core/Src/main.c:237:12: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+../Core/Src/main.c:237:30: warning: embedded '\0' in format [-Wformat-contains-nul]
+  237 |    sprintf(display,"Right:%5d\0", diffr/68);
       |                              ^~
 ../Core/Src/main.c: In function 'StartDefaultTask':
-../Core/Src/main.c:820:10: warning: unused variable 'test' [-Wunused-variable]
-  820 |  uint8_t test[20] = "Testing";
+../Core/Src/main.c:857:10: warning: unused variable 'test' [-Wunused-variable]
+  857 |  uint8_t test[20] = "Testing";
       |          ^~~~
 ../Core/Src/main.c: In function 'motor':
-../Core/Src/main.c:858:6: warning: variable 'x' set but not used [-Wunused-but-set-variable]
-  858 |  int x = 0;
+../Core/Src/main.c:895:6: warning: unused variable 'x' [-Wunused-variable]
+  895 |  int x = 0;
       |      ^
 ../Core/Src/main.c: In function 'motorControl':
-../Core/Src/main.c:278:1: warning: control reaches end of non-void function [-Wreturn-type]
-  278 | }
+../Core/Src/main.c:289:1: warning: control reaches end of non-void function [-Wreturn-type]
+  289 | }
       | ^
 arm-none-eabi-gcc -o "MDP_grp13.elf" @"objects.list"   -mcpu=cortex-m4 -T"/Users/le/Documents/GitHub/MDP_grp13_stm32/MDP_grp13/STM32F407VETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="MDP_grp13.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 Finished building target: MDP_grp13.elf
@@ -211,69 +195,65 @@ arm-none-eabi-size   MDP_grp13.elf
 arm-none-eabi-objdump -h -S  MDP_grp13.elf  > "MDP_grp13.list"
 arm-none-eabi-objcopy  -O ihex  MDP_grp13.elf  "MDP_grp13.hex"
    text	   data	    bss	    dec	    hex	filename
-  40876	    124	  21916	  62916	   f5c4	MDP_grp13.elf
+  45340	    128	  21912	  67380	  10734	MDP_grp13.elf
 Finished building: default.size.stdout
  
 Finished building: MDP_grp13.hex
  
 Finished building: MDP_grp13.list
  
-23:32:01 **** Incremental Build of configuration Debug for project MDP_grp13 ****
-make -j7 all 
-arm-none-eabi-size   MDP_grp13.elf 
-   text	   data	    bss	    dec	    hex	filename
-  40876	    124	  21916	  62916	   f5c4	MDP_grp13.elf
-Finished building: default.size.stdout
- 
-23:34:19 **** Incremental Build of configuration Debug for project MDP_grp13 ****
+23:00:16 **** Incremental Build of configuration Debug for project MDP_grp13 ****
 make -j7 all 
 arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F407xx -c -I"/Users/le/Documents/GitHub/MDP_grp13_stm32/MDP_grp13/PeripheralDrivers/inc" -I"/Users/le/Documents/GitHub/MDP_grp13_stm32/MDP_grp13/PeripheralDrivers" -I../Core/Inc -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F -I../Drivers/CMSIS/Include -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
-../Core/Src/main.c:102:27: warning: data definition has no type or storage class
-  102 | uint16_t uDistCheck1 = 0; uDistCheck2 = 0; uDistFinal = 0;
+../Core/Src/main.c:105:27: warning: data definition has no type or storage class
+  105 | uint16_t uDistCheck1 = 0; uDistCheck2 = 0; uDistFinal = 0;
       |                           ^~~~~~~~~~~
-../Core/Src/main.c:102:27: warning: type defaults to 'int' in declaration of 'uDistCheck2' [-Wimplicit-int]
-../Core/Src/main.c:102:44: warning: data definition has no type or storage class
-  102 | uint16_t uDistCheck1 = 0; uDistCheck2 = 0; uDistFinal = 0;
+../Core/Src/main.c:105:27: warning: type defaults to 'int' in declaration of 'uDistCheck2' [-Wimplicit-int]
+../Core/Src/main.c:105:44: warning: data definition has no type or storage class
+  105 | uint16_t uDistCheck1 = 0; uDistCheck2 = 0; uDistFinal = 0;
       |                                            ^~~~~~~~~~
-../Core/Src/main.c:102:44: warning: type defaults to 'int' in declaration of 'uDistFinal' [-Wimplicit-int]
+../Core/Src/main.c:105:44: warning: type defaults to 'int' in declaration of 'uDistFinal' [-Wimplicit-int]
 ../Core/Src/main.c: In function 'motorControl':
-../Core/Src/main.c:232:4: warning: implicit declaration of function 'sprintf' [-Wimplicit-function-declaration]
-  232 |    sprintf(display,"Left:%5d\0", diffl/68);
+../Core/Src/main.c:227:13: warning: implicit declaration of function 'abs' [-Wimplicit-function-declaration]
+  227 |     diffl = abs(cntl2);
+      |             ^~~
+../Core/Src/main.c:235:4: warning: implicit declaration of function 'sprintf' [-Wimplicit-function-declaration]
+  235 |    sprintf(display,"Left:%5d\0", diffl/68);
       |    ^~~~~~~
-../Core/Src/main.c:232:4: warning: incompatible implicit declaration of built-in function 'sprintf'
+../Core/Src/main.c:235:4: warning: incompatible implicit declaration of built-in function 'sprintf'
 ../Core/Src/main.c:27:1: note: include '<stdio.h>' or provide a declaration of 'sprintf'
    26 | #include "math.h"
   +++ |+#include <stdio.h>
    27 | /* USER CODE END Includes */
-../Core/Src/main.c:232:12: warning: pointer targets in passing argument 1 of 'sprintf' differ in signedness [-Wpointer-sign]
-  232 |    sprintf(display,"Left:%5d\0", diffl/68);
+../Core/Src/main.c:235:12: warning: pointer targets in passing argument 1 of 'sprintf' differ in signedness [-Wpointer-sign]
+  235 |    sprintf(display,"Left:%5d\0", diffl/68);
       |            ^~~~~~~
       |            |
       |            uint8_t * {aka unsigned char *}
-../Core/Src/main.c:232:12: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
-../Core/Src/main.c:232:29: warning: embedded '\0' in format [-Wformat-contains-nul]
-  232 |    sprintf(display,"Left:%5d\0", diffl/68);
+../Core/Src/main.c:235:12: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+../Core/Src/main.c:235:29: warning: embedded '\0' in format [-Wformat-contains-nul]
+  235 |    sprintf(display,"Left:%5d\0", diffl/68);
       |                             ^~
-../Core/Src/main.c:234:12: warning: pointer targets in passing argument 1 of 'sprintf' differ in signedness [-Wpointer-sign]
-  234 |    sprintf(display,"Right:%5d\0", diffr/68);
+../Core/Src/main.c:237:12: warning: pointer targets in passing argument 1 of 'sprintf' differ in signedness [-Wpointer-sign]
+  237 |    sprintf(display,"Right:%5d\0", diffr/68);
       |            ^~~~~~~
       |            |
       |            uint8_t * {aka unsigned char *}
-../Core/Src/main.c:234:12: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
-../Core/Src/main.c:234:30: warning: embedded '\0' in format [-Wformat-contains-nul]
-  234 |    sprintf(display,"Right:%5d\0", diffr/68);
+../Core/Src/main.c:237:12: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+../Core/Src/main.c:237:30: warning: embedded '\0' in format [-Wformat-contains-nul]
+  237 |    sprintf(display,"Right:%5d\0", diffr/68);
       |                              ^~
 ../Core/Src/main.c: In function 'StartDefaultTask':
-../Core/Src/main.c:820:10: warning: unused variable 'test' [-Wunused-variable]
-  820 |  uint8_t test[20] = "Testing";
+../Core/Src/main.c:857:10: warning: unused variable 'test' [-Wunused-variable]
+  857 |  uint8_t test[20] = "Testing";
       |          ^~~~
 ../Core/Src/main.c: In function 'motor':
-../Core/Src/main.c:858:6: warning: variable 'x' set but not used [-Wunused-but-set-variable]
-  858 |  int x = 0;
+../Core/Src/main.c:895:6: warning: unused variable 'x' [-Wunused-variable]
+  895 |  int x = 0;
       |      ^
 ../Core/Src/main.c: In function 'motorControl':
-../Core/Src/main.c:278:1: warning: control reaches end of non-void function [-Wreturn-type]
-  278 | }
+../Core/Src/main.c:289:1: warning: control reaches end of non-void function [-Wreturn-type]
+  289 | }
       | ^
 arm-none-eabi-gcc -o "MDP_grp13.elf" @"objects.list"   -mcpu=cortex-m4 -T"/Users/le/Documents/GitHub/MDP_grp13_stm32/MDP_grp13/STM32F407VETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="MDP_grp13.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 Finished building target: MDP_grp13.elf
@@ -282,62 +262,65 @@ arm-none-eabi-size   MDP_grp13.elf
 arm-none-eabi-objdump -h -S  MDP_grp13.elf  > "MDP_grp13.list"
 arm-none-eabi-objcopy  -O ihex  MDP_grp13.elf  "MDP_grp13.hex"
    text	   data	    bss	    dec	    hex	filename
-  40876	    124	  21916	  62916	   f5c4	MDP_grp13.elf
+  45340	    128	  21912	  67380	  10734	MDP_grp13.elf
 Finished building: default.size.stdout
  
 Finished building: MDP_grp13.hex
  
 Finished building: MDP_grp13.list
  
-23:36:48 **** Incremental Build of configuration Debug for project MDP_grp13 ****
+23:11:37 **** Incremental Build of configuration Debug for project MDP_grp13 ****
 make -j7 all 
 arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F407xx -c -I"/Users/le/Documents/GitHub/MDP_grp13_stm32/MDP_grp13/PeripheralDrivers/inc" -I"/Users/le/Documents/GitHub/MDP_grp13_stm32/MDP_grp13/PeripheralDrivers" -I../Core/Inc -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F -I../Drivers/CMSIS/Include -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
-../Core/Src/main.c:102:27: warning: data definition has no type or storage class
-  102 | uint16_t uDistCheck1 = 0; uDistCheck2 = 0; uDistFinal = 0;
+../Core/Src/main.c:105:27: warning: data definition has no type or storage class
+  105 | uint16_t uDistCheck1 = 0; uDistCheck2 = 0; uDistFinal = 0;
       |                           ^~~~~~~~~~~
-../Core/Src/main.c:102:27: warning: type defaults to 'int' in declaration of 'uDistCheck2' [-Wimplicit-int]
-../Core/Src/main.c:102:44: warning: data definition has no type or storage class
-  102 | uint16_t uDistCheck1 = 0; uDistCheck2 = 0; uDistFinal = 0;
+../Core/Src/main.c:105:27: warning: type defaults to 'int' in declaration of 'uDistCheck2' [-Wimplicit-int]
+../Core/Src/main.c:105:44: warning: data definition has no type or storage class
+  105 | uint16_t uDistCheck1 = 0; uDistCheck2 = 0; uDistFinal = 0;
       |                                            ^~~~~~~~~~
-../Core/Src/main.c:102:44: warning: type defaults to 'int' in declaration of 'uDistFinal' [-Wimplicit-int]
+../Core/Src/main.c:105:44: warning: type defaults to 'int' in declaration of 'uDistFinal' [-Wimplicit-int]
 ../Core/Src/main.c: In function 'motorControl':
-../Core/Src/main.c:232:4: warning: implicit declaration of function 'sprintf' [-Wimplicit-function-declaration]
-  232 |    sprintf(display,"Left:%5d\0", diffl/68);
+../Core/Src/main.c:226:12: warning: implicit declaration of function 'abs' [-Wimplicit-function-declaration]
+  226 |    diffl = abs(cntl2);
+      |            ^~~
+../Core/Src/main.c:229:4: warning: implicit declaration of function 'sprintf' [-Wimplicit-function-declaration]
+  229 |    sprintf(display,"Left:%5d\0", diffl/68);
       |    ^~~~~~~
-../Core/Src/main.c:232:4: warning: incompatible implicit declaration of built-in function 'sprintf'
+../Core/Src/main.c:229:4: warning: incompatible implicit declaration of built-in function 'sprintf'
 ../Core/Src/main.c:27:1: note: include '<stdio.h>' or provide a declaration of 'sprintf'
    26 | #include "math.h"
   +++ |+#include <stdio.h>
    27 | /* USER CODE END Includes */
-../Core/Src/main.c:232:12: warning: pointer targets in passing argument 1 of 'sprintf' differ in signedness [-Wpointer-sign]
-  232 |    sprintf(display,"Left:%5d\0", diffl/68);
+../Core/Src/main.c:229:12: warning: pointer targets in passing argument 1 of 'sprintf' differ in signedness [-Wpointer-sign]
+  229 |    sprintf(display,"Left:%5d\0", diffl/68);
       |            ^~~~~~~
       |            |
       |            uint8_t * {aka unsigned char *}
-../Core/Src/main.c:232:12: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
-../Core/Src/main.c:232:29: warning: embedded '\0' in format [-Wformat-contains-nul]
-  232 |    sprintf(display,"Left:%5d\0", diffl/68);
+../Core/Src/main.c:229:12: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+../Core/Src/main.c:229:29: warning: embedded '\0' in format [-Wformat-contains-nul]
+  229 |    sprintf(display,"Left:%5d\0", diffl/68);
       |                             ^~
-../Core/Src/main.c:234:12: warning: pointer targets in passing argument 1 of 'sprintf' differ in signedness [-Wpointer-sign]
-  234 |    sprintf(display,"Right:%5d\0", diffr/68);
+../Core/Src/main.c:231:12: warning: pointer targets in passing argument 1 of 'sprintf' differ in signedness [-Wpointer-sign]
+  231 |    sprintf(display,"Right:%5d\0", diffr/68);
       |            ^~~~~~~
       |            |
       |            uint8_t * {aka unsigned char *}
-../Core/Src/main.c:234:12: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
-../Core/Src/main.c:234:30: warning: embedded '\0' in format [-Wformat-contains-nul]
-  234 |    sprintf(display,"Right:%5d\0", diffr/68);
+../Core/Src/main.c:231:12: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+../Core/Src/main.c:231:30: warning: embedded '\0' in format [-Wformat-contains-nul]
+  231 |    sprintf(display,"Right:%5d\0", diffr/68);
       |                              ^~
 ../Core/Src/main.c: In function 'StartDefaultTask':
-../Core/Src/main.c:820:10: warning: unused variable 'test' [-Wunused-variable]
-  820 |  uint8_t test[20] = "Testing";
+../Core/Src/main.c:851:10: warning: unused variable 'test' [-Wunused-variable]
+  851 |  uint8_t test[20] = "Testing";
       |          ^~~~
 ../Core/Src/main.c: In function 'motor':
-../Core/Src/main.c:858:6: warning: variable 'x' set but not used [-Wunused-but-set-variable]
-  858 |  int x = 0;
+../Core/Src/main.c:889:6: warning: unused variable 'x' [-Wunused-variable]
+  889 |  int x = 0;
       |      ^
 ../Core/Src/main.c: In function 'motorControl':
-../Core/Src/main.c:278:1: warning: control reaches end of non-void function [-Wreturn-type]
-  278 | }
+../Core/Src/main.c:283:1: warning: control reaches end of non-void function [-Wreturn-type]
+  283 | }
       | ^
 arm-none-eabi-gcc -o "MDP_grp13.elf" @"objects.list"   -mcpu=cortex-m4 -T"/Users/le/Documents/GitHub/MDP_grp13_stm32/MDP_grp13/STM32F407VETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="MDP_grp13.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 Finished building target: MDP_grp13.elf
@@ -346,62 +329,65 @@ arm-none-eabi-size   MDP_grp13.elf
 arm-none-eabi-objdump -h -S  MDP_grp13.elf  > "MDP_grp13.list"
 arm-none-eabi-objcopy  -O ihex  MDP_grp13.elf  "MDP_grp13.hex"
    text	   data	    bss	    dec	    hex	filename
-  40876	    124	  21916	  62916	   f5c4	MDP_grp13.elf
+  45260	    128	  21912	  67300	  106e4	MDP_grp13.elf
 Finished building: default.size.stdout
  
 Finished building: MDP_grp13.hex
  
 Finished building: MDP_grp13.list
  
-23:41:34 **** Incremental Build of configuration Debug for project MDP_grp13 ****
+23:33:17 **** Incremental Build of configuration Debug for project MDP_grp13 ****
 make -j7 all 
 arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F407xx -c -I"/Users/le/Documents/GitHub/MDP_grp13_stm32/MDP_grp13/PeripheralDrivers/inc" -I"/Users/le/Documents/GitHub/MDP_grp13_stm32/MDP_grp13/PeripheralDrivers" -I../Core/Inc -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F -I../Drivers/CMSIS/Include -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
-../Core/Src/main.c:102:27: warning: data definition has no type or storage class
-  102 | uint16_t uDistCheck1 = 0; uDistCheck2 = 0; uDistFinal = 0;
+../Core/Src/main.c:105:27: warning: data definition has no type or storage class
+  105 | uint16_t uDistCheck1 = 0; uDistCheck2 = 0; uDistFinal = 0;
       |                           ^~~~~~~~~~~
-../Core/Src/main.c:102:27: warning: type defaults to 'int' in declaration of 'uDistCheck2' [-Wimplicit-int]
-../Core/Src/main.c:102:44: warning: data definition has no type or storage class
-  102 | uint16_t uDistCheck1 = 0; uDistCheck2 = 0; uDistFinal = 0;
+../Core/Src/main.c:105:27: warning: type defaults to 'int' in declaration of 'uDistCheck2' [-Wimplicit-int]
+../Core/Src/main.c:105:44: warning: data definition has no type or storage class
+  105 | uint16_t uDistCheck1 = 0; uDistCheck2 = 0; uDistFinal = 0;
       |                                            ^~~~~~~~~~
-../Core/Src/main.c:102:44: warning: type defaults to 'int' in declaration of 'uDistFinal' [-Wimplicit-int]
+../Core/Src/main.c:105:44: warning: type defaults to 'int' in declaration of 'uDistFinal' [-Wimplicit-int]
 ../Core/Src/main.c: In function 'motorControl':
-../Core/Src/main.c:232:4: warning: implicit declaration of function 'sprintf' [-Wimplicit-function-declaration]
-  232 |    sprintf(display,"Left:%5d\0", diffl/68);
+../Core/Src/main.c:226:12: warning: implicit declaration of function 'abs' [-Wimplicit-function-declaration]
+  226 |    diffl = abs(cntl2);
+      |            ^~~
+../Core/Src/main.c:229:4: warning: implicit declaration of function 'sprintf' [-Wimplicit-function-declaration]
+  229 |    sprintf(display,"Left:%5d\0", diffl/68);
       |    ^~~~~~~
-../Core/Src/main.c:232:4: warning: incompatible implicit declaration of built-in function 'sprintf'
+../Core/Src/main.c:229:4: warning: incompatible implicit declaration of built-in function 'sprintf'
 ../Core/Src/main.c:27:1: note: include '<stdio.h>' or provide a declaration of 'sprintf'
    26 | #include "math.h"
   +++ |+#include <stdio.h>
    27 | /* USER CODE END Includes */
-../Core/Src/main.c:232:12: warning: pointer targets in passing argument 1 of 'sprintf' differ in signedness [-Wpointer-sign]
-  232 |    sprintf(display,"Left:%5d\0", diffl/68);
+../Core/Src/main.c:229:12: warning: pointer targets in passing argument 1 of 'sprintf' differ in signedness [-Wpointer-sign]
+  229 |    sprintf(display,"Left:%5d\0", diffl/68);
       |            ^~~~~~~
       |            |
       |            uint8_t * {aka unsigned char *}
-../Core/Src/main.c:232:12: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
-../Core/Src/main.c:232:29: warning: embedded '\0' in format [-Wformat-contains-nul]
-  232 |    sprintf(display,"Left:%5d\0", diffl/68);
+../Core/Src/main.c:229:12: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+../Core/Src/main.c:229:29: warning: embedded '\0' in format [-Wformat-contains-nul]
+  229 |    sprintf(display,"Left:%5d\0", diffl/68);
       |                             ^~
-../Core/Src/main.c:234:12: warning: pointer targets in passing argument 1 of 'sprintf' differ in signedness [-Wpointer-sign]
-  234 |    sprintf(display,"Right:%5d\0", diffr/68);
+../Core/Src/main.c:231:12: warning: pointer targets in passing argument 1 of 'sprintf' differ in signedness [-Wpointer-sign]
+  231 |    sprintf(display,"Right:%5d\0", diffr/68);
       |            ^~~~~~~
       |            |
       |            uint8_t * {aka unsigned char *}
-../Core/Src/main.c:234:12: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
-../Core/Src/main.c:234:30: warning: embedded '\0' in format [-Wformat-contains-nul]
-  234 |    sprintf(display,"Right:%5d\0", diffr/68);
+../Core/Src/main.c:231:12: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+../Core/Src/main.c:231:30: warning: embedded '\0' in format [-Wformat-contains-nul]
+  231 |    sprintf(display,"Right:%5d\0", diffr/68);
       |                              ^~
 ../Core/Src/main.c: In function 'StartDefaultTask':
-../Core/Src/main.c:820:10: warning: unused variable 'test' [-Wunused-variable]
-  820 |  uint8_t test[20] = "Testing";
+../Core/Src/main.c:851:10: warning: unused variable 'test' [-Wunused-variable]
+  851 |  uint8_t test[20] = "Testing";
       |          ^~~~
 ../Core/Src/main.c: In function 'motor':
-../Core/Src/main.c:858:6: warning: variable 'x' set but not used [-Wunused-but-set-variable]
-  858 |  int x = 0;
+../Core/Src/main.c:889:6: warning: unused variable 'x' [-Wunused-variable]
+  889 |  int x = 0;
       |      ^
 ../Core/Src/main.c: In function 'motorControl':
-../Core/Src/main.c:278:1: warning: control reaches end of non-void function [-Wreturn-type]
-  278 | }
+../Core/Src/main.c:283:1: warning: control reaches end of non-void function [-Wreturn-type]
+  283 | }
       | ^
 arm-none-eabi-gcc -o "MDP_grp13.elf" @"objects.list"   -mcpu=cortex-m4 -T"/Users/le/Documents/GitHub/MDP_grp13_stm32/MDP_grp13/STM32F407VETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="MDP_grp13.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 Finished building target: MDP_grp13.elf
@@ -410,117 +396,65 @@ arm-none-eabi-size   MDP_grp13.elf
 arm-none-eabi-objdump -h -S  MDP_grp13.elf  > "MDP_grp13.list"
 arm-none-eabi-objcopy  -O ihex  MDP_grp13.elf  "MDP_grp13.hex"
    text	   data	    bss	    dec	    hex	filename
-  40876	    124	  21916	  62916	   f5c4	MDP_grp13.elf
+  45212	    128	  21912	  67252	  106b4	MDP_grp13.elf
 Finished building: default.size.stdout
  
 Finished building: MDP_grp13.hex
  
 Finished building: MDP_grp13.list
  
-23:45:20 **** Incremental Build of configuration Debug for project MDP_grp13 ****
+23:37:50 **** Incremental Build of configuration Debug for project MDP_grp13 ****
 make -j7 all 
 arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F407xx -c -I"/Users/le/Documents/GitHub/MDP_grp13_stm32/MDP_grp13/PeripheralDrivers/inc" -I"/Users/le/Documents/GitHub/MDP_grp13_stm32/MDP_grp13/PeripheralDrivers" -I../Core/Inc -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F -I../Drivers/CMSIS/Include -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
-../Core/Src/main.c:102:27: warning: data definition has no type or storage class
-  102 | uint16_t uDistCheck1 = 0; uDistCheck2 = 0; uDistFinal = 0;
+../Core/Src/main.c:105:27: warning: data definition has no type or storage class
+  105 | uint16_t uDistCheck1 = 0; uDistCheck2 = 0; uDistFinal = 0;
       |                           ^~~~~~~~~~~
-../Core/Src/main.c:102:27: warning: type defaults to 'int' in declaration of 'uDistCheck2' [-Wimplicit-int]
-../Core/Src/main.c:102:44: warning: data definition has no type or storage class
-  102 | uint16_t uDistCheck1 = 0; uDistCheck2 = 0; uDistFinal = 0;
+../Core/Src/main.c:105:27: warning: type defaults to 'int' in declaration of 'uDistCheck2' [-Wimplicit-int]
+../Core/Src/main.c:105:44: warning: data definition has no type or storage class
+  105 | uint16_t uDistCheck1 = 0; uDistCheck2 = 0; uDistFinal = 0;
       |                                            ^~~~~~~~~~
-../Core/Src/main.c:102:44: warning: type defaults to 'int' in declaration of 'uDistFinal' [-Wimplicit-int]
+../Core/Src/main.c:105:44: warning: type defaults to 'int' in declaration of 'uDistFinal' [-Wimplicit-int]
 ../Core/Src/main.c: In function 'motorControl':
-../Core/Src/main.c:232:4: warning: implicit declaration of function 'sprintf' [-Wimplicit-function-declaration]
-  232 |    sprintf(display,"Left:%5d\0", diffl/68);
+../Core/Src/main.c:226:12: warning: implicit declaration of function 'abs' [-Wimplicit-function-declaration]
+  226 |    diffl = abs(cntl2);
+      |            ^~~
+../Core/Src/main.c:229:4: warning: implicit declaration of function 'sprintf' [-Wimplicit-function-declaration]
+  229 |    sprintf(display,"Left:%5d\0", diffl/68);
       |    ^~~~~~~
-../Core/Src/main.c:232:4: warning: incompatible implicit declaration of built-in function 'sprintf'
+../Core/Src/main.c:229:4: warning: incompatible implicit declaration of built-in function 'sprintf'
 ../Core/Src/main.c:27:1: note: include '<stdio.h>' or provide a declaration of 'sprintf'
    26 | #include "math.h"
   +++ |+#include <stdio.h>
    27 | /* USER CODE END Includes */
-../Core/Src/main.c:232:12: warning: pointer targets in passing argument 1 of 'sprintf' differ in signedness [-Wpointer-sign]
-  232 |    sprintf(display,"Left:%5d\0", diffl/68);
+../Core/Src/main.c:229:12: warning: pointer targets in passing argument 1 of 'sprintf' differ in signedness [-Wpointer-sign]
+  229 |    sprintf(display,"Left:%5d\0", diffl/68);
       |            ^~~~~~~
       |            |
       |            uint8_t * {aka unsigned char *}
-../Core/Src/main.c:232:12: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
-../Core/Src/main.c:232:29: warning: embedded '\0' in format [-Wformat-contains-nul]
-  232 |    sprintf(display,"Left:%5d\0", diffl/68);
+../Core/Src/main.c:229:12: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+../Core/Src/main.c:229:29: warning: embedded '\0' in format [-Wformat-contains-nul]
+  229 |    sprintf(display,"Left:%5d\0", diffl/68);
       |                             ^~
-../Core/Src/main.c:234:12: warning: pointer targets in passing argument 1 of 'sprintf' differ in signedness [-Wpointer-sign]
-  234 |    sprintf(display,"Right:%5d\0", diffr/68);
+../Core/Src/main.c:231:12: warning: pointer targets in passing argument 1 of 'sprintf' differ in signedness [-Wpointer-sign]
+  231 |    sprintf(display,"Right:%5d\0", diffr/68);
       |            ^~~~~~~
       |            |
       |            uint8_t * {aka unsigned char *}
-../Core/Src/main.c:234:12: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
-../Core/Src/main.c:234:30: warning: embedded '\0' in format [-Wformat-contains-nul]
-  234 |    sprintf(display,"Right:%5d\0", diffr/68);
-      |                              ^~
-../Core/Src/main.c:240:21: error: called object is not a function or function pointer
-  240 |     speedR = speedR*0.90(0.9,1+speedR/1000);
-      |                     ^~~~
-../Core/Src/main.c: In function 'StartDefaultTask':
-../Core/Src/main.c:820:10: warning: unused variable 'test' [-Wunused-variable]
-  820 |  uint8_t test[20] = "Testing";
-      |          ^~~~
-../Core/Src/main.c: In function 'motor':
-../Core/Src/main.c:858:6: warning: variable 'x' set but not used [-Wunused-but-set-variable]
-  858 |  int x = 0;
-      |      ^
-../Core/Src/main.c: In function 'motorControl':
-../Core/Src/main.c:278:1: warning: control reaches end of non-void function [-Wreturn-type]
-  278 | }
-      | ^
-make: *** [Core/Src/subdir.mk:37: Core/Src/main.o] Error 1
-"make -j7 all" terminated with exit code 2. Build might be incomplete.
-23:45:42 **** Incremental Build of configuration Debug for project MDP_grp13 ****
-make -j7 all 
-arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F407xx -c -I"/Users/le/Documents/GitHub/MDP_grp13_stm32/MDP_grp13/PeripheralDrivers/inc" -I"/Users/le/Documents/GitHub/MDP_grp13_stm32/MDP_grp13/PeripheralDrivers" -I../Core/Inc -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F -I../Drivers/CMSIS/Include -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
-../Core/Src/main.c:102:27: warning: data definition has no type or storage class
-  102 | uint16_t uDistCheck1 = 0; uDistCheck2 = 0; uDistFinal = 0;
-      |                           ^~~~~~~~~~~
-../Core/Src/main.c:102:27: warning: type defaults to 'int' in declaration of 'uDistCheck2' [-Wimplicit-int]
-../Core/Src/main.c:102:44: warning: data definition has no type or storage class
-  102 | uint16_t uDistCheck1 = 0; uDistCheck2 = 0; uDistFinal = 0;
-      |                                            ^~~~~~~~~~
-../Core/Src/main.c:102:44: warning: type defaults to 'int' in declaration of 'uDistFinal' [-Wimplicit-int]
-../Core/Src/main.c: In function 'motorControl':
-../Core/Src/main.c:232:4: warning: implicit declaration of function 'sprintf' [-Wimplicit-function-declaration]
-  232 |    sprintf(display,"Left:%5d\0", diffl/68);
-      |    ^~~~~~~
-../Core/Src/main.c:232:4: warning: incompatible implicit declaration of built-in function 'sprintf'
-../Core/Src/main.c:27:1: note: include '<stdio.h>' or provide a declaration of 'sprintf'
-   26 | #include "math.h"
-  +++ |+#include <stdio.h>
-   27 | /* USER CODE END Includes */
-../Core/Src/main.c:232:12: warning: pointer targets in passing argument 1 of 'sprintf' differ in signedness [-Wpointer-sign]
-  232 |    sprintf(display,"Left:%5d\0", diffl/68);
-      |            ^~~~~~~
-      |            |
-      |            uint8_t * {aka unsigned char *}
-../Core/Src/main.c:232:12: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
-../Core/Src/main.c:232:29: warning: embedded '\0' in format [-Wformat-contains-nul]
-  232 |    sprintf(display,"Left:%5d\0", diffl/68);
-      |                             ^~
-../Core/Src/main.c:234:12: warning: pointer targets in passing argument 1 of 'sprintf' differ in signedness [-Wpointer-sign]
-  234 |    sprintf(display,"Right:%5d\0", diffr/68);
-      |            ^~~~~~~
-      |            |
-      |            uint8_t * {aka unsigned char *}
-../Core/Src/main.c:234:12: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
-../Core/Src/main.c:234:30: warning: embedded '\0' in format [-Wformat-contains-nul]
-  234 |    sprintf(display,"Right:%5d\0", diffr/68);
+../Core/Src/main.c:231:12: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+../Core/Src/main.c:231:30: warning: embedded '\0' in format [-Wformat-contains-nul]
+  231 |    sprintf(display,"Right:%5d\0", diffr/68);
       |                              ^~
 ../Core/Src/main.c: In function 'StartDefaultTask':
-../Core/Src/main.c:820:10: warning: unused variable 'test' [-Wunused-variable]
-  820 |  uint8_t test[20] = "Testing";
+../Core/Src/main.c:851:10: warning: unused variable 'test' [-Wunused-variable]
+  851 |  uint8_t test[20] = "Testing";
       |          ^~~~
 ../Core/Src/main.c: In function 'motor':
-../Core/Src/main.c:858:6: warning: variable 'x' set but not used [-Wunused-but-set-variable]
-  858 |  int x = 0;
+../Core/Src/main.c:889:6: warning: unused variable 'x' [-Wunused-variable]
+  889 |  int x = 0;
       |      ^
 ../Core/Src/main.c: In function 'motorControl':
-../Core/Src/main.c:278:1: warning: control reaches end of non-void function [-Wreturn-type]
-  278 | }
+../Core/Src/main.c:283:1: warning: control reaches end of non-void function [-Wreturn-type]
+  283 | }
       | ^
 arm-none-eabi-gcc -o "MDP_grp13.elf" @"objects.list"   -mcpu=cortex-m4 -T"/Users/le/Documents/GitHub/MDP_grp13_stm32/MDP_grp13/STM32F407VETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="MDP_grp13.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 Finished building target: MDP_grp13.elf
@@ -529,62 +463,72 @@ arm-none-eabi-size   MDP_grp13.elf
 arm-none-eabi-objdump -h -S  MDP_grp13.elf  > "MDP_grp13.list"
 arm-none-eabi-objcopy  -O ihex  MDP_grp13.elf  "MDP_grp13.hex"
    text	   data	    bss	    dec	    hex	filename
-  45036	    128	  21912	  67076	  10604	MDP_grp13.elf
+  45308	    128	  21912	  67348	  10714	MDP_grp13.elf
 Finished building: default.size.stdout
  
 Finished building: MDP_grp13.hex
  
 Finished building: MDP_grp13.list
  
-23:47:25 **** Incremental Build of configuration Debug for project MDP_grp13 ****
+23:38:08 **** Incremental Build of configuration Debug for project MDP_grp13 ****
+make -j7 all 
+arm-none-eabi-size   MDP_grp13.elf 
+   text	   data	    bss	    dec	    hex	filename
+  45308	    128	  21912	  67348	  10714	MDP_grp13.elf
+Finished building: default.size.stdout
+ 
+23:39:28 **** Incremental Build of configuration Debug for project MDP_grp13 ****
 make -j7 all 
 arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F407xx -c -I"/Users/le/Documents/GitHub/MDP_grp13_stm32/MDP_grp13/PeripheralDrivers/inc" -I"/Users/le/Documents/GitHub/MDP_grp13_stm32/MDP_grp13/PeripheralDrivers" -I../Core/Inc -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F -I../Drivers/CMSIS/Include -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
-../Core/Src/main.c:102:27: warning: data definition has no type or storage class
-  102 | uint16_t uDistCheck1 = 0; uDistCheck2 = 0; uDistFinal = 0;
+../Core/Src/main.c:105:27: warning: data definition has no type or storage class
+  105 | uint16_t uDistCheck1 = 0; uDistCheck2 = 0; uDistFinal = 0;
       |                           ^~~~~~~~~~~
-../Core/Src/main.c:102:27: warning: type defaults to 'int' in declaration of 'uDistCheck2' [-Wimplicit-int]
-../Core/Src/main.c:102:44: warning: data definition has no type or storage class
-  102 | uint16_t uDistCheck1 = 0; uDistCheck2 = 0; uDistFinal = 0;
+../Core/Src/main.c:105:27: warning: type defaults to 'int' in declaration of 'uDistCheck2' [-Wimplicit-int]
+../Core/Src/main.c:105:44: warning: data definition has no type or storage class
+  105 | uint16_t uDistCheck1 = 0; uDistCheck2 = 0; uDistFinal = 0;
       |                                            ^~~~~~~~~~
-../Core/Src/main.c:102:44: warning: type defaults to 'int' in declaration of 'uDistFinal' [-Wimplicit-int]
+../Core/Src/main.c:105:44: warning: type defaults to 'int' in declaration of 'uDistFinal' [-Wimplicit-int]
 ../Core/Src/main.c: In function 'motorControl':
-../Core/Src/main.c:232:4: warning: implicit declaration of function 'sprintf' [-Wimplicit-function-declaration]
-  232 |    sprintf(display,"Left:%5d\0", diffl/68);
+../Core/Src/main.c:226:12: warning: implicit declaration of function 'abs' [-Wimplicit-function-declaration]
+  226 |    diffl = abs(cntl2);
+      |            ^~~
+../Core/Src/main.c:229:4: warning: implicit declaration of function 'sprintf' [-Wimplicit-function-declaration]
+  229 |    sprintf(display,"Left:%5d\0", diffl/68);
       |    ^~~~~~~
-../Core/Src/main.c:232:4: warning: incompatible implicit declaration of built-in function 'sprintf'
+../Core/Src/main.c:229:4: warning: incompatible implicit declaration of built-in function 'sprintf'
 ../Core/Src/main.c:27:1: note: include '<stdio.h>' or provide a declaration of 'sprintf'
    26 | #include "math.h"
   +++ |+#include <stdio.h>
    27 | /* USER CODE END Includes */
-../Core/Src/main.c:232:12: warning: pointer targets in passing argument 1 of 'sprintf' differ in signedness [-Wpointer-sign]
-  232 |    sprintf(display,"Left:%5d\0", diffl/68);
+../Core/Src/main.c:229:12: warning: pointer targets in passing argument 1 of 'sprintf' differ in signedness [-Wpointer-sign]
+  229 |    sprintf(display,"Left:%5d\0", diffl/68);
       |            ^~~~~~~
       |            |
       |            uint8_t * {aka unsigned char *}
-../Core/Src/main.c:232:12: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
-../Core/Src/main.c:232:29: warning: embedded '\0' in format [-Wformat-contains-nul]
-  232 |    sprintf(display,"Left:%5d\0", diffl/68);
+../Core/Src/main.c:229:12: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+../Core/Src/main.c:229:29: warning: embedded '\0' in format [-Wformat-contains-nul]
+  229 |    sprintf(display,"Left:%5d\0", diffl/68);
       |                             ^~
-../Core/Src/main.c:234:12: warning: pointer targets in passing argument 1 of 'sprintf' differ in signedness [-Wpointer-sign]
-  234 |    sprintf(display,"Right:%5d\0", diffr/68);
+../Core/Src/main.c:231:12: warning: pointer targets in passing argument 1 of 'sprintf' differ in signedness [-Wpointer-sign]
+  231 |    sprintf(display,"Right:%5d\0", diffr/68);
       |            ^~~~~~~
       |            |
       |            uint8_t * {aka unsigned char *}
-../Core/Src/main.c:234:12: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
-../Core/Src/main.c:234:30: warning: embedded '\0' in format [-Wformat-contains-nul]
-  234 |    sprintf(display,"Right:%5d\0", diffr/68);
+../Core/Src/main.c:231:12: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+../Core/Src/main.c:231:30: warning: embedded '\0' in format [-Wformat-contains-nul]
+  231 |    sprintf(display,"Right:%5d\0", diffr/68);
       |                              ^~
 ../Core/Src/main.c: In function 'StartDefaultTask':
-../Core/Src/main.c:820:10: warning: unused variable 'test' [-Wunused-variable]
-  820 |  uint8_t test[20] = "Testing";
+../Core/Src/main.c:851:10: warning: unused variable 'test' [-Wunused-variable]
+  851 |  uint8_t test[20] = "Testing";
       |          ^~~~
 ../Core/Src/main.c: In function 'motor':
-../Core/Src/main.c:858:6: warning: variable 'x' set but not used [-Wunused-but-set-variable]
-  858 |  int x = 0;
+../Core/Src/main.c:889:6: warning: unused variable 'x' [-Wunused-variable]
+  889 |  int x = 0;
       |      ^
 ../Core/Src/main.c: In function 'motorControl':
-../Core/Src/main.c:278:1: warning: control reaches end of non-void function [-Wreturn-type]
-  278 | }
+../Core/Src/main.c:283:1: warning: control reaches end of non-void function [-Wreturn-type]
+  283 | }
       | ^
 arm-none-eabi-gcc -o "MDP_grp13.elf" @"objects.list"   -mcpu=cortex-m4 -T"/Users/le/Documents/GitHub/MDP_grp13_stm32/MDP_grp13/STM32F407VETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="MDP_grp13.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 Finished building target: MDP_grp13.elf
@@ -593,62 +537,72 @@ arm-none-eabi-size   MDP_grp13.elf
 arm-none-eabi-objdump -h -S  MDP_grp13.elf  > "MDP_grp13.list"
 arm-none-eabi-objcopy  -O ihex  MDP_grp13.elf  "MDP_grp13.hex"
    text	   data	    bss	    dec	    hex	filename
-  44988	    128	  21912	  67028	  105d4	MDP_grp13.elf
+  45292	    128	  21912	  67332	  10704	MDP_grp13.elf
 Finished building: default.size.stdout
  
 Finished building: MDP_grp13.hex
  
 Finished building: MDP_grp13.list
  
-23:50:21 **** Incremental Build of configuration Debug for project MDP_grp13 ****
+23:39:42 **** Incremental Build of configuration Debug for project MDP_grp13 ****
+make -j7 all 
+arm-none-eabi-size   MDP_grp13.elf 
+   text	   data	    bss	    dec	    hex	filename
+  45292	    128	  21912	  67332	  10704	MDP_grp13.elf
+Finished building: default.size.stdout
+ 
+23:42:31 **** Incremental Build of configuration Debug for project MDP_grp13 ****
 make -j7 all 
 arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F407xx -c -I"/Users/le/Documents/GitHub/MDP_grp13_stm32/MDP_grp13/PeripheralDrivers/inc" -I"/Users/le/Documents/GitHub/MDP_grp13_stm32/MDP_grp13/PeripheralDrivers" -I../Core/Inc -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F -I../Drivers/CMSIS/Include -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
-../Core/Src/main.c:102:27: warning: data definition has no type or storage class
-  102 | uint16_t uDistCheck1 = 0; uDistCheck2 = 0; uDistFinal = 0;
+../Core/Src/main.c:105:27: warning: data definition has no type or storage class
+  105 | uint16_t uDistCheck1 = 0; uDistCheck2 = 0; uDistFinal = 0;
       |                           ^~~~~~~~~~~
-../Core/Src/main.c:102:27: warning: type defaults to 'int' in declaration of 'uDistCheck2' [-Wimplicit-int]
-../Core/Src/main.c:102:44: warning: data definition has no type or storage class
-  102 | uint16_t uDistCheck1 = 0; uDistCheck2 = 0; uDistFinal = 0;
+../Core/Src/main.c:105:27: warning: type defaults to 'int' in declaration of 'uDistCheck2' [-Wimplicit-int]
+../Core/Src/main.c:105:44: warning: data definition has no type or storage class
+  105 | uint16_t uDistCheck1 = 0; uDistCheck2 = 0; uDistFinal = 0;
       |                                            ^~~~~~~~~~
-../Core/Src/main.c:102:44: warning: type defaults to 'int' in declaration of 'uDistFinal' [-Wimplicit-int]
+../Core/Src/main.c:105:44: warning: type defaults to 'int' in declaration of 'uDistFinal' [-Wimplicit-int]
 ../Core/Src/main.c: In function 'motorControl':
-../Core/Src/main.c:232:4: warning: implicit declaration of function 'sprintf' [-Wimplicit-function-declaration]
-  232 |    sprintf(display,"Left:%5d\0", diffl/68);
+../Core/Src/main.c:226:12: warning: implicit declaration of function 'abs' [-Wimplicit-function-declaration]
+  226 |    diffl = abs(cntl2);
+      |            ^~~
+../Core/Src/main.c:229:4: warning: implicit declaration of function 'sprintf' [-Wimplicit-function-declaration]
+  229 |    sprintf(display,"Left:%5d\0", diffl/68);
       |    ^~~~~~~
-../Core/Src/main.c:232:4: warning: incompatible implicit declaration of built-in function 'sprintf'
+../Core/Src/main.c:229:4: warning: incompatible implicit declaration of built-in function 'sprintf'
 ../Core/Src/main.c:27:1: note: include '<stdio.h>' or provide a declaration of 'sprintf'
    26 | #include "math.h"
   +++ |+#include <stdio.h>
    27 | /* USER CODE END Includes */
-../Core/Src/main.c:232:12: warning: pointer targets in passing argument 1 of 'sprintf' differ in signedness [-Wpointer-sign]
-  232 |    sprintf(display,"Left:%5d\0", diffl/68);
+../Core/Src/main.c:229:12: warning: pointer targets in passing argument 1 of 'sprintf' differ in signedness [-Wpointer-sign]
+  229 |    sprintf(display,"Left:%5d\0", diffl/68);
       |            ^~~~~~~
       |            |
       |            uint8_t * {aka unsigned char *}
-../Core/Src/main.c:232:12: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
-../Core/Src/main.c:232:29: warning: embedded '\0' in format [-Wformat-contains-nul]
-  232 |    sprintf(display,"Left:%5d\0", diffl/68);
+../Core/Src/main.c:229:12: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+../Core/Src/main.c:229:29: warning: embedded '\0' in format [-Wformat-contains-nul]
+  229 |    sprintf(display,"Left:%5d\0", diffl/68);
       |                             ^~
-../Core/Src/main.c:234:12: warning: pointer targets in passing argument 1 of 'sprintf' differ in signedness [-Wpointer-sign]
-  234 |    sprintf(display,"Right:%5d\0", diffr/68);
+../Core/Src/main.c:231:12: warning: pointer targets in passing argument 1 of 'sprintf' differ in signedness [-Wpointer-sign]
+  231 |    sprintf(display,"Right:%5d\0", diffr/68);
       |            ^~~~~~~
       |            |
       |            uint8_t * {aka unsigned char *}
-../Core/Src/main.c:234:12: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
-../Core/Src/main.c:234:30: warning: embedded '\0' in format [-Wformat-contains-nul]
-  234 |    sprintf(display,"Right:%5d\0", diffr/68);
+../Core/Src/main.c:231:12: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+../Core/Src/main.c:231:30: warning: embedded '\0' in format [-Wformat-contains-nul]
+  231 |    sprintf(display,"Right:%5d\0", diffr/68);
       |                              ^~
 ../Core/Src/main.c: In function 'StartDefaultTask':
-../Core/Src/main.c:820:10: warning: unused variable 'test' [-Wunused-variable]
-  820 |  uint8_t test[20] = "Testing";
+../Core/Src/main.c:851:10: warning: unused variable 'test' [-Wunused-variable]
+  851 |  uint8_t test[20] = "Testing";
       |          ^~~~
 ../Core/Src/main.c: In function 'motor':
-../Core/Src/main.c:858:6: warning: variable 'x' set but not used [-Wunused-but-set-variable]
-  858 |  int x = 0;
+../Core/Src/main.c:889:6: warning: unused variable 'x' [-Wunused-variable]
+  889 |  int x = 0;
       |      ^
 ../Core/Src/main.c: In function 'motorControl':
-../Core/Src/main.c:278:1: warning: control reaches end of non-void function [-Wreturn-type]
-  278 | }
+../Core/Src/main.c:283:1: warning: control reaches end of non-void function [-Wreturn-type]
+  283 | }
       | ^
 arm-none-eabi-gcc -o "MDP_grp13.elf" @"objects.list"   -mcpu=cortex-m4 -T"/Users/le/Documents/GitHub/MDP_grp13_stm32/MDP_grp13/STM32F407VETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="MDP_grp13.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 Finished building target: MDP_grp13.elf
@@ -657,62 +611,65 @@ arm-none-eabi-size   MDP_grp13.elf
 arm-none-eabi-objdump -h -S  MDP_grp13.elf  > "MDP_grp13.list"
 arm-none-eabi-objcopy  -O ihex  MDP_grp13.elf  "MDP_grp13.hex"
    text	   data	    bss	    dec	    hex	filename
-  40876	    124	  21916	  62916	   f5c4	MDP_grp13.elf
+  45292	    128	  21912	  67332	  10704	MDP_grp13.elf
 Finished building: default.size.stdout
  
 Finished building: MDP_grp13.hex
  
 Finished building: MDP_grp13.list
  
-23:57:46 **** Incremental Build of configuration Debug for project MDP_grp13 ****
+23:46:10 **** Incremental Build of configuration Debug for project MDP_grp13 ****
 make -j7 all 
 arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F407xx -c -I"/Users/le/Documents/GitHub/MDP_grp13_stm32/MDP_grp13/PeripheralDrivers/inc" -I"/Users/le/Documents/GitHub/MDP_grp13_stm32/MDP_grp13/PeripheralDrivers" -I../Core/Inc -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F -I../Drivers/CMSIS/Include -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
-../Core/Src/main.c:102:27: warning: data definition has no type or storage class
-  102 | uint16_t uDistCheck1 = 0; uDistCheck2 = 0; uDistFinal = 0;
+../Core/Src/main.c:105:27: warning: data definition has no type or storage class
+  105 | uint16_t uDistCheck1 = 0; uDistCheck2 = 0; uDistFinal = 0;
       |                           ^~~~~~~~~~~
-../Core/Src/main.c:102:27: warning: type defaults to 'int' in declaration of 'uDistCheck2' [-Wimplicit-int]
-../Core/Src/main.c:102:44: warning: data definition has no type or storage class
-  102 | uint16_t uDistCheck1 = 0; uDistCheck2 = 0; uDistFinal = 0;
+../Core/Src/main.c:105:27: warning: type defaults to 'int' in declaration of 'uDistCheck2' [-Wimplicit-int]
+../Core/Src/main.c:105:44: warning: data definition has no type or storage class
+  105 | uint16_t uDistCheck1 = 0; uDistCheck2 = 0; uDistFinal = 0;
       |                                            ^~~~~~~~~~
-../Core/Src/main.c:102:44: warning: type defaults to 'int' in declaration of 'uDistFinal' [-Wimplicit-int]
+../Core/Src/main.c:105:44: warning: type defaults to 'int' in declaration of 'uDistFinal' [-Wimplicit-int]
 ../Core/Src/main.c: In function 'motorControl':
-../Core/Src/main.c:232:4: warning: implicit declaration of function 'sprintf' [-Wimplicit-function-declaration]
-  232 |    sprintf(display,"Left:%5d\0", diffl/68);
+../Core/Src/main.c:226:12: warning: implicit declaration of function 'abs' [-Wimplicit-function-declaration]
+  226 |    diffl = abs(cntl2);
+      |            ^~~
+../Core/Src/main.c:229:4: warning: implicit declaration of function 'sprintf' [-Wimplicit-function-declaration]
+  229 |    sprintf(display,"Left:%5d\0", diffl/68);
       |    ^~~~~~~
-../Core/Src/main.c:232:4: warning: incompatible implicit declaration of built-in function 'sprintf'
+../Core/Src/main.c:229:4: warning: incompatible implicit declaration of built-in function 'sprintf'
 ../Core/Src/main.c:27:1: note: include '<stdio.h>' or provide a declaration of 'sprintf'
    26 | #include "math.h"
   +++ |+#include <stdio.h>
    27 | /* USER CODE END Includes */
-../Core/Src/main.c:232:12: warning: pointer targets in passing argument 1 of 'sprintf' differ in signedness [-Wpointer-sign]
-  232 |    sprintf(display,"Left:%5d\0", diffl/68);
+../Core/Src/main.c:229:12: warning: pointer targets in passing argument 1 of 'sprintf' differ in signedness [-Wpointer-sign]
+  229 |    sprintf(display,"Left:%5d\0", diffl/68);
       |            ^~~~~~~
       |            |
       |            uint8_t * {aka unsigned char *}
-../Core/Src/main.c:232:12: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
-../Core/Src/main.c:232:29: warning: embedded '\0' in format [-Wformat-contains-nul]
-  232 |    sprintf(display,"Left:%5d\0", diffl/68);
+../Core/Src/main.c:229:12: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+../Core/Src/main.c:229:29: warning: embedded '\0' in format [-Wformat-contains-nul]
+  229 |    sprintf(display,"Left:%5d\0", diffl/68);
       |                             ^~
-../Core/Src/main.c:234:12: warning: pointer targets in passing argument 1 of 'sprintf' differ in signedness [-Wpointer-sign]
-  234 |    sprintf(display,"Right:%5d\0", diffr/68);
+../Core/Src/main.c:231:12: warning: pointer targets in passing argument 1 of 'sprintf' differ in signedness [-Wpointer-sign]
+  231 |    sprintf(display,"Right:%5d\0", diffr/68);
       |            ^~~~~~~
       |            |
       |            uint8_t * {aka unsigned char *}
-../Core/Src/main.c:234:12: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
-../Core/Src/main.c:234:30: warning: embedded '\0' in format [-Wformat-contains-nul]
-  234 |    sprintf(display,"Right:%5d\0", diffr/68);
+../Core/Src/main.c:231:12: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+../Core/Src/main.c:231:30: warning: embedded '\0' in format [-Wformat-contains-nul]
+  231 |    sprintf(display,"Right:%5d\0", diffr/68);
       |                              ^~
 ../Core/Src/main.c: In function 'StartDefaultTask':
-../Core/Src/main.c:820:10: warning: unused variable 'test' [-Wunused-variable]
-  820 |  uint8_t test[20] = "Testing";
+../Core/Src/main.c:851:10: warning: unused variable 'test' [-Wunused-variable]
+  851 |  uint8_t test[20] = "Testing";
       |          ^~~~
 ../Core/Src/main.c: In function 'motor':
-../Core/Src/main.c:858:6: warning: variable 'x' set but not used [-Wunused-but-set-variable]
-  858 |  int x = 0;
+../Core/Src/main.c:889:6: warning: unused variable 'x' [-Wunused-variable]
+  889 |  int x = 0;
       |      ^
 ../Core/Src/main.c: In function 'motorControl':
-../Core/Src/main.c:278:1: warning: control reaches end of non-void function [-Wreturn-type]
-  278 | }
+../Core/Src/main.c:283:1: warning: control reaches end of non-void function [-Wreturn-type]
+  283 | }
       | ^
 arm-none-eabi-gcc -o "MDP_grp13.elf" @"objects.list"   -mcpu=cortex-m4 -T"/Users/le/Documents/GitHub/MDP_grp13_stm32/MDP_grp13/STM32F407VETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="MDP_grp13.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 Finished building target: MDP_grp13.elf
@@ -721,62 +678,65 @@ arm-none-eabi-size   MDP_grp13.elf
 arm-none-eabi-objdump -h -S  MDP_grp13.elf  > "MDP_grp13.list"
 arm-none-eabi-objcopy  -O ihex  MDP_grp13.elf  "MDP_grp13.hex"
    text	   data	    bss	    dec	    hex	filename
-  45068	    128	  21912	  67108	  10624	MDP_grp13.elf
+  45308	    128	  21912	  67348	  10714	MDP_grp13.elf
 Finished building: default.size.stdout
  
 Finished building: MDP_grp13.hex
  
 Finished building: MDP_grp13.list
  
-23:59:30 **** Incremental Build of configuration Debug for project MDP_grp13 ****
+23:49:15 **** Incremental Build of configuration Debug for project MDP_grp13 ****
 make -j7 all 
 arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F407xx -c -I"/Users/le/Documents/GitHub/MDP_grp13_stm32/MDP_grp13/PeripheralDrivers/inc" -I"/Users/le/Documents/GitHub/MDP_grp13_stm32/MDP_grp13/PeripheralDrivers" -I../Core/Inc -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F -I../Drivers/CMSIS/Include -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
-../Core/Src/main.c:102:27: warning: data definition has no type or storage class
-  102 | uint16_t uDistCheck1 = 0; uDistCheck2 = 0; uDistFinal = 0;
+../Core/Src/main.c:105:27: warning: data definition has no type or storage class
+  105 | uint16_t uDistCheck1 = 0; uDistCheck2 = 0; uDistFinal = 0;
       |                           ^~~~~~~~~~~
-../Core/Src/main.c:102:27: warning: type defaults to 'int' in declaration of 'uDistCheck2' [-Wimplicit-int]
-../Core/Src/main.c:102:44: warning: data definition has no type or storage class
-  102 | uint16_t uDistCheck1 = 0; uDistCheck2 = 0; uDistFinal = 0;
+../Core/Src/main.c:105:27: warning: type defaults to 'int' in declaration of 'uDistCheck2' [-Wimplicit-int]
+../Core/Src/main.c:105:44: warning: data definition has no type or storage class
+  105 | uint16_t uDistCheck1 = 0; uDistCheck2 = 0; uDistFinal = 0;
       |                                            ^~~~~~~~~~
-../Core/Src/main.c:102:44: warning: type defaults to 'int' in declaration of 'uDistFinal' [-Wimplicit-int]
+../Core/Src/main.c:105:44: warning: type defaults to 'int' in declaration of 'uDistFinal' [-Wimplicit-int]
 ../Core/Src/main.c: In function 'motorControl':
-../Core/Src/main.c:232:4: warning: implicit declaration of function 'sprintf' [-Wimplicit-function-declaration]
-  232 |    sprintf(display,"Left:%5d\0", diffl/68);
+../Core/Src/main.c:226:12: warning: implicit declaration of function 'abs' [-Wimplicit-function-declaration]
+  226 |    diffl = abs(cntl2);
+      |            ^~~
+../Core/Src/main.c:229:4: warning: implicit declaration of function 'sprintf' [-Wimplicit-function-declaration]
+  229 |    sprintf(display,"Left:%5d\0", diffl/68);
       |    ^~~~~~~
-../Core/Src/main.c:232:4: warning: incompatible implicit declaration of built-in function 'sprintf'
+../Core/Src/main.c:229:4: warning: incompatible implicit declaration of built-in function 'sprintf'
 ../Core/Src/main.c:27:1: note: include '<stdio.h>' or provide a declaration of 'sprintf'
    26 | #include "math.h"
   +++ |+#include <stdio.h>
    27 | /* USER CODE END Includes */
-../Core/Src/main.c:232:12: warning: pointer targets in passing argument 1 of 'sprintf' differ in signedness [-Wpointer-sign]
-  232 |    sprintf(display,"Left:%5d\0", diffl/68);
+../Core/Src/main.c:229:12: warning: pointer targets in passing argument 1 of 'sprintf' differ in signedness [-Wpointer-sign]
+  229 |    sprintf(display,"Left:%5d\0", diffl/68);
       |            ^~~~~~~
       |            |
       |            uint8_t * {aka unsigned char *}
-../Core/Src/main.c:232:12: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
-../Core/Src/main.c:232:29: warning: embedded '\0' in format [-Wformat-contains-nul]
-  232 |    sprintf(display,"Left:%5d\0", diffl/68);
+../Core/Src/main.c:229:12: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+../Core/Src/main.c:229:29: warning: embedded '\0' in format [-Wformat-contains-nul]
+  229 |    sprintf(display,"Left:%5d\0", diffl/68);
       |                             ^~
-../Core/Src/main.c:234:12: warning: pointer targets in passing argument 1 of 'sprintf' differ in signedness [-Wpointer-sign]
-  234 |    sprintf(display,"Right:%5d\0", diffr/68);
+../Core/Src/main.c:231:12: warning: pointer targets in passing argument 1 of 'sprintf' differ in signedness [-Wpointer-sign]
+  231 |    sprintf(display,"Right:%5d\0", diffr/68);
       |            ^~~~~~~
       |            |
       |            uint8_t * {aka unsigned char *}
-../Core/Src/main.c:234:12: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
-../Core/Src/main.c:234:30: warning: embedded '\0' in format [-Wformat-contains-nul]
-  234 |    sprintf(display,"Right:%5d\0", diffr/68);
+../Core/Src/main.c:231:12: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+../Core/Src/main.c:231:30: warning: embedded '\0' in format [-Wformat-contains-nul]
+  231 |    sprintf(display,"Right:%5d\0", diffr/68);
       |                              ^~
 ../Core/Src/main.c: In function 'StartDefaultTask':
-../Core/Src/main.c:820:10: warning: unused variable 'test' [-Wunused-variable]
-  820 |  uint8_t test[20] = "Testing";
+../Core/Src/main.c:851:10: warning: unused variable 'test' [-Wunused-variable]
+  851 |  uint8_t test[20] = "Testing";
       |          ^~~~
 ../Core/Src/main.c: In function 'motor':
-../Core/Src/main.c:858:6: warning: variable 'x' set but not used [-Wunused-but-set-variable]
-  858 |  int x = 0;
+../Core/Src/main.c:889:6: warning: unused variable 'x' [-Wunused-variable]
+  889 |  int x = 0;
       |      ^
 ../Core/Src/main.c: In function 'motorControl':
-../Core/Src/main.c:278:1: warning: control reaches end of non-void function [-Wreturn-type]
-  278 | }
+../Core/Src/main.c:283:1: warning: control reaches end of non-void function [-Wreturn-type]
+  283 | }
       | ^
 arm-none-eabi-gcc -o "MDP_grp13.elf" @"objects.list"   -mcpu=cortex-m4 -T"/Users/le/Documents/GitHub/MDP_grp13_stm32/MDP_grp13/STM32F407VETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="MDP_grp13.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 Finished building target: MDP_grp13.elf
@@ -785,62 +745,65 @@ arm-none-eabi-size   MDP_grp13.elf
 arm-none-eabi-objdump -h -S  MDP_grp13.elf  > "MDP_grp13.list"
 arm-none-eabi-objcopy  -O ihex  MDP_grp13.elf  "MDP_grp13.hex"
    text	   data	    bss	    dec	    hex	filename
-  45068	    128	  21912	  67108	  10624	MDP_grp13.elf
+  45308	    128	  21912	  67348	  10714	MDP_grp13.elf
 Finished building: default.size.stdout
  
 Finished building: MDP_grp13.hex
  
 Finished building: MDP_grp13.list
  
-00:01:02 **** Incremental Build of configuration Debug for project MDP_grp13 ****
+23:52:33 **** Incremental Build of configuration Debug for project MDP_grp13 ****
 make -j7 all 
 arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F407xx -c -I"/Users/le/Documents/GitHub/MDP_grp13_stm32/MDP_grp13/PeripheralDrivers/inc" -I"/Users/le/Documents/GitHub/MDP_grp13_stm32/MDP_grp13/PeripheralDrivers" -I../Core/Inc -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F -I../Drivers/CMSIS/Include -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
-../Core/Src/main.c:102:27: warning: data definition has no type or storage class
-  102 | uint16_t uDistCheck1 = 0; uDistCheck2 = 0; uDistFinal = 0;
+../Core/Src/main.c:105:27: warning: data definition has no type or storage class
+  105 | uint16_t uDistCheck1 = 0; uDistCheck2 = 0; uDistFinal = 0;
       |                           ^~~~~~~~~~~
-../Core/Src/main.c:102:27: warning: type defaults to 'int' in declaration of 'uDistCheck2' [-Wimplicit-int]
-../Core/Src/main.c:102:44: warning: data definition has no type or storage class
-  102 | uint16_t uDistCheck1 = 0; uDistCheck2 = 0; uDistFinal = 0;
+../Core/Src/main.c:105:27: warning: type defaults to 'int' in declaration of 'uDistCheck2' [-Wimplicit-int]
+../Core/Src/main.c:105:44: warning: data definition has no type or storage class
+  105 | uint16_t uDistCheck1 = 0; uDistCheck2 = 0; uDistFinal = 0;
       |                                            ^~~~~~~~~~
-../Core/Src/main.c:102:44: warning: type defaults to 'int' in declaration of 'uDistFinal' [-Wimplicit-int]
+../Core/Src/main.c:105:44: warning: type defaults to 'int' in declaration of 'uDistFinal' [-Wimplicit-int]
 ../Core/Src/main.c: In function 'motorControl':
-../Core/Src/main.c:232:4: warning: implicit declaration of function 'sprintf' [-Wimplicit-function-declaration]
-  232 |    sprintf(display,"Left:%5d\0", diffl/68);
+../Core/Src/main.c:226:12: warning: implicit declaration of function 'abs' [-Wimplicit-function-declaration]
+  226 |    diffl = abs(cntl2);
+      |            ^~~
+../Core/Src/main.c:230:4: warning: implicit declaration of function 'sprintf' [-Wimplicit-function-declaration]
+  230 |    sprintf(display,"Left:%5d\0", diffl/68);
       |    ^~~~~~~
-../Core/Src/main.c:232:4: warning: incompatible implicit declaration of built-in function 'sprintf'
+../Core/Src/main.c:230:4: warning: incompatible implicit declaration of built-in function 'sprintf'
 ../Core/Src/main.c:27:1: note: include '<stdio.h>' or provide a declaration of 'sprintf'
    26 | #include "math.h"
   +++ |+#include <stdio.h>
    27 | /* USER CODE END Includes */
+../Core/Src/main.c:230:12: warning: pointer targets in passing argument 1 of 'sprintf' differ in signedness [-Wpointer-sign]
+  230 |    sprintf(display,"Left:%5d\0", diffl/68);
+      |            ^~~~~~~
+      |            |
+      |            uint8_t * {aka unsigned char *}
+../Core/Src/main.c:230:12: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+../Core/Src/main.c:230:29: warning: embedded '\0' in format [-Wformat-contains-nul]
+  230 |    sprintf(display,"Left:%5d\0", diffl/68);
+      |                             ^~
 ../Core/Src/main.c:232:12: warning: pointer targets in passing argument 1 of 'sprintf' differ in signedness [-Wpointer-sign]
-  232 |    sprintf(display,"Left:%5d\0", diffl/68);
+  232 |    sprintf(display,"Right:%5d\0", diffr/68);
       |            ^~~~~~~
       |            |
       |            uint8_t * {aka unsigned char *}
 ../Core/Src/main.c:232:12: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
-../Core/Src/main.c:232:29: warning: embedded '\0' in format [-Wformat-contains-nul]
-  232 |    sprintf(display,"Left:%5d\0", diffl/68);
-      |                             ^~
-../Core/Src/main.c:234:12: warning: pointer targets in passing argument 1 of 'sprintf' differ in signedness [-Wpointer-sign]
-  234 |    sprintf(display,"Right:%5d\0", diffr/68);
-      |            ^~~~~~~
-      |            |
-      |            uint8_t * {aka unsigned char *}
-../Core/Src/main.c:234:12: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
-../Core/Src/main.c:234:30: warning: embedded '\0' in format [-Wformat-contains-nul]
-  234 |    sprintf(display,"Right:%5d\0", diffr/68);
+../Core/Src/main.c:232:30: warning: embedded '\0' in format [-Wformat-contains-nul]
+  232 |    sprintf(display,"Right:%5d\0", diffr/68);
       |                              ^~
 ../Core/Src/main.c: In function 'StartDefaultTask':
-../Core/Src/main.c:820:10: warning: unused variable 'test' [-Wunused-variable]
-  820 |  uint8_t test[20] = "Testing";
+../Core/Src/main.c:852:10: warning: unused variable 'test' [-Wunused-variable]
+  852 |  uint8_t test[20] = "Testing";
       |          ^~~~
 ../Core/Src/main.c: In function 'motor':
-../Core/Src/main.c:858:6: warning: variable 'x' set but not used [-Wunused-but-set-variable]
-  858 |  int x = 0;
+../Core/Src/main.c:890:6: warning: unused variable 'x' [-Wunused-variable]
+  890 |  int x = 0;
       |      ^
 ../Core/Src/main.c: In function 'motorControl':
-../Core/Src/main.c:278:1: warning: control reaches end of non-void function [-Wreturn-type]
-  278 | }
+../Core/Src/main.c:284:1: warning: control reaches end of non-void function [-Wreturn-type]
+  284 | }
       | ^
 arm-none-eabi-gcc -o "MDP_grp13.elf" @"objects.list"   -mcpu=cortex-m4 -T"/Users/le/Documents/GitHub/MDP_grp13_stm32/MDP_grp13/STM32F407VETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="MDP_grp13.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 Finished building target: MDP_grp13.elf
@@ -849,62 +812,65 @@ arm-none-eabi-size   MDP_grp13.elf
 arm-none-eabi-objdump -h -S  MDP_grp13.elf  > "MDP_grp13.list"
 arm-none-eabi-objcopy  -O ihex  MDP_grp13.elf  "MDP_grp13.hex"
    text	   data	    bss	    dec	    hex	filename
-  45068	    128	  21912	  67108	  10624	MDP_grp13.elf
+  45356	    128	  21912	  67396	  10744	MDP_grp13.elf
 Finished building: default.size.stdout
  
 Finished building: MDP_grp13.hex
  
 Finished building: MDP_grp13.list
  
-00:03:49 **** Incremental Build of configuration Debug for project MDP_grp13 ****
+23:54:12 **** Incremental Build of configuration Debug for project MDP_grp13 ****
 make -j7 all 
 arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F407xx -c -I"/Users/le/Documents/GitHub/MDP_grp13_stm32/MDP_grp13/PeripheralDrivers/inc" -I"/Users/le/Documents/GitHub/MDP_grp13_stm32/MDP_grp13/PeripheralDrivers" -I../Core/Inc -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F -I../Drivers/CMSIS/Include -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
-../Core/Src/main.c:102:27: warning: data definition has no type or storage class
-  102 | uint16_t uDistCheck1 = 0; uDistCheck2 = 0; uDistFinal = 0;
+../Core/Src/main.c:105:27: warning: data definition has no type or storage class
+  105 | uint16_t uDistCheck1 = 0; uDistCheck2 = 0; uDistFinal = 0;
       |                           ^~~~~~~~~~~
-../Core/Src/main.c:102:27: warning: type defaults to 'int' in declaration of 'uDistCheck2' [-Wimplicit-int]
-../Core/Src/main.c:102:44: warning: data definition has no type or storage class
-  102 | uint16_t uDistCheck1 = 0; uDistCheck2 = 0; uDistFinal = 0;
+../Core/Src/main.c:105:27: warning: type defaults to 'int' in declaration of 'uDistCheck2' [-Wimplicit-int]
+../Core/Src/main.c:105:44: warning: data definition has no type or storage class
+  105 | uint16_t uDistCheck1 = 0; uDistCheck2 = 0; uDistFinal = 0;
       |                                            ^~~~~~~~~~
-../Core/Src/main.c:102:44: warning: type defaults to 'int' in declaration of 'uDistFinal' [-Wimplicit-int]
+../Core/Src/main.c:105:44: warning: type defaults to 'int' in declaration of 'uDistFinal' [-Wimplicit-int]
 ../Core/Src/main.c: In function 'motorControl':
-../Core/Src/main.c:232:4: warning: implicit declaration of function 'sprintf' [-Wimplicit-function-declaration]
-  232 |    sprintf(display,"Left:%5d\0", diffl/68);
+../Core/Src/main.c:226:12: warning: implicit declaration of function 'abs' [-Wimplicit-function-declaration]
+  226 |    diffl = abs(cntl2);
+      |            ^~~
+../Core/Src/main.c:230:4: warning: implicit declaration of function 'sprintf' [-Wimplicit-function-declaration]
+  230 |    sprintf(display,"Left:%5d\0", diffl/68);
       |    ^~~~~~~
-../Core/Src/main.c:232:4: warning: incompatible implicit declaration of built-in function 'sprintf'
+../Core/Src/main.c:230:4: warning: incompatible implicit declaration of built-in function 'sprintf'
 ../Core/Src/main.c:27:1: note: include '<stdio.h>' or provide a declaration of 'sprintf'
    26 | #include "math.h"
   +++ |+#include <stdio.h>
    27 | /* USER CODE END Includes */
+../Core/Src/main.c:230:12: warning: pointer targets in passing argument 1 of 'sprintf' differ in signedness [-Wpointer-sign]
+  230 |    sprintf(display,"Left:%5d\0", diffl/68);
+      |            ^~~~~~~
+      |            |
+      |            uint8_t * {aka unsigned char *}
+../Core/Src/main.c:230:12: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+../Core/Src/main.c:230:29: warning: embedded '\0' in format [-Wformat-contains-nul]
+  230 |    sprintf(display,"Left:%5d\0", diffl/68);
+      |                             ^~
 ../Core/Src/main.c:232:12: warning: pointer targets in passing argument 1 of 'sprintf' differ in signedness [-Wpointer-sign]
-  232 |    sprintf(display,"Left:%5d\0", diffl/68);
+  232 |    sprintf(display,"Right:%5d\0", diffr/68);
       |            ^~~~~~~
       |            |
       |            uint8_t * {aka unsigned char *}
 ../Core/Src/main.c:232:12: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
-../Core/Src/main.c:232:29: warning: embedded '\0' in format [-Wformat-contains-nul]
-  232 |    sprintf(display,"Left:%5d\0", diffl/68);
-      |                             ^~
-../Core/Src/main.c:234:12: warning: pointer targets in passing argument 1 of 'sprintf' differ in signedness [-Wpointer-sign]
-  234 |    sprintf(display,"Right:%5d\0", diffr/68);
-      |            ^~~~~~~
-      |            |
-      |            uint8_t * {aka unsigned char *}
-../Core/Src/main.c:234:12: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
-../Core/Src/main.c:234:30: warning: embedded '\0' in format [-Wformat-contains-nul]
-  234 |    sprintf(display,"Right:%5d\0", diffr/68);
+../Core/Src/main.c:232:30: warning: embedded '\0' in format [-Wformat-contains-nul]
+  232 |    sprintf(display,"Right:%5d\0", diffr/68);
       |                              ^~
 ../Core/Src/main.c: In function 'StartDefaultTask':
-../Core/Src/main.c:820:10: warning: unused variable 'test' [-Wunused-variable]
-  820 |  uint8_t test[20] = "Testing";
+../Core/Src/main.c:852:10: warning: unused variable 'test' [-Wunused-variable]
+  852 |  uint8_t test[20] = "Testing";
       |          ^~~~
 ../Core/Src/main.c: In function 'motor':
-../Core/Src/main.c:858:6: warning: variable 'x' set but not used [-Wunused-but-set-variable]
-  858 |  int x = 0;
+../Core/Src/main.c:890:6: warning: unused variable 'x' [-Wunused-variable]
+  890 |  int x = 0;
       |      ^
 ../Core/Src/main.c: In function 'motorControl':
-../Core/Src/main.c:278:1: warning: control reaches end of non-void function [-Wreturn-type]
-  278 | }
+../Core/Src/main.c:284:1: warning: control reaches end of non-void function [-Wreturn-type]
+  284 | }
       | ^
 arm-none-eabi-gcc -o "MDP_grp13.elf" @"objects.list"   -mcpu=cortex-m4 -T"/Users/le/Documents/GitHub/MDP_grp13_stm32/MDP_grp13/STM32F407VETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="MDP_grp13.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 Finished building target: MDP_grp13.elf
@@ -913,62 +879,65 @@ arm-none-eabi-size   MDP_grp13.elf
 arm-none-eabi-objdump -h -S  MDP_grp13.elf  > "MDP_grp13.list"
 arm-none-eabi-objcopy  -O ihex  MDP_grp13.elf  "MDP_grp13.hex"
    text	   data	    bss	    dec	    hex	filename
-  45068	    128	  21912	  67108	  10624	MDP_grp13.elf
+  45532	    128	  21912	  67572	  107f4	MDP_grp13.elf
 Finished building: default.size.stdout
  
 Finished building: MDP_grp13.hex
  
 Finished building: MDP_grp13.list
  
-00:12:17 **** Incremental Build of configuration Debug for project MDP_grp13 ****
+23:59:03 **** Incremental Build of configuration Debug for project MDP_grp13 ****
 make -j7 all 
 arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F407xx -c -I"/Users/le/Documents/GitHub/MDP_grp13_stm32/MDP_grp13/PeripheralDrivers/inc" -I"/Users/le/Documents/GitHub/MDP_grp13_stm32/MDP_grp13/PeripheralDrivers" -I../Core/Inc -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F -I../Drivers/CMSIS/Include -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
-../Core/Src/main.c:102:27: warning: data definition has no type or storage class
-  102 | uint16_t uDistCheck1 = 0; uDistCheck2 = 0; uDistFinal = 0;
+../Core/Src/main.c:105:27: warning: data definition has no type or storage class
+  105 | uint16_t uDistCheck1 = 0; uDistCheck2 = 0; uDistFinal = 0;
       |                           ^~~~~~~~~~~
-../Core/Src/main.c:102:27: warning: type defaults to 'int' in declaration of 'uDistCheck2' [-Wimplicit-int]
-../Core/Src/main.c:102:44: warning: data definition has no type or storage class
-  102 | uint16_t uDistCheck1 = 0; uDistCheck2 = 0; uDistFinal = 0;
+../Core/Src/main.c:105:27: warning: type defaults to 'int' in declaration of 'uDistCheck2' [-Wimplicit-int]
+../Core/Src/main.c:105:44: warning: data definition has no type or storage class
+  105 | uint16_t uDistCheck1 = 0; uDistCheck2 = 0; uDistFinal = 0;
       |                                            ^~~~~~~~~~
-../Core/Src/main.c:102:44: warning: type defaults to 'int' in declaration of 'uDistFinal' [-Wimplicit-int]
+../Core/Src/main.c:105:44: warning: type defaults to 'int' in declaration of 'uDistFinal' [-Wimplicit-int]
 ../Core/Src/main.c: In function 'motorControl':
-../Core/Src/main.c:232:4: warning: implicit declaration of function 'sprintf' [-Wimplicit-function-declaration]
-  232 |    sprintf(display,"Left:%5d\0", diffl/68);
+../Core/Src/main.c:226:12: warning: implicit declaration of function 'abs' [-Wimplicit-function-declaration]
+  226 |    diffl = abs(cntl2);
+      |            ^~~
+../Core/Src/main.c:230:4: warning: implicit declaration of function 'sprintf' [-Wimplicit-function-declaration]
+  230 |    sprintf(display,"Left:%5d\0", diffl/68);
       |    ^~~~~~~
-../Core/Src/main.c:232:4: warning: incompatible implicit declaration of built-in function 'sprintf'
+../Core/Src/main.c:230:4: warning: incompatible implicit declaration of built-in function 'sprintf'
 ../Core/Src/main.c:27:1: note: include '<stdio.h>' or provide a declaration of 'sprintf'
    26 | #include "math.h"
   +++ |+#include <stdio.h>
    27 | /* USER CODE END Includes */
+../Core/Src/main.c:230:12: warning: pointer targets in passing argument 1 of 'sprintf' differ in signedness [-Wpointer-sign]
+  230 |    sprintf(display,"Left:%5d\0", diffl/68);
+      |            ^~~~~~~
+      |            |
+      |            uint8_t * {aka unsigned char *}
+../Core/Src/main.c:230:12: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+../Core/Src/main.c:230:29: warning: embedded '\0' in format [-Wformat-contains-nul]
+  230 |    sprintf(display,"Left:%5d\0", diffl/68);
+      |                             ^~
 ../Core/Src/main.c:232:12: warning: pointer targets in passing argument 1 of 'sprintf' differ in signedness [-Wpointer-sign]
-  232 |    sprintf(display,"Left:%5d\0", diffl/68);
+  232 |    sprintf(display,"Right:%5d\0", diffr/68);
       |            ^~~~~~~
       |            |
       |            uint8_t * {aka unsigned char *}
 ../Core/Src/main.c:232:12: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
-../Core/Src/main.c:232:29: warning: embedded '\0' in format [-Wformat-contains-nul]
-  232 |    sprintf(display,"Left:%5d\0", diffl/68);
-      |                             ^~
-../Core/Src/main.c:234:12: warning: pointer targets in passing argument 1 of 'sprintf' differ in signedness [-Wpointer-sign]
-  234 |    sprintf(display,"Right:%5d\0", diffr/68);
-      |            ^~~~~~~
-      |            |
-      |            uint8_t * {aka unsigned char *}
-../Core/Src/main.c:234:12: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
-../Core/Src/main.c:234:30: warning: embedded '\0' in format [-Wformat-contains-nul]
-  234 |    sprintf(display,"Right:%5d\0", diffr/68);
+../Core/Src/main.c:232:30: warning: embedded '\0' in format [-Wformat-contains-nul]
+  232 |    sprintf(display,"Right:%5d\0", diffr/68);
       |                              ^~
 ../Core/Src/main.c: In function 'StartDefaultTask':
-../Core/Src/main.c:820:10: warning: unused variable 'test' [-Wunused-variable]
-  820 |  uint8_t test[20] = "Testing";
+../Core/Src/main.c:852:10: warning: unused variable 'test' [-Wunused-variable]
+  852 |  uint8_t test[20] = "Testing";
       |          ^~~~
 ../Core/Src/main.c: In function 'motor':
-../Core/Src/main.c:858:6: warning: variable 'x' set but not used [-Wunused-but-set-variable]
-  858 |  int x = 0;
+../Core/Src/main.c:890:6: warning: unused variable 'x' [-Wunused-variable]
+  890 |  int x = 0;
       |      ^
 ../Core/Src/main.c: In function 'motorControl':
-../Core/Src/main.c:278:1: warning: control reaches end of non-void function [-Wreturn-type]
-  278 | }
+../Core/Src/main.c:284:1: warning: control reaches end of non-void function [-Wreturn-type]
+  284 | }
       | ^
 arm-none-eabi-gcc -o "MDP_grp13.elf" @"objects.list"   -mcpu=cortex-m4 -T"/Users/le/Documents/GitHub/MDP_grp13_stm32/MDP_grp13/STM32F407VETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="MDP_grp13.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 Finished building target: MDP_grp13.elf
@@ -977,17 +946,278 @@ arm-none-eabi-size   MDP_grp13.elf
 arm-none-eabi-objdump -h -S  MDP_grp13.elf  > "MDP_grp13.list"
 arm-none-eabi-objcopy  -O ihex  MDP_grp13.elf  "MDP_grp13.hex"
    text	   data	    bss	    dec	    hex	filename
-  45068	    128	  21912	  67108	  10624	MDP_grp13.elf
+  45532	    128	  21912	  67572	  107f4	MDP_grp13.elf
 Finished building: default.size.stdout
  
 Finished building: MDP_grp13.hex
  
 Finished building: MDP_grp13.list
  
-00:12:36 **** Incremental Build of configuration Debug for project MDP_grp13 ****
+00:01:39 **** Incremental Build of configuration Debug for project MDP_grp13 ****
 make -j7 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F407xx -c -I"/Users/le/Documents/GitHub/MDP_grp13_stm32/MDP_grp13/PeripheralDrivers/inc" -I"/Users/le/Documents/GitHub/MDP_grp13_stm32/MDP_grp13/PeripheralDrivers" -I../Core/Inc -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F -I../Drivers/CMSIS/Include -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c:105:27: warning: data definition has no type or storage class
+  105 | uint16_t uDistCheck1 = 0; uDistCheck2 = 0; uDistFinal = 0;
+      |                           ^~~~~~~~~~~
+../Core/Src/main.c:105:27: warning: type defaults to 'int' in declaration of 'uDistCheck2' [-Wimplicit-int]
+../Core/Src/main.c:105:44: warning: data definition has no type or storage class
+  105 | uint16_t uDistCheck1 = 0; uDistCheck2 = 0; uDistFinal = 0;
+      |                                            ^~~~~~~~~~
+../Core/Src/main.c:105:44: warning: type defaults to 'int' in declaration of 'uDistFinal' [-Wimplicit-int]
+../Core/Src/main.c: In function 'motorControl':
+../Core/Src/main.c:226:12: warning: implicit declaration of function 'abs' [-Wimplicit-function-declaration]
+  226 |    diffl = abs(cntl2);
+      |            ^~~
+../Core/Src/main.c:230:4: warning: implicit declaration of function 'sprintf' [-Wimplicit-function-declaration]
+  230 |    sprintf(display,"Left:%5d\0", diffl/68);
+      |    ^~~~~~~
+../Core/Src/main.c:230:4: warning: incompatible implicit declaration of built-in function 'sprintf'
+../Core/Src/main.c:27:1: note: include '<stdio.h>' or provide a declaration of 'sprintf'
+   26 | #include "math.h"
+  +++ |+#include <stdio.h>
+   27 | /* USER CODE END Includes */
+../Core/Src/main.c:230:12: warning: pointer targets in passing argument 1 of 'sprintf' differ in signedness [-Wpointer-sign]
+  230 |    sprintf(display,"Left:%5d\0", diffl/68);
+      |            ^~~~~~~
+      |            |
+      |            uint8_t * {aka unsigned char *}
+../Core/Src/main.c:230:12: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+../Core/Src/main.c:230:29: warning: embedded '\0' in format [-Wformat-contains-nul]
+  230 |    sprintf(display,"Left:%5d\0", diffl/68);
+      |                             ^~
+../Core/Src/main.c:232:12: warning: pointer targets in passing argument 1 of 'sprintf' differ in signedness [-Wpointer-sign]
+  232 |    sprintf(display,"Right:%5d\0", diffr/68);
+      |            ^~~~~~~
+      |            |
+      |            uint8_t * {aka unsigned char *}
+../Core/Src/main.c:232:12: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+../Core/Src/main.c:232:30: warning: embedded '\0' in format [-Wformat-contains-nul]
+  232 |    sprintf(display,"Right:%5d\0", diffr/68);
+      |                              ^~
+../Core/Src/main.c: In function 'StartDefaultTask':
+../Core/Src/main.c:852:10: warning: unused variable 'test' [-Wunused-variable]
+  852 |  uint8_t test[20] = "Testing";
+      |          ^~~~
+../Core/Src/main.c: In function 'motor':
+../Core/Src/main.c:890:6: warning: unused variable 'x' [-Wunused-variable]
+  890 |  int x = 0;
+      |      ^
+../Core/Src/main.c: In function 'motorControl':
+../Core/Src/main.c:284:1: warning: control reaches end of non-void function [-Wreturn-type]
+  284 | }
+      | ^
+arm-none-eabi-gcc -o "MDP_grp13.elf" @"objects.list"   -mcpu=cortex-m4 -T"/Users/le/Documents/GitHub/MDP_grp13_stm32/MDP_grp13/STM32F407VETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="MDP_grp13.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: MDP_grp13.elf
+ 
 arm-none-eabi-size   MDP_grp13.elf 
+arm-none-eabi-objdump -h -S  MDP_grp13.elf  > "MDP_grp13.list"
+arm-none-eabi-objcopy  -O ihex  MDP_grp13.elf  "MDP_grp13.hex"
    text	   data	    bss	    dec	    hex	filename
-  45068	    128	  21912	  67108	  10624	MDP_grp13.elf
+  45532	    128	  21912	  67572	  107f4	MDP_grp13.elf
 Finished building: default.size.stdout
+ 
+Finished building: MDP_grp13.hex
+ 
+Finished building: MDP_grp13.list
+ 
+00:03:00 **** Incremental Build of configuration Debug for project MDP_grp13 ****
+make -j7 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F407xx -c -I"/Users/le/Documents/GitHub/MDP_grp13_stm32/MDP_grp13/PeripheralDrivers/inc" -I"/Users/le/Documents/GitHub/MDP_grp13_stm32/MDP_grp13/PeripheralDrivers" -I../Core/Inc -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F -I../Drivers/CMSIS/Include -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c:105:27: warning: data definition has no type or storage class
+  105 | uint16_t uDistCheck1 = 0; uDistCheck2 = 0; uDistFinal = 0;
+      |                           ^~~~~~~~~~~
+../Core/Src/main.c:105:27: warning: type defaults to 'int' in declaration of 'uDistCheck2' [-Wimplicit-int]
+../Core/Src/main.c:105:44: warning: data definition has no type or storage class
+  105 | uint16_t uDistCheck1 = 0; uDistCheck2 = 0; uDistFinal = 0;
+      |                                            ^~~~~~~~~~
+../Core/Src/main.c:105:44: warning: type defaults to 'int' in declaration of 'uDistFinal' [-Wimplicit-int]
+../Core/Src/main.c: In function 'motorControl':
+../Core/Src/main.c:226:12: warning: implicit declaration of function 'abs' [-Wimplicit-function-declaration]
+  226 |    diffl = abs(cntl2);
+      |            ^~~
+../Core/Src/main.c:230:4: warning: implicit declaration of function 'sprintf' [-Wimplicit-function-declaration]
+  230 |    sprintf(display,"Left:%5d\0", diffl/68);
+      |    ^~~~~~~
+../Core/Src/main.c:230:4: warning: incompatible implicit declaration of built-in function 'sprintf'
+../Core/Src/main.c:27:1: note: include '<stdio.h>' or provide a declaration of 'sprintf'
+   26 | #include "math.h"
+  +++ |+#include <stdio.h>
+   27 | /* USER CODE END Includes */
+../Core/Src/main.c:230:12: warning: pointer targets in passing argument 1 of 'sprintf' differ in signedness [-Wpointer-sign]
+  230 |    sprintf(display,"Left:%5d\0", diffl/68);
+      |            ^~~~~~~
+      |            |
+      |            uint8_t * {aka unsigned char *}
+../Core/Src/main.c:230:12: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+../Core/Src/main.c:230:29: warning: embedded '\0' in format [-Wformat-contains-nul]
+  230 |    sprintf(display,"Left:%5d\0", diffl/68);
+      |                             ^~
+../Core/Src/main.c:232:12: warning: pointer targets in passing argument 1 of 'sprintf' differ in signedness [-Wpointer-sign]
+  232 |    sprintf(display,"Right:%5d\0", diffr/68);
+      |            ^~~~~~~
+      |            |
+      |            uint8_t * {aka unsigned char *}
+../Core/Src/main.c:232:12: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+../Core/Src/main.c:232:30: warning: embedded '\0' in format [-Wformat-contains-nul]
+  232 |    sprintf(display,"Right:%5d\0", diffr/68);
+      |                              ^~
+../Core/Src/main.c: In function 'StartDefaultTask':
+../Core/Src/main.c:852:10: warning: unused variable 'test' [-Wunused-variable]
+  852 |  uint8_t test[20] = "Testing";
+      |          ^~~~
+../Core/Src/main.c: In function 'motor':
+../Core/Src/main.c:890:6: warning: unused variable 'x' [-Wunused-variable]
+  890 |  int x = 0;
+      |      ^
+../Core/Src/main.c: In function 'motorControl':
+../Core/Src/main.c:284:1: warning: control reaches end of non-void function [-Wreturn-type]
+  284 | }
+      | ^
+arm-none-eabi-gcc -o "MDP_grp13.elf" @"objects.list"   -mcpu=cortex-m4 -T"/Users/le/Documents/GitHub/MDP_grp13_stm32/MDP_grp13/STM32F407VETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="MDP_grp13.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: MDP_grp13.elf
+ 
+arm-none-eabi-size   MDP_grp13.elf 
+arm-none-eabi-objdump -h -S  MDP_grp13.elf  > "MDP_grp13.list"
+arm-none-eabi-objcopy  -O ihex  MDP_grp13.elf  "MDP_grp13.hex"
+   text	   data	    bss	    dec	    hex	filename
+  45532	    128	  21912	  67572	  107f4	MDP_grp13.elf
+Finished building: default.size.stdout
+ 
+Finished building: MDP_grp13.hex
+ 
+Finished building: MDP_grp13.list
+ 
+00:05:57 **** Incremental Build of configuration Debug for project MDP_grp13 ****
+make -j7 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F407xx -c -I"/Users/le/Documents/GitHub/MDP_grp13_stm32/MDP_grp13/PeripheralDrivers/inc" -I"/Users/le/Documents/GitHub/MDP_grp13_stm32/MDP_grp13/PeripheralDrivers" -I../Core/Inc -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F -I../Drivers/CMSIS/Include -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c:105:27: warning: data definition has no type or storage class
+  105 | uint16_t uDistCheck1 = 0; uDistCheck2 = 0; uDistFinal = 0;
+      |                           ^~~~~~~~~~~
+../Core/Src/main.c:105:27: warning: type defaults to 'int' in declaration of 'uDistCheck2' [-Wimplicit-int]
+../Core/Src/main.c:105:44: warning: data definition has no type or storage class
+  105 | uint16_t uDistCheck1 = 0; uDistCheck2 = 0; uDistFinal = 0;
+      |                                            ^~~~~~~~~~
+../Core/Src/main.c:105:44: warning: type defaults to 'int' in declaration of 'uDistFinal' [-Wimplicit-int]
+../Core/Src/main.c: In function 'motorControl':
+../Core/Src/main.c:226:12: warning: implicit declaration of function 'abs' [-Wimplicit-function-declaration]
+  226 |    diffl = abs(cntl2);
+      |            ^~~
+../Core/Src/main.c:230:4: warning: implicit declaration of function 'sprintf' [-Wimplicit-function-declaration]
+  230 |    sprintf(display,"Left:%5d\0", diffl/68);
+      |    ^~~~~~~
+../Core/Src/main.c:230:4: warning: incompatible implicit declaration of built-in function 'sprintf'
+../Core/Src/main.c:27:1: note: include '<stdio.h>' or provide a declaration of 'sprintf'
+   26 | #include "math.h"
+  +++ |+#include <stdio.h>
+   27 | /* USER CODE END Includes */
+../Core/Src/main.c:230:12: warning: pointer targets in passing argument 1 of 'sprintf' differ in signedness [-Wpointer-sign]
+  230 |    sprintf(display,"Left:%5d\0", diffl/68);
+      |            ^~~~~~~
+      |            |
+      |            uint8_t * {aka unsigned char *}
+../Core/Src/main.c:230:12: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+../Core/Src/main.c:230:29: warning: embedded '\0' in format [-Wformat-contains-nul]
+  230 |    sprintf(display,"Left:%5d\0", diffl/68);
+      |                             ^~
+../Core/Src/main.c:232:12: warning: pointer targets in passing argument 1 of 'sprintf' differ in signedness [-Wpointer-sign]
+  232 |    sprintf(display,"Right:%5d\0", diffr/68);
+      |            ^~~~~~~
+      |            |
+      |            uint8_t * {aka unsigned char *}
+../Core/Src/main.c:232:12: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+../Core/Src/main.c:232:30: warning: embedded '\0' in format [-Wformat-contains-nul]
+  232 |    sprintf(display,"Right:%5d\0", diffr/68);
+      |                              ^~
+../Core/Src/main.c: In function 'StartDefaultTask':
+../Core/Src/main.c:852:10: warning: unused variable 'test' [-Wunused-variable]
+  852 |  uint8_t test[20] = "Testing";
+      |          ^~~~
+../Core/Src/main.c: In function 'motor':
+../Core/Src/main.c:890:6: warning: unused variable 'x' [-Wunused-variable]
+  890 |  int x = 0;
+      |      ^
+../Core/Src/main.c: In function 'motorControl':
+../Core/Src/main.c:284:1: warning: control reaches end of non-void function [-Wreturn-type]
+  284 | }
+      | ^
+arm-none-eabi-gcc -o "MDP_grp13.elf" @"objects.list"   -mcpu=cortex-m4 -T"/Users/le/Documents/GitHub/MDP_grp13_stm32/MDP_grp13/STM32F407VETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="MDP_grp13.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: MDP_grp13.elf
+ 
+arm-none-eabi-size   MDP_grp13.elf 
+arm-none-eabi-objdump -h -S  MDP_grp13.elf  > "MDP_grp13.list"
+arm-none-eabi-objcopy  -O ihex  MDP_grp13.elf  "MDP_grp13.hex"
+   text	   data	    bss	    dec	    hex	filename
+  45532	    128	  21912	  67572	  107f4	MDP_grp13.elf
+Finished building: default.size.stdout
+ 
+Finished building: MDP_grp13.hex
+ 
+Finished building: MDP_grp13.list
+ 
+00:08:13 **** Incremental Build of configuration Debug for project MDP_grp13 ****
+make -j7 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F407xx -c -I"/Users/le/Documents/GitHub/MDP_grp13_stm32/MDP_grp13/PeripheralDrivers/inc" -I"/Users/le/Documents/GitHub/MDP_grp13_stm32/MDP_grp13/PeripheralDrivers" -I../Core/Inc -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F -I../Drivers/CMSIS/Include -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c:105:27: warning: data definition has no type or storage class
+  105 | uint16_t uDistCheck1 = 0; uDistCheck2 = 0; uDistFinal = 0;
+      |                           ^~~~~~~~~~~
+../Core/Src/main.c:105:27: warning: type defaults to 'int' in declaration of 'uDistCheck2' [-Wimplicit-int]
+../Core/Src/main.c:105:44: warning: data definition has no type or storage class
+  105 | uint16_t uDistCheck1 = 0; uDistCheck2 = 0; uDistFinal = 0;
+      |                                            ^~~~~~~~~~
+../Core/Src/main.c:105:44: warning: type defaults to 'int' in declaration of 'uDistFinal' [-Wimplicit-int]
+../Core/Src/main.c: In function 'motorControl':
+../Core/Src/main.c:226:12: warning: implicit declaration of function 'abs' [-Wimplicit-function-declaration]
+  226 |    diffl = abs(cntl2);
+      |            ^~~
+../Core/Src/main.c:230:4: warning: implicit declaration of function 'sprintf' [-Wimplicit-function-declaration]
+  230 |    sprintf(display,"Left:%5d\0", diffl/68);
+      |    ^~~~~~~
+../Core/Src/main.c:230:4: warning: incompatible implicit declaration of built-in function 'sprintf'
+../Core/Src/main.c:27:1: note: include '<stdio.h>' or provide a declaration of 'sprintf'
+   26 | #include "math.h"
+  +++ |+#include <stdio.h>
+   27 | /* USER CODE END Includes */
+../Core/Src/main.c:230:12: warning: pointer targets in passing argument 1 of 'sprintf' differ in signedness [-Wpointer-sign]
+  230 |    sprintf(display,"Left:%5d\0", diffl/68);
+      |            ^~~~~~~
+      |            |
+      |            uint8_t * {aka unsigned char *}
+../Core/Src/main.c:230:12: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+../Core/Src/main.c:230:29: warning: embedded '\0' in format [-Wformat-contains-nul]
+  230 |    sprintf(display,"Left:%5d\0", diffl/68);
+      |                             ^~
+../Core/Src/main.c:232:12: warning: pointer targets in passing argument 1 of 'sprintf' differ in signedness [-Wpointer-sign]
+  232 |    sprintf(display,"Right:%5d\0", diffr/68);
+      |            ^~~~~~~
+      |            |
+      |            uint8_t * {aka unsigned char *}
+../Core/Src/main.c:232:12: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+../Core/Src/main.c:232:30: warning: embedded '\0' in format [-Wformat-contains-nul]
+  232 |    sprintf(display,"Right:%5d\0", diffr/68);
+      |                              ^~
+../Core/Src/main.c: In function 'StartDefaultTask':
+../Core/Src/main.c:852:10: warning: unused variable 'test' [-Wunused-variable]
+  852 |  uint8_t test[20] = "Testing";
+      |          ^~~~
+../Core/Src/main.c: In function 'motor':
+../Core/Src/main.c:890:6: warning: unused variable 'x' [-Wunused-variable]
+  890 |  int x = 0;
+      |      ^
+../Core/Src/main.c: In function 'motorControl':
+../Core/Src/main.c:284:1: warning: control reaches end of non-void function [-Wreturn-type]
+  284 | }
+      | ^
+arm-none-eabi-gcc -o "MDP_grp13.elf" @"objects.list"   -mcpu=cortex-m4 -T"/Users/le/Documents/GitHub/MDP_grp13_stm32/MDP_grp13/STM32F407VETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="MDP_grp13.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: MDP_grp13.elf
+ 
+arm-none-eabi-size   MDP_grp13.elf 
+arm-none-eabi-objdump -h -S  MDP_grp13.elf  > "MDP_grp13.list"
+arm-none-eabi-objcopy  -O ihex  MDP_grp13.elf  "MDP_grp13.hex"
+   text	   data	    bss	    dec	    hex	filename
+  45532	    128	  21912	  67572	  107f4	MDP_grp13.elf
+Finished building: default.size.stdout
+ 
+Finished building: MDP_grp13.hex
+ 
+Finished building: MDP_grp13.list
  
