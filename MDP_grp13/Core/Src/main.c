@@ -43,6 +43,8 @@ const double Rturnvar = 0.66;
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
+ADC_HandleTypeDef hadc1;
+
 TIM_HandleTypeDef htim1;
 TIM_HandleTypeDef htim2;
 TIM_HandleTypeDef htim3;
@@ -56,7 +58,7 @@ osThreadId_t LED_ToggleHandle;
 const osThreadAttr_t LED_Toggle_attributes = {
   .name = "LED_Toggle",
   .stack_size = 128 * 4,
-  .priority = (osPriority_t) osPriorityLow,
+  .priority = (osPriority_t) osPriorityHigh,
 };
 /* Definitions for MotorTask */
 osThreadId_t MotorTaskHandle;
@@ -78,6 +80,7 @@ static void MX_TIM1_Init(void);
 static void MX_TIM3_Init(void);
 static void MX_TIM4_Init(void);
 static void MX_USART3_UART_Init(void);
+static void MX_ADC1_Init(void);
 void StartDefaultTask(void *argument);
 void motor(void *argument);
 
@@ -103,8 +106,9 @@ uint32_t Difference = 0;
 int Is_First_Captured = 0;  // boolean function
 uint16_t Distance = 0;
 uint16_t uDistCheck1 = 0; uDistCheck2 = 0; uDistFinal = 0;
+uint8_t ultra[20];
 /* UART */
-uint8_t aRxBuffer[20];
+uint8_t aRxBuffer[1];
 
 void delay(uint16_t time){  //provide us delay
 	__HAL_TIM_SET_COUNTER(&htim4, 0);
@@ -174,6 +178,12 @@ void ultraDistCheck (void)
 		}
 	}
 	uDistFinal = (uDistCheck1 + uDistCheck2)/2;
+}
+
+void waitCmd (void) {	//not complete
+	while (*aRxBuffer == 'R') {
+		HAL_UART_Receive_IT(&huart3, (uint8_t *)aRxBuffer, 1);
+	}
 }
 
 //Master function for all motor functions
@@ -358,9 +368,10 @@ int main(void)
   MX_TIM3_Init();
   MX_TIM4_Init();
   MX_USART3_UART_Init();
+  MX_ADC1_Init();
   /* USER CODE BEGIN 2 */
   HAL_TIM_IC_Start_IT(&htim4, TIM_CHANNEL_1);
-  HAL_UART_Receive_IT(&huart3, (uint8_t *) aRxBuffer, 10);
+  HAL_UART_Receive_IT(&huart3, (uint8_t *) aRxBuffer, 1);
   OLED_Init();
   /* USER CODE END 2 */
 
@@ -450,6 +461,56 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
+}
+
+/**
+  * @brief ADC1 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_ADC1_Init(void)
+{
+
+  /* USER CODE BEGIN ADC1_Init 0 */
+
+  /* USER CODE END ADC1_Init 0 */
+
+  ADC_ChannelConfTypeDef sConfig = {0};
+
+  /* USER CODE BEGIN ADC1_Init 1 */
+
+  /* USER CODE END ADC1_Init 1 */
+  /** Configure the global features of the ADC (Clock, Resolution, Data Alignment and number of conversion)
+  */
+  hadc1.Instance = ADC1;
+  hadc1.Init.ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV2;
+  hadc1.Init.Resolution = ADC_RESOLUTION_12B;
+  hadc1.Init.ScanConvMode = DISABLE;
+  hadc1.Init.ContinuousConvMode = DISABLE;
+  hadc1.Init.DiscontinuousConvMode = DISABLE;
+  hadc1.Init.ExternalTrigConvEdge = ADC_EXTERNALTRIGCONVEDGE_NONE;
+  hadc1.Init.ExternalTrigConv = ADC_SOFTWARE_START;
+  hadc1.Init.DataAlign = ADC_DATAALIGN_RIGHT;
+  hadc1.Init.NbrOfConversion = 1;
+  hadc1.Init.DMAContinuousRequests = DISABLE;
+  hadc1.Init.EOCSelection = ADC_EOC_SINGLE_CONV;
+  if (HAL_ADC_Init(&hadc1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
+  */
+  sConfig.Channel = ADC_CHANNEL_11;
+  sConfig.Rank = ADC_REGULAR_RANK_1;
+  sConfig.SamplingTime = ADC_SAMPLETIME_1CYCLE_5;
+  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN ADC1_Init 2 */
+
+  /* USER CODE END ADC1_Init 2 */
+
 }
 
 /**
@@ -784,9 +845,9 @@ static void MX_GPIO_Init(void)
 
   /* GPIO Ports Clock Enable */
   __HAL_RCC_GPIOE_CLK_ENABLE();
+  __HAL_RCC_GPIOC_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
   __HAL_RCC_GPIOD_CLK_ENABLE();
-  __HAL_RCC_GPIOC_CLK_ENABLE();
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
@@ -835,7 +896,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
 	/*Prevent unused argument(s) compilation warning*/
 	UNUSED(huart);
-	HAL_UART_Transmit(&huart3,(uint8_t *)aRxBuffer,10,0xFFFF); //might not nd since we not rly transmitting
+	HAL_UART_Transmit(&huart3,(uint8_t *)aRxBuffer,10,0xFFFF); //might not nd
 }
 /* USER CODE END 4 */
 
@@ -849,28 +910,28 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 void StartDefaultTask(void *argument)
 {
   /* USER CODE BEGIN 5 */
-	uint8_t test[20] = "Testing";
-//	uint8_t ultra[20];
-//	uint8_t ch = 'A';
-  /* Infinite loop */
-  for(;;)
-  {
-	  //OLED_ShowString(5,5,test);
+	uint8_t test[20] = "Testing w/ UART";
 
-//	  HAL_UART_Transmit(&huart3,(uint8_t *)&ch,1,0xFFFF);  //STM transmitting to RPi
-//	  if(ch < 'Z'){
-//		  ch++;
-//	  } else ch = 'A';
+	uint8_t checkPi[1];
+//	uint8_t ch = 'A'; /* From Workshop */
+	/* Infinite loop */
+	for(;;)
+	{
+//		HAL_UART_Receive_IT(&huart3, (uint8_t *) aRxBuffer, 1);
+		OLED_ShowString(5,5,test);
+		sprintf(checkPi, "Pi cmd: %s\0", aRxBuffer);
+		OLED_ShowString(10, 20, checkPi);
 
-//	  ultraDistCheck();
-//	  HAL_Delay(200);
-//	  sprintf(ultra, "uDist: %ucm\0", uDistFinal);
-//	  OLED_ShowString(10, 20, ultra);
+//		ultraDistCheck();
+//		HAL_Delay(200);
+//		sprintf(ultra, "uDist: %u cm\0", uDistFinal);
+//		OLED_ShowString(10, 20, ultra);
 
-	  //OLED_Refresh_Gram();
-//	  HAL_GPIO_TogglePin(LED3_GPIO_Port, LED3_Pin);
-	  osDelay(1000000);
-  }
+		OLED_Refresh_Gram();
+		//	  HAL_GPIO_TogglePin(LED3_GPIO_Port, LED3_Pin);
+//		HAL_Delay(1000);
+		osDelay(1000);
+	}
   /* USER CODE END 5 */
 }
 
@@ -888,15 +949,69 @@ void motor(void *argument)
 	HAL_TIM_PWM_Start(&htim8, TIM_CHANNEL_2);
 	HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_4);
 	int x = 0;
-	for(;;){
-		if(HAL_GPIO_ReadPin(USRBUT_GPIO_Port,USRBUT_Pin)==0){
-		htim1.Instance->CCR4 = 74;
-		HAL_Delay(100);
-		Fleft(90);
-		HAL_Delay(5000);
-		Fright(90);
-		}
-	}
+
+	*aRxBuffer = '\0';
+
+	uint8_t toRpiTest[6] = "NiHao";
+		for(;;)
+		  {
+			switch (*aRxBuffer)
+			{
+			case '\0': // initialize
+				htim1.Instance->CCR4 = 74;
+				HAL_UART_Receive_IT(&huart3, (uint8_t *)aRxBuffer, 1);
+				break;
+			case 'H':
+				HAL_UART_Transmit_IT(&huart3,(uint8_t *)&toRpiTest,6);
+				osDelay(50);
+				*aRxBuffer = 'R';
+				break;
+			case 'K':
+				HAL_UART_Transmit_IT(&huart3,(uint8_t *)"OK?\n",4);
+				osDelay(50);
+				*aRxBuffer = 'R';
+				break;
+			case 'L':
+				Fleft(90);
+				*aRxBuffer = 'R'; //might need to put in movement function itself. cuz wun come back here
+				break;
+			case 'F':
+				motorControl(3000, 3000, 'F', 'F', 0, 10000, 90);
+				*aRxBuffer = 'R'; //might need to put in movement function itself.
+				break;
+			case 'U':
+				ultraDistCheck();
+				HAL_Delay(200);
+				char reply[] = "000\n";
+				reply[0] += uDistFinal / 100 % 10;
+				reply[1] += uDistFinal / 10 % 10;
+				reply[2] += uDistFinal % 10;
+				if (uDistFinal > 999)
+					reply[0] = '9';
+				HAL_UART_Transmit_IT(&huart3, (uint8_t *)reply, strlen(reply));
+				osDelay(50);
+				*aRxBuffer = 'R';
+				break;
+			case 'R':
+				waitCmd();
+				break;
+			default:
+				*aRxBuffer = 'R';
+				break;
+			}
+			HAL_Delay(100);
+		  }
+
+//	for(;;){
+//		if(HAL_GPIO_ReadPin(USRBUT_GPIO_Port,USRBUT_Pin)==0){
+//		htim1.Instance->CCR4 = 74;
+//		HAL_Delay(100);
+//		Fleft(90);
+//		HAL_Delay(5000);
+//		Fright(90);
+//		}
+//	}
+	osDelay(1000);
   /* USER CODE END motor */
 }
 
