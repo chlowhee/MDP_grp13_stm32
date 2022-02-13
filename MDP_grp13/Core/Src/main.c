@@ -44,6 +44,7 @@ const double Rturnvar = 0.66;
 
 /* Private variables ---------------------------------------------------------*/
 ADC_HandleTypeDef hadc1;
+ADC_HandleTypeDef hadc2;
 
 TIM_HandleTypeDef htim1;
 TIM_HandleTypeDef htim2;
@@ -81,6 +82,7 @@ static void MX_TIM3_Init(void);
 static void MX_TIM4_Init(void);
 static void MX_USART3_UART_Init(void);
 static void MX_ADC1_Init(void);
+static void MX_ADC2_Init(void);
 void StartDefaultTask(void *argument);
 void motor(void *argument);
 
@@ -109,6 +111,9 @@ uint16_t uDistCheck1 = 0; uDistCheck2 = 0; uDistFinal = 0;
 uint8_t ultra[20];
 /* UART */
 uint8_t aRxBuffer[1];
+/* IR */
+uint32_t ir1Dist = 0;
+uint32_t ir2Dist = 0;
 
 void delay(uint16_t time){  //provide us delay
 	__HAL_TIM_SET_COUNTER(&htim4, 0);
@@ -178,6 +183,34 @@ void ultraDistCheck (void)
 		}
 	}
 	uDistFinal = (uDistCheck1 + uDistCheck2)/2;
+}
+
+void irLeft (void) { //ADC1 (nd solder) (a bit more wonky)
+	uint32_t adc1 = 0;
+	float V = 0;
+	HAL_ADC_Start(&hadc1);
+	adc1 = HAL_ADC_GetValue(&hadc1);
+	V = (float)adc1/1000;
+
+	if (V <= 0.42) V = 0.42; //cap at 80 cm
+	else if (V >= 2.84) V = 2.84; //cap at 10 cm
+
+
+	ir1Dist = 31.13125 * pow(V, -1.08797);
+}
+
+void irRight (void) { //ADC2
+	uint32_t adc2 = 0;
+	float V = 0;
+	HAL_ADC_Start(&hadc2);
+	adc2 = HAL_ADC_GetValue(&hadc2);
+	V = (float)adc2/1000;
+
+	if (V <= 0.42) V = 0.44; //cap at 80 cm
+	else if (V >= 2.9) V = 2.95; //cap at 10 cm
+
+
+	ir2Dist = 32.6167 * pow(V, -1.0928);
 }
 
 void waitCmd (void) {	//not complete
@@ -369,6 +402,7 @@ int main(void)
   MX_TIM4_Init();
   MX_USART3_UART_Init();
   MX_ADC1_Init();
+  MX_ADC2_Init();
   /* USER CODE BEGIN 2 */
   HAL_TIM_IC_Start_IT(&htim4, TIM_CHANNEL_1);
   HAL_UART_Receive_IT(&huart3, (uint8_t *) aRxBuffer, 1);
@@ -501,8 +535,8 @@ static void MX_ADC1_Init(void)
   /** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
   */
   sConfig.Channel = ADC_CHANNEL_11;
-  sConfig.Rank = ADC_REGULAR_RANK_1;
-  sConfig.SamplingTime = ADC_SAMPLETIME_1CYCLE_5;
+  sConfig.Rank = 1;
+  sConfig.SamplingTime = ADC_SAMPLETIME_3CYCLES;
   if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
   {
     Error_Handler();
@@ -510,6 +544,56 @@ static void MX_ADC1_Init(void)
   /* USER CODE BEGIN ADC1_Init 2 */
 
   /* USER CODE END ADC1_Init 2 */
+
+}
+
+/**
+  * @brief ADC2 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_ADC2_Init(void)
+{
+
+  /* USER CODE BEGIN ADC2_Init 0 */
+
+  /* USER CODE END ADC2_Init 0 */
+
+  ADC_ChannelConfTypeDef sConfig = {0};
+
+  /* USER CODE BEGIN ADC2_Init 1 */
+
+  /* USER CODE END ADC2_Init 1 */
+  /** Configure the global features of the ADC (Clock, Resolution, Data Alignment and number of conversion)
+  */
+  hadc2.Instance = ADC2;
+  hadc2.Init.ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV2;
+  hadc2.Init.Resolution = ADC_RESOLUTION_12B;
+  hadc2.Init.ScanConvMode = DISABLE;
+  hadc2.Init.ContinuousConvMode = DISABLE;
+  hadc2.Init.DiscontinuousConvMode = DISABLE;
+  hadc2.Init.ExternalTrigConvEdge = ADC_EXTERNALTRIGCONVEDGE_NONE;
+  hadc2.Init.ExternalTrigConv = ADC_SOFTWARE_START;
+  hadc2.Init.DataAlign = ADC_DATAALIGN_RIGHT;
+  hadc2.Init.NbrOfConversion = 1;
+  hadc2.Init.DMAContinuousRequests = DISABLE;
+  hadc2.Init.EOCSelection = ADC_EOC_SINGLE_CONV;
+  if (HAL_ADC_Init(&hadc2) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
+  */
+  sConfig.Channel = ADC_CHANNEL_12;
+  sConfig.Rank = 1;
+  sConfig.SamplingTime = ADC_SAMPLETIME_3CYCLES;
+  if (HAL_ADC_ConfigChannel(&hadc2, &sConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN ADC2_Init 2 */
+
+  /* USER CODE END ADC2_Init 2 */
 
 }
 
@@ -910,14 +994,13 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 void StartDefaultTask(void *argument)
 {
   /* USER CODE BEGIN 5 */
-	uint8_t test[20] = "Testing w/ UART";
-
+	uint8_t test[20] = "Testing ir";
+	uint8_t ultra[20];
 	uint8_t checkPi[1];
-//	uint8_t ch = 'A'; /* From Workshop */
 	/* Infinite loop */
 	for(;;)
 	{
-//		HAL_UART_Receive_IT(&huart3, (uint8_t *) aRxBuffer, 1);
+		HAL_UART_Receive_IT(&huart3, (uint8_t *) aRxBuffer, 1);
 		OLED_ShowString(5,5,test);
 		sprintf(checkPi, "Pi cmd: %s\0", aRxBuffer);
 		OLED_ShowString(10, 20, checkPi);
@@ -927,9 +1010,19 @@ void StartDefaultTask(void *argument)
 //		sprintf(ultra, "uDist: %u cm\0", uDistFinal);
 //		OLED_ShowString(10, 20, ultra);
 
+//		irLeft();
+//		HAL_Delay(200);
+//		sprintf(ultra, "IR left: %u\0", ir1Dist);
+//		OLED_ShowString(10, 30, ultra);
+
+//		irRight();
+//		HAL_Delay(200);
+//		sprintf(ultra, "IR dist: %u\0", ir2Dist);
+//		OLED_ShowString(10, 30, ultra);
+
+
 		OLED_Refresh_Gram();
 		//	  HAL_GPIO_TogglePin(LED3_GPIO_Port, LED3_Pin);
-//		HAL_Delay(1000);
 		osDelay(1000);
 	}
   /* USER CODE END 5 */
