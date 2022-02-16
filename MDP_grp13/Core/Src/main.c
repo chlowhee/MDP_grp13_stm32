@@ -324,6 +324,7 @@ int motorControl(int speedL, int speedR, char dirL, char dirR, int turn, int tim
 
 		speedL=speedR=tick=diffl=diffr=0;
 		OLED_Refresh_Gram();
+		*aRxBuffer = 'R';
 }
 
 void Fleft(int deg){
@@ -901,7 +902,7 @@ static void MX_USART3_UART_Init(void)
 
   /* USER CODE END USART3_Init 1 */
   huart3.Instance = USART3;
-  huart3.Init.BaudRate = 115200;
+  huart3.Init.BaudRate = 9600;
   huart3.Init.WordLength = UART_WORDLENGTH_8B;
   huart3.Init.StopBits = UART_STOPBITS_1;
   huart3.Init.Parity = UART_PARITY_NONE;
@@ -994,7 +995,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 void StartDefaultTask(void *argument)
 {
   /* USER CODE BEGIN 5 */
-	uint8_t test[20] = "Testing ir";
+	uint8_t test[20] = "Testing Pi";
 	uint8_t ultra[20];
 	uint8_t checkPi[1];
 	/* Infinite loop */
@@ -1023,7 +1024,7 @@ void StartDefaultTask(void *argument)
 
 		OLED_Refresh_Gram();
 		//	  HAL_GPIO_TogglePin(LED3_GPIO_Port, LED3_Pin);
-		osDelay(1000);
+		osDelay(100);
 	}
   /* USER CODE END 5 */
 }
@@ -1066,11 +1067,11 @@ void motor(void *argument)
 				break;
 			case 'L':
 				Fleft(90);
-				*aRxBuffer = 'R'; //might need to put in movement function itself. cuz wun come back here
+//				*aRxBuffer = 'R'; //put in motorControl(). cuz wun come back here
 				break;
 			case 'F':
 				motorControl(3000, 3000, 'F', 'F', 0, 10000, 90);
-				*aRxBuffer = 'R'; //might need to put in movement function itself.
+//				*aRxBuffer = 'R';
 				break;
 			case 'U':
 				ultraDistCheck();
@@ -1085,14 +1086,24 @@ void motor(void *argument)
 				osDelay(50);
 				*aRxBuffer = 'R';
 				break;
+			case 'S':
+				irRight();
+				char reply2[] = "00\n";
+				reply2[0] += ir2Dist / 10 % 10;
+				reply2[1] += ir2Dist % 10;
+				HAL_UART_Transmit_IT(&huart3, (uint8_t *)reply2, strlen(reply2));
+				osDelay(50);
+				*aRxBuffer = 'R';
+				break;
 			case 'R':
 				waitCmd();
 				break;
 			default:
-				*aRxBuffer = 'R';
+//				*aRxBuffer = 'R';
+				HAL_UART_Receive_IT(&huart3, (uint8_t *)aRxBuffer, 1);
 				break;
 			}
-			HAL_Delay(100);
+			osDelay(100);
 		  }
 
 //	for(;;){
@@ -1104,6 +1115,7 @@ void motor(void *argument)
 //		Fright(90);
 //		}
 //	}
+
 	osDelay(1000);
   /* USER CODE END motor */
 }
