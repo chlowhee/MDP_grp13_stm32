@@ -5,6 +5,7 @@ buildConsoleProblemBackgroundColor=58,0,2
 buildConsoleProblemInfoBackgroundColor=122,123,127
 buildConsoleProblemWarningBackgroundColor=252,105,188
 eclipse.preferences.version=1
+sourceHoverBackgroundColor=47,47,47
 spelling_locale=en_GB
 spelling_locale_initialized=true
 useAnnotationsPrefPage=true

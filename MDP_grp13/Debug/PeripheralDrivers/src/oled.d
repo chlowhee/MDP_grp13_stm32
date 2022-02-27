@@ -1,5 +1,5 @@
 PeripheralDrivers/src/oled.o: ../PeripheralDrivers/src/oled.c \
- C:/Users/limke/OneDrive/Desktop/MDP/MDP_grp13/PeripheralDrivers/inc/oled.h \
+ /Users/le/Documents/GitHub/MDP_grp13_stm32/MDP_grp13/PeripheralDrivers/inc/oled.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h \
  ../Core/Inc/stm32f4xx_hal_conf.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc.h \
@@ -31,9 +31,9 @@ PeripheralDrivers/src/oled.o: ../PeripheralDrivers/src/oled.c \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h \
- C:/Users/limke/OneDrive/Desktop/MDP/MDP_grp13/PeripheralDrivers/inc/oledfont.h
+ /Users/le/Documents/GitHub/MDP_grp13_stm32/MDP_grp13/PeripheralDrivers/inc/oledfont.h
 
-C:/Users/limke/OneDrive/Desktop/MDP/MDP_grp13/PeripheralDrivers/inc/oled.h:
+/Users/le/Documents/GitHub/MDP_grp13_stm32/MDP_grp13/PeripheralDrivers/inc/oled.h:
 
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h:
 
@@ -97,4 +97,4 @@ C:/Users/limke/OneDrive/Desktop/MDP/MDP_grp13/PeripheralDrivers/inc/oled.h:
 
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h:
 
-C:/Users/limke/OneDrive/Desktop/MDP/MDP_grp13/PeripheralDrivers/inc/oledfont.h:
+/Users/le/Documents/GitHub/MDP_grp13_stm32/MDP_grp13/PeripheralDrivers/inc/oledfont.h:

@@ -13,6 +13,7 @@
   * in the root directory of this software component.
   * If no LICENSE file comes with this software, it is provided AS-IS.
   *
+  *sudo sync && sudo systemctl poweroff
   ******************************************************************************
   */
 /* USER CODE END Header */
@@ -88,10 +89,13 @@ void motor(void *argument);
 
 /* USER CODE BEGIN PFP */
 int motorControl(int, int, char, char, int, int, double);
+int motorCont(int, int, char, char, int, int, double);
 void Fleft(int);
 void Rleft(int);
 void Fright(int);
 void Rright(int);
+void spotTurn(int);
+void degTurn(int);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -171,21 +175,16 @@ void ultraDistCheck (void)
 	HAL_Delay(100);
 	uDistCheck2 = HCSR04_Read();
 	HAL_Delay(100);
-
 	while (uDistCheck1 - uDistCheck2 >= 5 || uDistCheck2 - uDistCheck1 >= 5) {
 		uDistCheck1 = HCSR04_Read();
 		HAL_Delay(100);
 		uDistCheck2 = HCSR04_Read();
 		HAL_Delay(100);
-
-		if (uDistCheck1 - uDistCheck2 < 5 || uDistCheck2 - uDistCheck1 < 5) {
-			break;
-		}
 	}
 	uDistFinal = (uDistCheck1 + uDistCheck2)/2;
 }
 
-void irLeft (void) { //ADC1 (nd solder) (a bit more wonky)
+void irLeft (void) { //ADC1 (a bit more wonky)
 	uint32_t adc1 = 0;
 	float V = 0;
 	HAL_ADC_Start(&hadc1);
@@ -214,13 +213,14 @@ void irRight (void) { //ADC2
 }
 
 void waitCmd (void) {	//not complete
-	while (*aRxBuffer == 'R') {
+	while (*aRxBuffer == 'Z') {
 		HAL_UART_Receive_IT(&huart3, (uint8_t *)aRxBuffer, 1);
 	}
 }
 
 //Master function for all motor functions
 int motorControl(int speedL, int speedR, char dirL, char dirR, int turn, int time, double dist){
+
 
 	//declaration
 	HAL_TIM_Encoder_Start(&htim2, TIM_CHANNEL_ALL);		//left encoder(MotorA) start
@@ -363,6 +363,158 @@ void Rright(int deg){
 //	htim1.Instance->CCR4 = 74;
 //	HAL_Delay(50);
 //	motorControl(1000, 1000, 'F', 'F', 0, 1000, 2);
+}
+
+int motorCont(int speedL, int speedR, char dirL, char dirR, int turn, int time, double dist){
+	*aRxBuffer = 'Z';
+	//declaration
+	HAL_TIM_Encoder_Start(&htim2, TIM_CHANNEL_ALL);		//left encoder(MotorA) start
+	HAL_TIM_Encoder_Start(&htim3, TIM_CHANNEL_ALL);		//right encoder(MotorB) start
+	cntl1 = __HAL_TIM_GET_COUNTER(&htim2);
+	cntr1 = __HAL_TIM_GET_COUNTER(&htim3);
+	tick = HAL_GetTick();
+	double encDist = dist * 68;
+
+	int currTime = 0;
+
+	//Select direction of motor//
+
+	switch(dirL){
+		case 'F':
+			HAL_GPIO_WritePin(GPIOA, AIN1_Pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(GPIOA, AIN2_Pin, GPIO_PIN_RESET);
+			break;
+
+		case 'R':
+			HAL_GPIO_WritePin(GPIOA, AIN1_Pin, GPIO_PIN_RESET);
+			HAL_GPIO_WritePin(GPIOA, AIN2_Pin, GPIO_PIN_SET);
+			break;
+	}
+
+	switch(dirR){
+		case 'F':
+			HAL_GPIO_WritePin(GPIOA, BIN1_Pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(GPIOA, BIN2_Pin, GPIO_PIN_RESET);
+			break;
+
+		case 'R':
+			HAL_GPIO_WritePin(GPIOA, BIN1_Pin, GPIO_PIN_RESET);
+			HAL_GPIO_WritePin(GPIOA, BIN2_Pin, GPIO_PIN_SET);
+			break;
+	}
+	//End of motor direction selection//
+
+	__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_1, speedL);
+	__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_2, speedR);
+
+
+	while(currTime<time){
+			cntl2 = __HAL_TIM_GET_COUNTER(&htim2);
+			cntr2 = __HAL_TIM_GET_COUNTER(&htim3);
+			diffl = abs(cntl2);
+			diffr =abs(cntr2);
+			avg = abs((diffl+diffr)/2);
+			sprintf(display,"Left:%5d\0", diffl/68);
+			OLED_ShowString(10,35,display);
+			sprintf(display,"Right:%5d\0", diffr/68);
+			OLED_ShowString(10,50,display);
+			OLED_Refresh_Gram();
+
+			if(avg>=encDist*0.95){
+				speedL = speedL*0.95;
+				speedR = speedR*0.95;
+				__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_1, speedL);
+				__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_2, speedR);
+			}
+
+			if(avg>=encDist){
+				__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_1, 0);
+				__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_2, 0);
+				HAL_Delay(500);
+				break;
+			}
+
+		}
+		__HAL_TIM_SET_COUNTER(&htim2,0);
+		__HAL_TIM_SET_COUNTER(&htim3,0);
+
+		speedL=speedR=tick=diffl=diffr=0;
+		OLED_Refresh_Gram();
+		*aRxBuffer = 'Z';
+}
+
+void degTurn(int mode){
+	switch(mode){
+	case 1: //Turn left
+			htim1.Instance->CCR4 = 56;
+			HAL_Delay(100);
+			motorCont(500,2200,'F','F',1,1000,88*0.57);
+			break;
+	case 2:
+			htim1.Instance->CCR4 = 104;
+			HAL_Delay(100);
+			motorCont(2200,500,'F','F',1,1000,105*0.57);
+			break;
+	}
+
+
+}
+
+void forward(int mode){
+	htim1.Instance->CCR4 = 74;
+	HAL_Delay(100);
+	switch(mode){
+	case 0:
+			motorCont(2000, 2000, 'F', 'F', 1, 1000, 100);break;
+	case 1:
+			motorCont(1000, 900, 'F', 'F', 1, 1000, 9);break;
+	case 2:
+			motorCont(1100, 980, 'F', 'F', 1, 1000, 19.5);break;
+	case 3:
+			motorCont(1200, 1080, 'F', 'F', 1, 1000, 29);break;
+	case 4:
+			motorCont(1300, 1300, 'F', 'F', 1, 1000, 40);break;
+	case 5:
+			motorCont(1400, 1400, 'F', 'F', 1, 1000, 50);break;
+	case 6:
+			motorCont(1500, 1500, 'F', 'F', 1, 1000, 60);break;
+	case 7:
+			motorCont(1600, 1600, 'F', 'F', 1, 1000, 70);break;
+	case 8:
+			motorCont(1700, 1700, 'F', 'F', 1, 1000, 80);break;
+	case 9:
+			motorCont(1800, 1800, 'F', 'F', 1, 1000, 90);break;
+
+	}
+}
+
+void spotTurn(int mode){
+	switch(mode){
+	case 1: //Turn left
+		htim1.Instance->CCR4 = 56;
+		HAL_Delay(500);
+		motorCont(500, 1500, 'F', 'F', 1, 1000, 22);
+		htim1.Instance->CCR4 = 104;
+		HAL_Delay(500);
+		motorCont(1500, 500, 'R', 'R', 1, 1000, 21);
+		htim1.Instance->CCR4 = 56;
+		HAL_Delay(500);
+		motorCont(500, 1500, 'F', 'F', 1, 1000, 4.5);
+		htim1.Instance->CCR4 = 74;
+		break;
+	case 2: //Turn right
+		htim1.Instance->CCR4 = 104;
+		HAL_Delay(500);
+		motorCont(1500, 500, 'F', 'F', 1, 1000, 22);
+		htim1.Instance->CCR4 = 56;
+		HAL_Delay(500);
+		motorCont(500, 1500, 'R', 'R', 1, 1000, 19.5);
+		htim1.Instance->CCR4 = 104;
+		HAL_Delay(500);
+		motorCont(1500, 500, 'F', 'F', 1, 1000, 6);
+		htim1.Instance->CCR4 = 74;
+		break;
+	}
 }
 
 
@@ -902,7 +1054,7 @@ static void MX_USART3_UART_Init(void)
 
   /* USER CODE END USART3_Init 1 */
   huart3.Instance = USART3;
-  huart3.Init.BaudRate = 9600;
+  huart3.Init.BaudRate = 115200;
   huart3.Init.WordLength = UART_WORDLENGTH_8B;
   huart3.Init.StopBits = UART_STOPBITS_1;
   huart3.Init.Parity = UART_PARITY_NONE;
@@ -998,28 +1150,35 @@ void StartDefaultTask(void *argument)
 	uint8_t test[20] = "Testing Pi";
 	uint8_t ultra[20];
 	uint8_t checkPi[1];
+
 	/* Infinite loop */
 	for(;;)
 	{
 		HAL_UART_Receive_IT(&huart3, (uint8_t *) aRxBuffer, 1);
 		OLED_ShowString(5,5,test);
-		sprintf(checkPi, "Pi cmd: %s\0", aRxBuffer);
-		OLED_ShowString(10, 20, checkPi);
+//		sprintf(checkPi, "Pi cmd: %s\0", aRxBuffer);
+//		OLED_ShowString(10, 20, checkPi);
+		OLED_Clear();
+		ultraDistCheck();
+		HAL_Delay(200);
+		sprintf(ultra, "uDistF: %u\0", uDistFinal);
+		OLED_ShowString(10, 50, ultra);
 
-//		ultraDistCheck();
-//		HAL_Delay(200);
-//		sprintf(ultra, "uDist: %u cm\0", uDistFinal);
-//		OLED_ShowString(10, 20, ultra);
+		sprintf(ultra, "uDist1: %u\0", uDistCheck1);
+		OLED_ShowString(10, 25, ultra);
+
+		sprintf(ultra, "uDist2: %u\0", uDistCheck2);
+		OLED_ShowString(10, 35, ultra);
 
 //		irLeft();
-//		HAL_Delay(200);
+//		osDelay(100);
 //		sprintf(ultra, "IR left: %u\0", ir1Dist);
 //		OLED_ShowString(10, 30, ultra);
-
+//
 //		irRight();
-//		HAL_Delay(200);
-//		sprintf(ultra, "IR dist: %u\0", ir2Dist);
-//		OLED_ShowString(10, 30, ultra);
+//		HAL_Delay(100);
+//		sprintf(ultra, "IR right: %u\0", ir2Dist);
+//		OLED_ShowString(10, 40, ultra);
 
 
 		OLED_Refresh_Gram();
@@ -1044,8 +1203,8 @@ void motor(void *argument)
 	HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_4);
 	int x = 0;
 
-	*aRxBuffer = '\0';
-
+	//*aRxBuffer = '\0';
+	*aRxBuffer = '1';
 	uint8_t toRpiTest[6] = "NiHao";
 		for(;;)
 		  {
@@ -1058,21 +1217,63 @@ void motor(void *argument)
 			case 'H':
 				HAL_UART_Transmit_IT(&huart3,(uint8_t *)&toRpiTest,6);
 				osDelay(50);
-				*aRxBuffer = 'R';
+				*aRxBuffer = 'Z';
 				break;
 			case 'K':
 				HAL_UART_Transmit_IT(&huart3,(uint8_t *)"OK?\n",4);
 				osDelay(50);
-				*aRxBuffer = 'R';
+				*aRxBuffer = 'Z';
 				break;
+			case 'O':
+				HAL_UART_Transmit_IT(&huart3,(uint8_t *)"O",1);
+				while(*aRxBuffer=='O'){
+					HAL_Delay(100);
+					spotTurn(1);
+					HAL_Delay(100);
+					forward(37);
+					HAL_Delay(100);
+					spotTurn(2);
+					HAL_Delay(100);
+					forward(27);
+					HAL_Delay(100);
+					spotTurn(2);
+					HAL_Delay(100);
+					HAL_UART_Transmit_IT(&huart3,(uint8_t *)"O",1);
+					*aRxBuffer = 'Z';
+					waitCmd();
+				}
+//				*aRxBuffer = 'F'; //put in motorControl(). cuz wun come back here
+				*aRxBuffer = 'Z';
+				break;
+			case '0':
+				forward(0);break;
+			case '1':
+				forward(1);break;
+			case '2':
+				forward(2);break;
+			case '3':
+				forward(3);break;
+			case '4':
+				forward(4);break;
+			case '5':
+				forward(5);break;
+			case '6':
+				forward(6);break;
+			case '7':
+				forward(7);break;
+			case '8':
+				forward(8);break;
+			case '9':
+				forward(9);break;
 			case 'L':
-				Fleft(90);
-//				*aRxBuffer = 'R'; //put in motorControl(). cuz wun come back here
-				break;
-			case 'F':
-				motorControl(3000, 3000, 'F', 'F', 0, 10000, 90);
-//				*aRxBuffer = 'R';
-				break;
+				spotTurn(1);break;
+
+			case 'R':
+				spotTurn(2);break;
+			case 'Q':
+				degTurn(1);break;
+			case 'E':
+				degTurn(2);break;
 			case 'U':
 				ultraDistCheck();
 				HAL_Delay(200);
@@ -1084,18 +1285,27 @@ void motor(void *argument)
 					reply[0] = '9';
 				HAL_UART_Transmit_IT(&huart3, (uint8_t *)reply, strlen(reply));
 				osDelay(50);
-				*aRxBuffer = 'R';
+				*aRxBuffer = 'Z';
 				break;
-			case 'S':
-				irRight();
-				char reply2[] = "00\n";
-				reply2[0] += ir2Dist / 10 % 10;
-				reply2[1] += ir2Dist % 10;
-				HAL_UART_Transmit_IT(&huart3, (uint8_t *)reply2, strlen(reply2));
-				osDelay(50);
-				*aRxBuffer = 'R';
-				break;
-			case 'R':
+//			case 'S':
+////				irRight();
+//				char reply2[] = "00\n";
+//				reply2[0] += ir2Dist / 10 % 10;
+//				reply2[1] += ir2Dist % 10;
+//				HAL_UART_Transmit_IT(&huart3, (uint8_t *)reply2, strlen(reply2));
+//				osDelay(50);
+//				*aRxBuffer = 'R';
+//				break;
+//			case 'M':
+////				irLeft();
+//				char reply3[] = "00\n";
+//				reply3[0] += ir2Dist / 10 % 10;
+//				reply3[1] += ir2Dist % 10;
+//				HAL_UART_Transmit_IT(&huart3, (uint8_t *)reply2, strlen(reply3));
+//				osDelay(50);
+//				*aRxBuffer = 'R';
+//				break;
+			case 'Z':
 				waitCmd();
 				break;
 			default:
@@ -1103,7 +1313,7 @@ void motor(void *argument)
 				HAL_UART_Receive_IT(&huart3, (uint8_t *)aRxBuffer, 1);
 				break;
 			}
-			osDelay(100);
+			HAL_Delay(100);
 		  }
 
 //	for(;;){
