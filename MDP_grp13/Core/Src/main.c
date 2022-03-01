@@ -25,6 +25,7 @@
 /* USER CODE BEGIN Includes */
 #include "oled.h"
 #include "math.h"
+#include "PID.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -34,8 +35,9 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-const double Fturnvar = 0.588;
-const double Rturnvar = 0.66;
+#define CMPERREV 0.01470588235f;
+#define PID_KP 10.0f
+#define PID_KI 2.5f
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -88,20 +90,20 @@ void StartDefaultTask(void *argument);
 void motor(void *argument);
 
 /* USER CODE BEGIN PFP */
-int motorControl(int, int, char, char, int, int, double);
-int motorCont(int, int, char, char, int, int, double);
-void Fleft(int);
-void Rleft(int);
-void Fright(int);
-void Rright(int);
-void spotTurn(int);
+void fastestCar();
+void PIDmotor(float);
+int motorCont(int speedL, int speedR, char dirL, char dirR, double dist);
 void degTurn(int);
+void forward(int);
+void reverse(int);
+void spotTurn(int);
+
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
-int16_t cntl1, cntl2, cntr1, cntr2;
+int16_t currentLeft, currentRight;
 int16_t diffl = 0, diffr = 0, avg = 0;
 int32_t tick = 0;
 uint8_t display[20];
@@ -118,6 +120,9 @@ uint8_t aRxBuffer[1];
 /* IR */
 uint32_t ir1Dist = 0;
 uint32_t ir2Dist = 0;
+float outLeft =0;
+float outRight=0;
+float error=0;
 
 void delay(uint16_t time){  //provide us delay
 	__HAL_TIM_SET_COUNTER(&htim4, 0);
@@ -175,7 +180,7 @@ void ultraDistCheck (void)
 	HAL_Delay(100);
 	uDistCheck2 = HCSR04_Read();
 	HAL_Delay(100);
-	while (uDistCheck1 - uDistCheck2 >= 5 || uDistCheck2 - uDistCheck1 >= 5) {
+	while (abs(uDistCheck1 - uDistCheck2) >= 5) { // || uDistCheck2 - uDistCheck1 >= 5) {
 		uDistCheck1 = HCSR04_Read();
 		HAL_Delay(100);
 		uDistCheck2 = HCSR04_Read();
@@ -184,7 +189,7 @@ void ultraDistCheck (void)
 	uDistFinal = (uDistCheck1 + uDistCheck2)/2;
 }
 
-void irLeft (void) { //ADC1 (a bit more wonky)
+uint32_t irLeft (void) { //ADC1 (a bit more wonky)
 	uint32_t adc1 = 0;
 	float V = 0;
 	HAL_ADC_Start(&hadc1);
@@ -196,9 +201,10 @@ void irLeft (void) { //ADC1 (a bit more wonky)
 
 
 	ir1Dist = 31.13125 * pow(V, -1.08797);
+	return ir1Dist;
 }
 
-void irRight (void) { //ADC2
+uint32_t irRight (void) { //ADC2
 	uint32_t adc2 = 0;
 	float V = 0;
 	HAL_ADC_Start(&hadc2);
@@ -210,6 +216,7 @@ void irRight (void) { //ADC2
 
 
 	ir2Dist = 32.6167 * pow(V, -1.0928);
+	return ir2Dist;
 }
 
 void waitCmd (void) {	//not complete
@@ -218,167 +225,128 @@ void waitCmd (void) {	//not complete
 	}
 }
 
-//Master function for all motor functions
-int motorControl(int speedL, int speedR, char dirL, char dirR, int turn, int time, double dist){
+void fastestCar(){
+	/* (1) Start straight line loop */
+	while(1){
+		/* Increase RPM until ??? */
 
 
-	//declaration
+		/* Break to new loop for slowing down */
+		ultraDistCheck();
+		if(uDistFinal<=40){
+			break;
+		}
+	}
+
+	/* (2) Slow down car to prepare for turning */
+	while(1){
+		//Slow down code
+
+		ultraDistCheck();
+		if(uDistFinal<=20){
+			htim1.Instance->CCR4 = 104;
+			HAL_Delay(1000);
+			htim1.Instance->CCR4 = 73;
+			break;
+		}
+	}
+
+	/* (3) Move until near end of obstacle's corner */
+	int x=0;
+	while(1){
+		/* Constant Speed */
+
+
+		if(irLeft()>=30){
+			htim1.Instance->CCR4 = 56;
+			HAL_Delay(1000);
+			htim1.Instance->CCR4 = 75;
+			HAL_Delay(1000);
+			htim1.Instance->CCR4 = 56;
+			HAL_Delay(1000);
+			htim1.Instance->CCR4 = 75;
+			break;
+		}
+
+	}
+	/* (4) Move 50cm */
+	//Move
+
+	/* (5) Move straight until centre of obstacle */
+	//Calculate Dist to move
+	//Move Dist
+
+	//Turn Right
+
+	/* (6) Move back to parking spot */
+	while(1){
+		//Move straight
+
+		ultraDistCheck();
+		if(uDistFinal<=20){
+			//Stop
+			break;
+		}
+	}
+
+}
+
+//Master function for motor with PID control
+void PIDmotor(float distance){
+	/* Set UARTBuffer to default value */
+	*aRxBuffer = 'Z';
+
+	/* Initialise PID Controllers */
+	PIDController pidLeft = {PID_KP,PID_KI,0,0,0,0,0,0,4.0f};
+	PIDController pidRight =  {PID_KP,PID_KI,0,0,0,0,0,0,4.0f};
+
+	/* Initialise Encoder */
 	HAL_TIM_Encoder_Start(&htim2, TIM_CHANNEL_ALL);		//left encoder(MotorA) start
 	HAL_TIM_Encoder_Start(&htim3, TIM_CHANNEL_ALL);		//right encoder(MotorB) start
-	cntl1 = __HAL_TIM_GET_COUNTER(&htim2);
-	cntr1 = __HAL_TIM_GET_COUNTER(&htim3);
-	tick = HAL_GetTick();
-	double encDist = dist * 68;
 
-	int currTime = 0;
+	/* Configure direction of motors */
+	HAL_GPIO_WritePin(GPIOA, AIN1_Pin, GPIO_PIN_SET);
+	HAL_GPIO_WritePin(GPIOA, AIN2_Pin, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(GPIOA, BIN1_Pin, GPIO_PIN_SET);
+	HAL_GPIO_WritePin(GPIOA, BIN2_Pin, GPIO_PIN_RESET);
+	PIDController_Init(&pidLeft);
+	PIDController_Init(&pidRight);
 
-	//Select direction of motor//
+	while(1){
+		/* Take current encoder values */
+		currentLeft = __HAL_TIM_GET_COUNTER(&htim2)*CMPERREV;
+		currentRight = __HAL_TIM_GET_COUNTER(&htim3)*CMPERREV;
 
-	switch(dirL){
-		case 'F':
-			HAL_GPIO_WritePin(GPIOA, AIN1_Pin, GPIO_PIN_SET);
-			HAL_GPIO_WritePin(GPIOA, AIN2_Pin, GPIO_PIN_RESET);
-			break;
+		/* Compute new control signal */
+		outLeft = PIDController_Update(&pidLeft, distance, currentLeft);
+		outRight = PIDController_Update(&pidRight, distance, currentRight);
 
-		case 'R':
-			HAL_GPIO_WritePin(GPIOA, AIN1_Pin, GPIO_PIN_RESET);
-			HAL_GPIO_WritePin(GPIOA, AIN2_Pin, GPIO_PIN_SET);
-			break;
+		/* Update new values to motors */
+		__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_1, outLeft);
+		__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_2, outRight);
+		error = pidLeft.prevError;
+		/* Preventive measures for errors */
+		if(pidLeft.out>=4000 || pidRight.out>=4000)break;
 	}
 
-	switch(dirR){
-		case 'F':
-			HAL_GPIO_WritePin(GPIOA, BIN1_Pin, GPIO_PIN_SET);
-			HAL_GPIO_WritePin(GPIOA, BIN2_Pin, GPIO_PIN_RESET);
-			break;
-
-		case 'R':
-			HAL_GPIO_WritePin(GPIOA, BIN1_Pin, GPIO_PIN_RESET);
-			HAL_GPIO_WritePin(GPIOA, BIN2_Pin, GPIO_PIN_SET);
-			break;
-	}
-	//End of motor direction selection//
-
-	__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_1, speedL*1.08);
-	__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_2, speedR);
-
-
-	while(currTime<time){
-			cntl2 = __HAL_TIM_GET_COUNTER(&htim2);
-			cntr2 = __HAL_TIM_GET_COUNTER(&htim3);
-			diffl = abs(cntl2);
-			diffr =abs(cntr2);
-			diffr =abs(cntr2);
-			avg = abs((diffl+diffr)/2);
-			sprintf(display,"Left:%5d\0", diffl/68);
-			OLED_ShowString(10,35,display);
-			sprintf(display,"Right:%5d\0", diffr/68);
-			OLED_ShowString(10,50,display);
-			OLED_Refresh_Gram();
-
-			if(avg>=encDist*pow(0.8,30/dist)&&turn==0){
-				speedL = speedL*pow(0.9,1+speedL/1000);
-				speedR = speedR*pow(0.9,1+speedR/1000);
-				__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_1, speedL);
-				__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_2, speedR);
-			}
-			if(avg>=encDist && turn==0 && dirL=='F'){
-				HAL_GPIO_WritePin(GPIOA, AIN1_Pin, GPIO_PIN_RESET);
-				HAL_GPIO_WritePin(GPIOA, AIN2_Pin, GPIO_PIN_SET);
-				HAL_GPIO_WritePin(GPIOA, BIN1_Pin, GPIO_PIN_RESET);
-				HAL_GPIO_WritePin(GPIOA, BIN2_Pin, GPIO_PIN_SET);
-				HAL_Delay(100);
-				__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_1, 0);
-				__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_2, 0);
-				HAL_Delay(500);
-				break;
-			}
-
-			if(avg>=encDist && turn==0 && dirL=='R'){
-				HAL_GPIO_WritePin(GPIOA, AIN1_Pin, GPIO_PIN_SET);
-				HAL_GPIO_WritePin(GPIOA, AIN2_Pin, GPIO_PIN_RESET);
-				HAL_GPIO_WritePin(GPIOA, BIN1_Pin, GPIO_PIN_SET);
-				HAL_GPIO_WritePin(GPIOA, BIN2_Pin, GPIO_PIN_RESET);
-				HAL_Delay(100);
-				__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_1, 0);
-				__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_2, 0);
-				HAL_Delay(500);
-				break;
-			}
-
-			if((diffl>=encDist*0.7 || diffr>=encDist*0.8)&&turn==1){
-				speedL = speedL*0.9;
-				speedR = speedR*0.9;
-				__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_1, speedL);
-				__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_2, speedR);
-			}
-
-			if((diffl>=encDist*0.9 || diffr>=encDist*0.9)&&turn==1){
-
-				break;
-			}
-
-		}
-		__HAL_TIM_SET_COUNTER(&htim2,0);
-		__HAL_TIM_SET_COUNTER(&htim3,0);
-
-		speedL=speedR=tick=diffl=diffr=0;
-		OLED_Refresh_Gram();
-		*aRxBuffer = 'R';
+	/* Reset Encoders value */
+	__HAL_TIM_SET_COUNTER(&htim2,0);
+	__HAL_TIM_SET_COUNTER(&htim3,0);
 }
 
-void Fleft(int deg){
-	double dist = 0.585 * deg;
-	htim1.Instance->CCR4 = 56;
-	HAL_Delay(500);
-	motorControl(800, 4000, 'F', 'F', 1, 1000, dist);
-	htim1.Instance->CCR4 = 74;
-	motorControl(2000, 2000, 'F', 'F', 0, 1000, 13);
-}
-void Rleft(int deg){
-	double dist = (Rturnvar-0.05) * deg;
-	htim1.Instance->CCR4 = 56;
-	HAL_Delay(500);
-	motorControl(700, 3500, 'R', 'R', 1, 1000, dist);
-	__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_1, 0);
-	__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_2, 0);
-}
 
-void Fright(int deg){
-	double dist = Fturnvar * deg;
-	htim1.Instance->CCR4 = 108;
-	HAL_Delay(500);
-	motorControl(4000, 1000, 'F', 'F', 1, 1000, dist);
-	htim1.Instance->CCR4 = 74;
-	motorControl(2000, 2000, 'F', 'F', 0, 1000, 13);
-}
-void Rright(int deg){
-	double dist = Rturnvar * deg;
-	htim1.Instance->CCR4 = 108;
-	HAL_Delay(500);
-	motorControl(3700, 1000, 'R', 'R', 1, 1000, dist);
-	__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_1, 0);
-	__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_2, 0);
-//	HAL_Delay(50);
-//	htim1.Instance->CCR4 = 74;
-//	HAL_Delay(50);
-//	motorControl(1000, 1000, 'F', 'F', 0, 1000, 2);
-}
-
-int motorCont(int speedL, int speedR, char dirL, char dirR, int turn, int time, double dist){
+//Master function for image recognition motor control
+int motorCont(int speedL, int speedR, char dirL, char dirR, double dist){
 	*aRxBuffer = 'Z';
 	//declaration
 	HAL_TIM_Encoder_Start(&htim2, TIM_CHANNEL_ALL);		//left encoder(MotorA) start
 	HAL_TIM_Encoder_Start(&htim3, TIM_CHANNEL_ALL);		//right encoder(MotorB) start
-	cntl1 = __HAL_TIM_GET_COUNTER(&htim2);
-	cntr1 = __HAL_TIM_GET_COUNTER(&htim3);
+	currentLeft = __HAL_TIM_GET_COUNTER(&htim2);
+	currentRight = __HAL_TIM_GET_COUNTER(&htim3);
 	tick = HAL_GetTick();
 	double encDist = dist * 68;
 
-	int currTime = 0;
-
 	//Select direction of motor//
-
 	switch(dirL){
 		case 'F':
 			HAL_GPIO_WritePin(GPIOA, AIN1_Pin, GPIO_PIN_SET);
@@ -408,11 +376,11 @@ int motorCont(int speedL, int speedR, char dirL, char dirR, int turn, int time, 
 	__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_2, speedR);
 
 
-	while(currTime<time){
-			cntl2 = __HAL_TIM_GET_COUNTER(&htim2);
-			cntr2 = __HAL_TIM_GET_COUNTER(&htim3);
-			diffl = abs(cntl2);
-			diffr =abs(cntr2);
+	while(1){
+			currentLeft = __HAL_TIM_GET_COUNTER(&htim2);
+			currentRight = __HAL_TIM_GET_COUNTER(&htim3);
+			diffl = abs(currentLeft);
+			diffr =abs(currentRight);
 			avg = abs((diffl+diffr)/2);
 			sprintf(display,"Left:%5d\0", diffl/68);
 			OLED_ShowString(10,35,display);
@@ -446,44 +414,69 @@ int motorCont(int speedL, int speedR, char dirL, char dirR, int turn, int time, 
 void degTurn(int mode){
 	switch(mode){
 	case 1: //Turn left
-			htim1.Instance->CCR4 = 56;
+			htim1.Instance->CCR4 = 61;
 			HAL_Delay(100);
-			motorCont(500,2200,'F','F',1,1000,88*0.57);
+			motorCont(500,2200,'F','F',97*0.57);
 			break;
 	case 2:
-			htim1.Instance->CCR4 = 104;
+			htim1.Instance->CCR4 = 96;
 			HAL_Delay(100);
-			motorCont(2200,500,'F','F',1,1000,105*0.57);
+			motorCont(2200,500,'F','F',94*0.57);
+			HAL_Delay(50);
+			htim1.Instance->CCR4 = 73;
 			break;
 	}
-
-
 }
 
-void forward(int mode){
-	htim1.Instance->CCR4 = 74;
+void forward(int mode){ //Forward for image recognition
 	HAL_Delay(100);
 	switch(mode){
 	case 0:
-			motorCont(2000, 2000, 'F', 'F', 1, 1000, 100);break;
+			motorCont(1000, 1000, 'F', 'F', 104);break;
 	case 1:
-			motorCont(1000, 900, 'F', 'F', 1, 1000, 9);break;
+			motorCont(1000, 1000, 'F', 'F', 9);break;
 	case 2:
-			motorCont(1100, 980, 'F', 'F', 1, 1000, 19.5);break;
+			motorCont(1000, 1000, 'F', 'F', 19.5);break;
 	case 3:
-			motorCont(1200, 1080, 'F', 'F', 1, 1000, 29);break;
+			motorCont(1000, 1000, 'F', 'F', 29);break;
 	case 4:
-			motorCont(1300, 1300, 'F', 'F', 1, 1000, 40);break;
+			motorCont(1000, 1000, 'F', 'F', 41);break;
 	case 5:
-			motorCont(1400, 1400, 'F', 'F', 1, 1000, 50);break;
+			motorCont(1000, 1000, 'F', 'F', 51);break;
 	case 6:
-			motorCont(1500, 1500, 'F', 'F', 1, 1000, 60);break;
+			motorCont(1000, 1000, 'F', 'F', 62);break;
 	case 7:
-			motorCont(1600, 1600, 'F', 'F', 1, 1000, 70);break;
+			motorCont(1000, 1000, 'F', 'F', 73);break;
 	case 8:
-			motorCont(1700, 1700, 'F', 'F', 1, 1000, 80);break;
+			motorCont(1000, 1000, 'F', 'F', 84);break;
 	case 9:
-			motorCont(1800, 1800, 'F', 'F', 1, 1000, 90);break;
+			motorCont(1000, 1000, 'F', 'F', 94);break;
+	}
+}
+
+void reverse(int mode){//Reverse for image recognition
+	HAL_Delay(100);
+	switch(mode){
+	case 0:
+			motorCont(1000, 1000, 'R', 'R', 104);break;
+	case 1:
+			motorCont(1000, 1000,'R', 'R', 8.5);break;
+	case 2:
+			motorCont(1000, 1000,'R', 'R', 19.5);break;
+	case 3:
+			motorCont(1000, 1000, 'R', 'R', 29);break;
+	case 4:
+			motorCont(1000, 1000, 'R', 'R', 41);break;
+	case 5:
+			motorCont(1000, 1000,'R', 'R', 51);break;
+	case 6:
+			motorCont(1000, 1000, 'R', 'R', 62);break;
+	case 7:
+			motorCont(1000, 1000, 'R', 'R', 73);break;
+	case 8:
+			motorCont(1000, 1000, 'R', 'R', 84);break;
+	case 9:
+			motorCont(1000, 1000, 'R', 'R', 94);break;
 
 	}
 }
@@ -493,26 +486,28 @@ void spotTurn(int mode){
 	case 1: //Turn left
 		htim1.Instance->CCR4 = 56;
 		HAL_Delay(500);
-		motorCont(500, 1500, 'F', 'F', 1, 1000, 22);
+		motorCont(500, 1500, 'F', 'F', 21);
 		htim1.Instance->CCR4 = 104;
 		HAL_Delay(500);
-		motorCont(1500, 500, 'R', 'R', 1, 1000, 21);
+		motorCont(1500, 500, 'R', 'R', 21);
 		htim1.Instance->CCR4 = 56;
 		HAL_Delay(500);
-		motorCont(500, 1500, 'F', 'F', 1, 1000, 4.5);
-		htim1.Instance->CCR4 = 74;
+		motorCont(500, 1500, 'F', 'F', 5.47);
+		HAL_Delay(50);
+		htim1.Instance->CCR4 = 76;
 		break;
 	case 2: //Turn right
 		htim1.Instance->CCR4 = 104;
 		HAL_Delay(500);
-		motorCont(1500, 500, 'F', 'F', 1, 1000, 22);
+		motorCont(1500, 500, 'F', 'F', 21);
 		htim1.Instance->CCR4 = 56;
 		HAL_Delay(500);
-		motorCont(500, 1500, 'R', 'R', 1, 1000, 19.5);
+		motorCont(500, 1500, 'R', 'R', 20);
 		htim1.Instance->CCR4 = 104;
 		HAL_Delay(500);
-		motorCont(1500, 500, 'F', 'F', 1, 1000, 6);
-		htim1.Instance->CCR4 = 74;
+		motorCont(1500, 500, 'F', 'F', 5.5);
+		HAL_Delay(50);
+		htim1.Instance->CCR4 = 73;
 		break;
 	}
 }
@@ -1201,10 +1196,9 @@ void motor(void *argument)
 	HAL_TIM_PWM_Start(&htim8, TIM_CHANNEL_1);
 	HAL_TIM_PWM_Start(&htim8, TIM_CHANNEL_2);
 	HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_4);
-	int x = 0;
-
+	htim1.Instance->CCR4 = 74;
 	//*aRxBuffer = '\0';
-	*aRxBuffer = '1';
+	*aRxBuffer = '\0';
 	uint8_t toRpiTest[6] = "NiHao";
 		for(;;)
 		  {
@@ -1224,50 +1218,51 @@ void motor(void *argument)
 				osDelay(50);
 				*aRxBuffer = 'Z';
 				break;
-			case 'O':
-				HAL_UART_Transmit_IT(&huart3,(uint8_t *)"O",1);
-				while(*aRxBuffer=='O'){
-					HAL_Delay(100);
-					spotTurn(1);
-					HAL_Delay(100);
-					forward(37);
-					HAL_Delay(100);
-					spotTurn(2);
-					HAL_Delay(100);
-					forward(27);
-					HAL_Delay(100);
-					spotTurn(2);
-					HAL_Delay(100);
-					HAL_UART_Transmit_IT(&huart3,(uint8_t *)"O",1);
-					*aRxBuffer = 'Z';
-					waitCmd();
-				}
-//				*aRxBuffer = 'F'; //put in motorControl(). cuz wun come back here
-				*aRxBuffer = 'Z';
-				break;
-			case '0':
-				forward(0);break;
-			case '1':
-				forward(1);break;
-			case '2':
-				forward(2);break;
-			case '3':
-				forward(3);break;
-			case '4':
-				forward(4);break;
-			case '5':
-				forward(5);break;
-			case '6':
-				forward(6);break;
-			case '7':
-				forward(7);break;
-			case '8':
-				forward(8);break;
+			//========================Forward========================
 			case '9':
+				forward(0);break;
+			case '0':
+				forward(1);break;
+			case '1':
+				forward(2);break;
+			case '2':
+				forward(3);break;
+			case '3':
+				forward(4);break;
+			case '4':
+				forward(5);break;
+			case '5':
+				forward(6);break;
+			case '6':
+				forward(7);break;
+			case '7':
+				forward(8);break;
+			case '8':
 				forward(9);break;
+			//========================Reverse========================
+			case 33:
+				reverse(1);break;
+			case 34:
+				reverse(2);break;
+			case 35:
+				reverse(3);break;
+			case 36:
+				reverse(4);break;
+			case 37:
+				reverse(5);break;
+			case 38:
+				reverse(6);break;
+			case 39:
+				reverse(7);break;
+			case 40:
+				reverse(8);break;
+			case 41:
+				reverse(9);break;
+			case 42:
+				reverse(0);break;
+			//========================Turn========================
 			case 'L':
 				spotTurn(1);break;
-
 			case 'R':
 				spotTurn(2);break;
 			case 'Q':
@@ -1305,6 +1300,11 @@ void motor(void *argument)
 //				osDelay(50);
 //				*aRxBuffer = 'R';
 //				break;
+			/* Test Cases */
+			case 'W':
+				PIDmotor(10);
+				break;
+
 			case 'Z':
 				waitCmd();
 				break;
@@ -1314,17 +1314,8 @@ void motor(void *argument)
 				break;
 			}
 			HAL_Delay(100);
+			HAL_UART_Transmit_IT(&huart3,(uint8_t *)"OK\n",2);
 		  }
-
-//	for(;;){
-//		if(HAL_GPIO_ReadPin(USRBUT_GPIO_Port,USRBUT_Pin)==0){
-//		htim1.Instance->CCR4 = 74;
-//		HAL_Delay(100);
-//		Fleft(90);
-//		HAL_Delay(5000);
-//		Fright(90);
-//		}
-//	}
 
 	osDelay(1000);
   /* USER CODE END motor */
