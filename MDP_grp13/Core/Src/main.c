@@ -26,6 +26,7 @@
 #include "oled.h"
 #include "math.h"
 #include "PID.h"
+#include <time.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -35,9 +36,10 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define CMPERREV 0.01470588235f;
-#define PID_KP 10.0f
-#define PID_KI 2.5f
+#define CMPERREV 0.01666666667f;
+#define PID_KP 20.0f
+#define PID_KI 0.000f
+#define PID_KD 0.0f
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -49,10 +51,13 @@
 ADC_HandleTypeDef hadc1;
 ADC_HandleTypeDef hadc2;
 
+RTC_HandleTypeDef hrtc;
+
 TIM_HandleTypeDef htim1;
 TIM_HandleTypeDef htim2;
 TIM_HandleTypeDef htim3;
 TIM_HandleTypeDef htim4;
+TIM_HandleTypeDef htim5;
 TIM_HandleTypeDef htim8;
 
 UART_HandleTypeDef huart3;
@@ -86,12 +91,14 @@ static void MX_TIM4_Init(void);
 static void MX_USART3_UART_Init(void);
 static void MX_ADC1_Init(void);
 static void MX_ADC2_Init(void);
+static void MX_RTC_Init(void);
+static void MX_TIM5_Init(void);
 void StartDefaultTask(void *argument);
 void motor(void *argument);
 
 /* USER CODE BEGIN PFP */
 void fastestCar();
-void PIDmotor(float);
+void PIDmotor(float,int);
 int motorCont(int speedL, int speedR, char dirL, char dirR, double dist);
 void degTurn(int);
 void forward(int);
@@ -104,6 +111,7 @@ void spotTurn(int);
 /* USER CODE BEGIN 0 */
 
 int16_t currentLeft, currentRight;
+float fLeft,fRight;
 int16_t diffl = 0, diffr = 0, avg = 0;
 int32_t tick = 0;
 uint8_t display[20];
@@ -118,11 +126,25 @@ uint8_t ultra[20];
 /* UART */
 uint8_t aRxBuffer[1];
 /* IR */
+//uint32_t ir1Dist = 0;
 uint32_t ir1Dist = 0;
 uint32_t ir2Dist = 0;
+uint32_t adc1;
+uint32_t adc2;
 float outLeft =0;
 float outRight=0;
 float error=0;
+float currDist;
+float velocityLeft=0;
+float velocityRight=0;
+float distanceLeft=0;
+float distanceRight=0;
+float pwmLeft = 1800;
+float pwmRight = 1500;
+
+/* Timer variables */
+float startSec;
+float currSec;
 
 void delay(uint16_t time){  //provide us delay
 	__HAL_TIM_SET_COUNTER(&htim4, 0);
@@ -190,22 +212,22 @@ void ultraDistCheck (void)
 }
 
 uint32_t irLeft (void) { //ADC1 (a bit more wonky)
-	uint32_t adc1 = 0;
+	adc1 = 0;
 	float V = 0;
 	HAL_ADC_Start(&hadc1);
 	adc1 = HAL_ADC_GetValue(&hadc1);
 	V = (float)adc1/1000;
 
-	if (V <= 0.42) V = 0.42; //cap at 80 cm
+	if (V <= 0.5) V = 0.5; //cap at 80 cm
 	else if (V >= 2.84) V = 2.84; //cap at 10 cm
 
 
-	ir1Dist = 31.13125 * pow(V, -1.08797);
+	ir1Dist = 34.96332 * pow(V, -1.19878);
 	return ir1Dist;
 }
 
 uint32_t irRight (void) { //ADC2
-	uint32_t adc2 = 0;
+	adc2 = 0;
 	float V = 0;
 	HAL_ADC_Start(&hadc2);
 	adc2 = HAL_ADC_GetValue(&hadc2);
@@ -220,8 +242,11 @@ uint32_t irRight (void) { //ADC2
 }
 
 void waitCmd (void) {	//not complete
+	//HAL_UART_Transmit_IT(&huart3,(uint8_t *)"OK",2);
 	while (*aRxBuffer == 'Z') {
+		//HAL_UART_Transmit_IT(&huart3,(uint8_t *)"OK",2);
 		HAL_UART_Receive_IT(&huart3, (uint8_t *)aRxBuffer, 1);
+		HAL_Delay(100);
 	}
 }
 
@@ -291,49 +316,229 @@ void fastestCar(){
 
 }
 
+void preCorr(){
+		while(uDistFinal>15 && uDistFinal<40){
+			HAL_GPIO_WritePin(GPIOA, AIN1_Pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(GPIOA, AIN2_Pin, GPIO_PIN_RESET);
+			HAL_GPIO_WritePin(GPIOA, BIN1_Pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(GPIOA, BIN2_Pin, GPIO_PIN_RESET);
+			__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_1, 600);
+			__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_2, 600);
+			ultraDistCheck();
+		}
+		__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_1, 0);
+		__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_2, 0);
+
+}
+
+void corrMotor(int mode){
+	if(mode==1){
+		while(uDistFinal>22 || uDistFinal>40){
+			HAL_GPIO_WritePin(GPIOA, AIN1_Pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(GPIOA, AIN2_Pin, GPIO_PIN_RESET);
+			HAL_GPIO_WritePin(GPIOA, BIN1_Pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(GPIOA, BIN2_Pin, GPIO_PIN_RESET);
+			__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_1, 600);
+			__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_2, 600);
+			ultraDistCheck();
+
+		}
+		__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_1, 0);
+		__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_2, 0);
+	}
+	else if(mode==2){
+		while(uDistFinal<24){
+			HAL_GPIO_WritePin(GPIOA, AIN1_Pin, GPIO_PIN_RESET);
+			HAL_GPIO_WritePin(GPIOA, AIN2_Pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(GPIOA, BIN1_Pin, GPIO_PIN_RESET);
+			HAL_GPIO_WritePin(GPIOA, BIN2_Pin, GPIO_PIN_SET);
+			__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_1, 600);
+			__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_2, 600);
+			ultraDistCheck();
+		}
+		__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_1, 0);
+		__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_2, 0);
+	}
+}
+
+void correction(){
+	*aRxBuffer = 'Z';
+	irLeft();
+	irRight();
+	ultraDistCheck();
+	if(uDistFinal>40){
+		while(irLeft()<=35 && irRight()<=35){
+			__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_1, 600);
+			__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_2, 600);
+		}
+		__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_1, 0);
+		__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_2, 0);
+	}
+	int mode = 0;
+	if(irLeft()<=35 || irRight()<=35){
+		if(irLeft<irRight)mode =1;
+		else mode=2;
+	}
+	if(mode==1){
+		preCorr();
+		while(irLeft()<=35){
+			htim1.Instance->CCR4 = 104;
+			HAL_Delay(100);
+			motorCont(1000, 1000, 'R', 'R', 1);
+			htim1.Instance->CCR4 = 56;
+			HAL_Delay(100);
+			motorCont(1000, 1000, 'F', 'F', 1);
+			irLeft();
+			htim1.Instance->CCR4 = 76;
+			HAL_Delay(50);
+			ultraDistCheck();
+			if(uDistFinal<15){
+				motorCont(1000, 1000, 'R', 'R', 2);
+				ultraDistCheck();
+			}
+			if(uDistFinal>15 && uDistFinal<40){
+				motorCont(1000, 1000, 'F', 'F', 2);
+			}
+		}
+		htim1.Instance->CCR4 = 76;
+	}
+	else if(mode==2){
+		preCorr();
+		while(irRight()<=35){
+			htim1.Instance->CCR4 =56;
+
+			HAL_Delay(100);
+			motorCont(1000, 1000, 'R', 'R', 1);
+			htim1.Instance->CCR4 = 104;
+			HAL_Delay(100);
+			motorCont(1000, 1000, 'F', 'F', 1);
+			irRight();
+			htim1.Instance->CCR4 = 73;
+			HAL_Delay(50);
+			ultraDistCheck();
+			if(uDistFinal<15){
+				motorCont(1000, 1000, 'R', 'R', 2);
+				ultraDistCheck();
+			}
+			if(uDistFinal>15 && uDistFinal<40){
+				motorCont(1000, 1000, 'F', 'F', 2);
+			}
+		}
+		htim1.Instance->CCR4 = 73;
+		HAL_Delay(50);
+	}
+	HAL_Delay(1000);
+	if(uDistFinal>23 && uDistFinal<40){//Forward until 25
+		corrMotor(1);
+	}
+	else if(uDistFinal<23){
+		corrMotor(2);
+	}
+}
+
+
+void motorSpeed(float left, float right){
+	if(left<0){
+		HAL_GPIO_WritePin(GPIOA, AIN1_Pin, GPIO_PIN_RESET);
+		HAL_GPIO_WritePin(GPIOA, AIN2_Pin, GPIO_PIN_SET);
+		left = fabs(left);
+	}
+	else if(left>0){
+		HAL_GPIO_WritePin(GPIOA, AIN1_Pin, GPIO_PIN_SET);
+		HAL_GPIO_WritePin(GPIOA, AIN2_Pin, GPIO_PIN_RESET);
+	}
+	if(right<0){
+		HAL_GPIO_WritePin(GPIOA, BIN1_Pin, GPIO_PIN_RESET);
+		HAL_GPIO_WritePin(GPIOA, BIN2_Pin, GPIO_PIN_SET);
+		right = fabs(right);
+	}
+	else if(right>0){
+		HAL_GPIO_WritePin(GPIOA, BIN1_Pin, GPIO_PIN_SET);
+		HAL_GPIO_WritePin(GPIOA, BIN2_Pin, GPIO_PIN_RESET);
+	}
+	__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_1, left);
+	__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_2, right);
+}
+
+void readEncoder(){
+	if(__HAL_TIM_IS_TIM_COUNTING_DOWN(&htim2)){
+		currentLeft = __HAL_TIM_GET_COUNTER(&htim2);
+		fLeft = currentLeft *-1*CMPERREV;
+	}
+	else{
+		currentLeft = __HAL_TIM_GET_COUNTER(&htim2);
+		fLeft = currentLeft *CMPERREV;
+	}
+	if(__HAL_TIM_IS_TIM_COUNTING_DOWN(&htim3)){
+		currentRight = __HAL_TIM_GET_COUNTER(&htim3);
+		fRight = currentRight * CMPERREV;
+	}
+	else{
+		currentRight = __HAL_TIM_GET_COUNTER(&htim2);
+		fRight = currentRight * -1 *CMPERREV;
+	}
+}
+
+float getTime(){
+	return __HAL_TIM_GET_COUNTER(&htim5)/1000000;
+}
+
+void timeStart(){
+	startSec = getTime();
+}
+
+float timeNow(){
+	currSec = getTime() - startSec;
+}
+
 //Master function for motor with PID control
-void PIDmotor(float distance){
+void PIDmotor(float setDist, int time){
 	/* Set UARTBuffer to default value */
 	*aRxBuffer = 'Z';
+	velocityLeft=velocityRight = setDist/time;
 
 	/* Initialise PID Controllers */
-	PIDController pidLeft = {PID_KP,PID_KI,0,0,0,0,0,0,4.0f};
-	PIDController pidRight =  {PID_KP,PID_KI,0,0,0,0,0,0,4.0f};
+	PIDController pidLeft = {PID_KP,PID_KI,PID_KD,0,-3000,3000,-1000,1000,1.0f};
+	PIDController pidRight ={PID_KP,PID_KI,PID_KD,0,-3000,3000,-1000,1000,1.0f};
 
-	/* Initialise Encoder */
+//	/* Initialise Encoder */
+	HAL_TIM_Base_Start(&htim5);
 	HAL_TIM_Encoder_Start(&htim2, TIM_CHANNEL_ALL);		//left encoder(MotorA) start
 	HAL_TIM_Encoder_Start(&htim3, TIM_CHANNEL_ALL);		//right encoder(MotorB) start
 
-	/* Configure direction of motors */
-	HAL_GPIO_WritePin(GPIOA, AIN1_Pin, GPIO_PIN_SET);
-	HAL_GPIO_WritePin(GPIOA, AIN2_Pin, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(GPIOA, BIN1_Pin, GPIO_PIN_SET);
-	HAL_GPIO_WritePin(GPIOA, BIN2_Pin, GPIO_PIN_RESET);
 	PIDController_Init(&pidLeft);
 	PIDController_Init(&pidRight);
-
+	timeStart();
 	while(1){
 		/* Take current encoder values */
-		currentLeft = __HAL_TIM_GET_COUNTER(&htim2)*CMPERREV;
-		currentRight = __HAL_TIM_GET_COUNTER(&htim3)*CMPERREV;
+		readEncoder();
+		distanceLeft = velocityLeft*timeNow();
+		distanceRight = velocityRight * currSec;
 
 		/* Compute new control signal */
-		outLeft = PIDController_Update(&pidLeft, distance, currentLeft);
-		outRight = PIDController_Update(&pidRight, distance, currentRight);
+		outLeft = PIDController_Update(&pidLeft, distanceLeft, fLeft);
+		outRight = PIDController_Update(&pidRight, distanceRight, fRight);
 
 		/* Update new values to motors */
-		__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_1, outLeft);
-		__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_2, outRight);
+		motorSpeed(outLeft, outRight);
 		error = pidLeft.prevError;
 		/* Preventive measures for errors */
-		if(pidLeft.out>=4000 || pidRight.out>=4000)break;
+		//if(pidLeft.out>=4000 || pidRight.out>=4000 || pidLeft.out<=4000 || pidRight.out<=4000)break;
 	}
 
+	motorSpeed(0,0);
 	/* Reset Encoders value */
 	__HAL_TIM_SET_COUNTER(&htim2,0);
 	__HAL_TIM_SET_COUNTER(&htim3,0);
 }
 
+void pidForward(float velocity, int time){
+	startSec = getTime();
+	while(1){
+		currSec= getTime()-startSec;
+	}
+
+}
 
 //Master function for image recognition motor control
 int motorCont(int speedL, int speedR, char dirL, char dirR, double dist){
@@ -344,7 +549,7 @@ int motorCont(int speedL, int speedR, char dirL, char dirR, double dist){
 	currentLeft = __HAL_TIM_GET_COUNTER(&htim2);
 	currentRight = __HAL_TIM_GET_COUNTER(&htim3);
 	tick = HAL_GetTick();
-	double encDist = dist * 68;
+	double encDist = dist * 72;
 
 	//Select direction of motor//
 	switch(dirL){
@@ -388,13 +593,6 @@ int motorCont(int speedL, int speedR, char dirL, char dirR, double dist){
 			OLED_ShowString(10,50,display);
 			OLED_Refresh_Gram();
 
-			if(avg>=encDist*0.95){
-				speedL = speedL*0.95;
-				speedR = speedR*0.95;
-				__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_1, speedL);
-				__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_2, speedR);
-			}
-
 			if(avg>=encDist){
 				__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_1, 0);
 				__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_2, 0);
@@ -416,12 +614,13 @@ void degTurn(int mode){
 	case 1: //Turn left
 			htim1.Instance->CCR4 = 61;
 			HAL_Delay(100);
-			motorCont(500,2200,'F','F',97*0.57);
+			motorCont(500,2200,'F','F',105*0.57);
+			htim1.Instance->CCR4 = 76;
 			break;
 	case 2:
 			htim1.Instance->CCR4 = 96;
 			HAL_Delay(100);
-			motorCont(2200,500,'F','F',94*0.57);
+			motorCont(2200,500,'F','F',100*0.57);
 			HAL_Delay(50);
 			htim1.Instance->CCR4 = 73;
 			break;
@@ -432,25 +631,25 @@ void forward(int mode){ //Forward for image recognition
 	HAL_Delay(100);
 	switch(mode){
 	case 0:
-			motorCont(1000, 1000, 'F', 'F', 104);break;
+			motorCont(pwmLeft, pwmRight, 'F', 'F', 100);break;
 	case 1:
-			motorCont(1000, 1000, 'F', 'F', 9);break;
+			motorCont(pwmLeft, pwmRight, 'F', 'F', 8);break;
 	case 2:
-			motorCont(1000, 1000, 'F', 'F', 19.5);break;
+			motorCont(pwmLeft, pwmRight, 'F', 'F', 18);break;
 	case 3:
-			motorCont(1000, 1000, 'F', 'F', 29);break;
+			motorCont(pwmLeft, pwmRight, 'F', 'F', 28);break;
 	case 4:
-			motorCont(1000, 1000, 'F', 'F', 41);break;
+			motorCont(pwmLeft, pwmRight, 'F', 'F', 38);break;
 	case 5:
-			motorCont(1000, 1000, 'F', 'F', 51);break;
+			motorCont(pwmLeft, pwmRight, 'F', 'F', 49);break;
 	case 6:
-			motorCont(1000, 1000, 'F', 'F', 62);break;
+			motorCont(pwmLeft, pwmRight, 'F', 'F', 60);break;
 	case 7:
-			motorCont(1000, 1000, 'F', 'F', 73);break;
+			motorCont(pwmLeft, pwmRight, 'F', 'F', 70);break;
 	case 8:
-			motorCont(1000, 1000, 'F', 'F', 84);break;
+			motorCont(pwmLeft, pwmRight, 'F', 'F', 80);break;
 	case 9:
-			motorCont(1000, 1000, 'F', 'F', 94);break;
+			motorCont(pwmLeft, pwmRight, 'F', 'F', 90);break;
 	}
 }
 
@@ -458,56 +657,66 @@ void reverse(int mode){//Reverse for image recognition
 	HAL_Delay(100);
 	switch(mode){
 	case 0:
-			motorCont(1000, 1000, 'R', 'R', 104);break;
+			motorCont(pwmLeft, pwmRight, 'R', 'R', 100);break;
 	case 1:
-			motorCont(1000, 1000,'R', 'R', 8.5);break;
+			motorCont(pwmLeft, pwmRight,'R', 'R', 6);break;
 	case 2:
-			motorCont(1000, 1000,'R', 'R', 19.5);break;
+			motorCont(pwmLeft, pwmRight,'R', 'R', 18);break;
 	case 3:
-			motorCont(1000, 1000, 'R', 'R', 29);break;
+			motorCont(pwmLeft, pwmRight, 'R', 'R', 28);break;
 	case 4:
-			motorCont(1000, 1000, 'R', 'R', 41);break;
+			motorCont(pwmLeft, pwmRight, 'R', 'R', 38);break;
 	case 5:
-			motorCont(1000, 1000,'R', 'R', 51);break;
+			motorCont(pwmLeft, pwmRight,'R', 'R', 49);break;
 	case 6:
-			motorCont(1000, 1000, 'R', 'R', 62);break;
+			motorCont(pwmLeft, pwmRight, 'R', 'R', 60);break;
 	case 7:
-			motorCont(1000, 1000, 'R', 'R', 73);break;
+			motorCont(pwmLeft, pwmRight, 'R', 'R', 70);break;
 	case 8:
-			motorCont(1000, 1000, 'R', 'R', 84);break;
+			motorCont(pwmLeft, pwmRight, 'R', 'R', 80);break;
 	case 9:
-			motorCont(1000, 1000, 'R', 'R', 94);break;
+			motorCont(pwmLeft, pwmRight, 'R', 'R', 90);break;
 
 	}
 }
 
 void spotTurn(int mode){
+	float var = 1;
+	float left = 1.0;
+	float turn1 = 20*var;
+	float turn2 = 21*var;
+	float turn3 = 3*var;
+	float turn4 = turn3;
 	switch(mode){
 	case 1: //Turn left
 		htim1.Instance->CCR4 = 56;
 		HAL_Delay(500);
-		motorCont(500, 1500, 'F', 'F', 21);
+		motorCont(700, 2100, 'F', 'F', turn1*left);
 		htim1.Instance->CCR4 = 104;
 		HAL_Delay(500);
-		motorCont(1500, 500, 'R', 'R', 21);
+		motorCont(2100, 700, 'R', 'R', turn2*left);
 		htim1.Instance->CCR4 = 56;
 		HAL_Delay(500);
-		motorCont(500, 1500, 'F', 'F', 5.47);
+		motorCont(700, 2100, 'F', 'F', turn3);
 		HAL_Delay(50);
 		htim1.Instance->CCR4 = 76;
+		HAL_Delay(500);
+		motorCont(1500, 1500, 'F', 'F', 5.5);
 		break;
 	case 2: //Turn right
 		htim1.Instance->CCR4 = 104;
 		HAL_Delay(500);
-		motorCont(1500, 500, 'F', 'F', 21);
+		motorCont(2100, 700, 'F', 'F', turn1);
 		htim1.Instance->CCR4 = 56;
 		HAL_Delay(500);
-		motorCont(500, 1500, 'R', 'R', 20);
+		motorCont(700, 2100, 'R', 'R', turn2);
 		htim1.Instance->CCR4 = 104;
 		HAL_Delay(500);
-		motorCont(1500, 500, 'F', 'F', 5.5);
+		motorCont(2100, 700, 'F', 'F', turn4);
 		HAL_Delay(50);
 		htim1.Instance->CCR4 = 73;
+		HAL_Delay(500);
+		motorCont(1500, 1500, 'F', 'F', 2);
 		break;
 	}
 }
@@ -528,7 +737,7 @@ int main(void)
   /* MCU Configuration--------------------------------------------------------*/
 
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
-  HAL_Init();
+	HAL_Init();
 
   /* USER CODE BEGIN Init */
 
@@ -551,6 +760,8 @@ int main(void)
   MX_USART3_UART_Init();
   MX_ADC1_Init();
   MX_ADC2_Init();
+  MX_RTC_Init();
+  MX_TIM5_Init();
   /* USER CODE BEGIN 2 */
   HAL_TIM_IC_Start_IT(&htim4, TIM_CHANNEL_1);
   HAL_UART_Receive_IT(&huart3, (uint8_t *) aRxBuffer, 1);
@@ -622,9 +833,10 @@ void SystemClock_Config(void)
   /** Initializes the RCC Oscillators according to the specified parameters
   * in the RCC_OscInitTypeDef structure.
   */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI|RCC_OSCILLATORTYPE_LSI;
   RCC_OscInitStruct.HSIState = RCC_HSI_ON;
   RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
+  RCC_OscInitStruct.LSIState = RCC_LSI_ON;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
   {
@@ -742,6 +954,46 @@ static void MX_ADC2_Init(void)
   /* USER CODE BEGIN ADC2_Init 2 */
 
   /* USER CODE END ADC2_Init 2 */
+
+}
+
+/**
+  * @brief RTC Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_RTC_Init(void)
+{
+
+  /* USER CODE BEGIN RTC_Init 0 */
+
+  /* USER CODE END RTC_Init 0 */
+
+  /* USER CODE BEGIN RTC_Init 1 */
+
+  /* USER CODE END RTC_Init 1 */
+  /** Initialize RTC Only
+  */
+  hrtc.Instance = RTC;
+  hrtc.Init.HourFormat = RTC_HOURFORMAT_24;
+  hrtc.Init.AsynchPrediv = 127;
+  hrtc.Init.SynchPrediv = 255;
+  hrtc.Init.OutPut = RTC_OUTPUT_DISABLE;
+  hrtc.Init.OutPutPolarity = RTC_OUTPUT_POLARITY_HIGH;
+  hrtc.Init.OutPutType = RTC_OUTPUT_TYPE_OPENDRAIN;
+  if (HAL_RTC_Init(&hrtc) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /** Enable Calibrartion
+  */
+  if (HAL_RTCEx_SetCalibrationOutPut(&hrtc, RTC_CALIBOUTPUT_1HZ) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN RTC_Init 2 */
+
+  /* USER CODE END RTC_Init 2 */
 
 }
 
@@ -966,6 +1218,51 @@ static void MX_TIM4_Init(void)
 }
 
 /**
+  * @brief TIM5 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_TIM5_Init(void)
+{
+
+  /* USER CODE BEGIN TIM5_Init 0 */
+
+  /* USER CODE END TIM5_Init 0 */
+
+  TIM_ClockConfigTypeDef sClockSourceConfig = {0};
+  TIM_MasterConfigTypeDef sMasterConfig = {0};
+
+  /* USER CODE BEGIN TIM5_Init 1 */
+
+  /* USER CODE END TIM5_Init 1 */
+  htim5.Instance = TIM5;
+  htim5.Init.Prescaler = 16-1;
+  htim5.Init.CounterMode = TIM_COUNTERMODE_UP;
+  htim5.Init.Period = 4294967295;
+  htim5.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+  htim5.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+  if (HAL_TIM_Base_Init(&htim5) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
+  if (HAL_TIM_ConfigClockSource(&htim5, &sClockSourceConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+  if (HAL_TIMEx_MasterConfigSynchronization(&htim5, &sMasterConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN TIM5_Init 2 */
+
+  /* USER CODE END TIM5_Init 2 */
+
+}
+
+/**
   * @brief TIM8 Initialization Function
   * @param None
   * @retval None
@@ -1153,27 +1450,26 @@ void StartDefaultTask(void *argument)
 		OLED_ShowString(5,5,test);
 //		sprintf(checkPi, "Pi cmd: %s\0", aRxBuffer);
 //		OLED_ShowString(10, 20, checkPi);
-		OLED_Clear();
 		ultraDistCheck();
 		HAL_Delay(200);
 		sprintf(ultra, "uDistF: %u\0", uDistFinal);
 		OLED_ShowString(10, 50, ultra);
 
-		sprintf(ultra, "uDist1: %u\0", uDistCheck1);
-		OLED_ShowString(10, 25, ultra);
-
-		sprintf(ultra, "uDist2: %u\0", uDistCheck2);
-		OLED_ShowString(10, 35, ultra);
-
-//		irLeft();
-//		osDelay(100);
-//		sprintf(ultra, "IR left: %u\0", ir1Dist);
-//		OLED_ShowString(10, 30, ultra);
+//		sprintf(ultra, "uDist1: %u\0", uDistCheck1);
+//		OLED_ShowString(10, 25, ultra);
 //
-//		irRight();
-//		HAL_Delay(100);
-//		sprintf(ultra, "IR right: %u\0", ir2Dist);
-//		OLED_ShowString(10, 40, ultra);
+//		sprintf(ultra, "uDist2: %u\0", uDistCheck2);
+//		OLED_ShowString(10, 35, ultra);
+
+		irLeft();
+		HAL_Delay(100);
+		sprintf(ultra, "IR left: %u\0", ir1Dist);
+		OLED_ShowString(10, 30, ultra);
+
+		irRight();
+		HAL_Delay(100);
+		sprintf(ultra, "IR right: %u\0", ir2Dist);
+		OLED_ShowString(10, 40, ultra);
 
 
 		OLED_Refresh_Gram();
@@ -1196,8 +1492,11 @@ void motor(void *argument)
 	HAL_TIM_PWM_Start(&htim8, TIM_CHANNEL_1);
 	HAL_TIM_PWM_Start(&htim8, TIM_CHANNEL_2);
 	HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_4);
-	htim1.Instance->CCR4 = 74;
-	//*aRxBuffer = '\0';
+	htim1.Instance->CCR4 = 56;
+	HAL_Delay(500);
+	htim1.Instance->CCR4 = 104;
+	HAL_Delay(500);
+	htim1.Instance->CCR4 = 73;
 	*aRxBuffer = '\0';
 	uint8_t toRpiTest[6] = "NiHao";
 		for(;;)
@@ -1205,7 +1504,6 @@ void motor(void *argument)
 			switch (*aRxBuffer)
 			{
 			case '\0': // initialize
-				htim1.Instance->CCR4 = 74;
 				HAL_UART_Receive_IT(&huart3, (uint8_t *)aRxBuffer, 1);
 				break;
 			case 'H':
@@ -1301,10 +1599,23 @@ void motor(void *argument)
 //				*aRxBuffer = 'R';
 //				break;
 			/* Test Cases */
-			case 'W':
-				PIDmotor(10);
+			case 'V':
+				correction();
 				break;
-
+			case 'W':
+				PIDmotor(100,10);
+				break;
+			case 'X':
+				ultraDistCheck();
+				irLeft();
+				irRight();
+				break;
+			case 'Y':
+				HAL_TIM_Encoder_Start(&htim2, TIM_CHANNEL_ALL);		//left encoder(MotorA) start
+					HAL_TIM_Encoder_Start(&htim3, TIM_CHANNEL_ALL);		//right encoder(MotorB) start
+				while(1){
+				readEncoder();}
+				break;
 			case 'Z':
 				waitCmd();
 				break;
@@ -1314,7 +1625,7 @@ void motor(void *argument)
 				break;
 			}
 			HAL_Delay(100);
-			HAL_UART_Transmit_IT(&huart3,(uint8_t *)"OK\n",2);
+			HAL_UART_Transmit_IT(&huart3,(uint8_t *)"OK",2);
 		  }
 
 	osDelay(1000);

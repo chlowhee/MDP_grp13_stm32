@@ -1,13 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <section name="Workbench">
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
-		<item key="selection" value="Speed"/>
+		<item key="selection" value="Distance"/>
 		<item key="wrap" value="true"/>
 		<item key="casesensitive" value="false"/>
 		<item key="wholeword" value="true"/>
 		<item key="incremental" value="false"/>
 		<item key="isRegEx" value="false"/>
 		<list key="findhistory">
+			<item value="distance"/>
+			<item value="distnace"/>
+			<item value="interrupt"/>
 			<item value="speed"/>
 			<item value="&apos;R&apos;"/>
 			<item value="waitCmd"/>
@@ -20,9 +23,6 @@
 			<item value="preemp"/>
 			<item value="yield"/>
 			<item value="CNT"/>
-			<item value="cnt"/>
-			<item value="reset"/>
-			<item value="input"/>
 		</list>
 		<list key="replacehistory">
 		</list>

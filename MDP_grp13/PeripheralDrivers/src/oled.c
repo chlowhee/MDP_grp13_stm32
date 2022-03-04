@@ -30,7 +30,7 @@ void OLED_WR_Byte(uint8_t dat,uint8_t cmd)
 		else 
 		   OLED_SDIN_Clr();
 		OLED_SCLK_Set();
-		dat<<=1;   
+		dat<<=1;
 	}				 		  
 	OLED_RS_Set();   	  
 } 

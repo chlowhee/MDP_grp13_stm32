@@ -10,3 +10,8 @@ uDistFinal
 aRxBuffer
 adc1
 ir1Dist
+currentLeft
+currentRight
+outLeft
+outRight
+error
