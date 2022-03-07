@@ -15,3 +15,15 @@ currentRight
 outLeft
 outRight
 error
+distanceLeft
+distanceRight
+prePWMLeft
+prePWMRight
+errorLeft
+errorRight
+constDisp
+acc
+disp
+vel
+fLeft
+fRight

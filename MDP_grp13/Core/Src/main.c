@@ -50,9 +50,9 @@
 #define PID_KP 20000.0f
 #define PID_KI 1000.0f
 #define PID_KD 0.0f
-#define LEFT 105
+#define LEFT 108
 #define CENTER 149
-#define RIGHT 212
+#define RIGHT 227
 #define PWMM 54.0f
 #define PWMC 310.0f
 #define TURNRATIO 0.8f
@@ -1720,45 +1720,47 @@ void motor(void *argument)
 			case 'L':
 				htim1.Instance->CCR4 = CENTER;
 				HAL_Delay(500);
-				htim1.Instance->CCR4 = LEFT+2;
+				htim1.Instance->CCR4 = LEFT;
 				HAL_Delay(500);
 				PIDturn(30,1);
-				htim1.Instance->CCR4 = RIGHT+15;
+				htim1.Instance->CCR4 = RIGHT;
 				HAL_Delay(500);
 				PIDturn(-28,2);
-				htim1.Instance->CCR4 = LEFT+2;
-				HAL_Delay(500);
-				PIDturn(29,1);
-				PIDmotor(4.5); //Forward to fit into 10x10 grid
+//				htim1.Instance->CCR4 = LEFT;
+//				HAL_Delay(500);
+//				PIDturn(30,1);
+//				PIDmotor(4.5); //Forward to fit into 10x10 grid
 				break;
 
 			case 'R':
 				htim1.Instance->CCR4 = CENTER;
 				HAL_Delay(500);
-				htim1.Instance->CCR4 = RIGHT+15;
+				htim1.Instance->CCR4 = RIGHT;
 				HAL_Delay(500);
 				PIDturn(30,2);
-				htim1.Instance->CCR4 = LEFT+2;
+				htim1.Instance->CCR4 = LEFT;
 				HAL_Delay(500);
 				PIDturn(-28,1);
-				htim1.Instance->CCR4 = RIGHT+15;
+				htim1.Instance->CCR4 = RIGHT;
 				HAL_Delay(500);
 				PIDturn(28,2);
 				PIDmotor(4.5); //Forward to fit into 10x10 grid
 				break;
 			case 'Q':
-				htim1.Instance->CCR4 = RIGHT+15;
+				htim1.Instance->CCR4 = RIGHT;
 				HAL_Delay(500);
-				htim1.Instance->CCR4 = LEFT+3;
+				htim1.Instance->CCR4 = LEFT;
 				HAL_Delay(500);
 				PIDturn(90,1);
+				PIDmotor(3);
 				break;
 			case 'E':
-				htim1.Instance->CCR4 = LEFT+2;
+				htim1.Instance->CCR4 = LEFT;
 				HAL_Delay(500);
-				htim1.Instance->CCR4 = RIGHT+15;
+				htim1.Instance->CCR4 = RIGHT;
 				HAL_Delay(500);
 				PIDturn(90,2);
+				PIDmotor(3);
 				break;
 			case 'U':
 				ultraDistCheck();
