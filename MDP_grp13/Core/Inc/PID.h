@@ -20,6 +20,9 @@ typedef struct {
 	float limMinInt;
 	float limMaxInt;
 
+	/* Feed forward */
+	float feedForward;
+
 	/* Sample time (in seconds) */
 	float T;
 
@@ -35,6 +38,6 @@ typedef struct {
 } PIDController;
 
 void  PIDController_Init(PIDController *pid);
-float PIDController_Update(PIDController *pid, float setpoint, float measurement);
+float PIDController_Update(PIDController *pid, float setpoint, float measurement, float prePWM);
 
 #endif

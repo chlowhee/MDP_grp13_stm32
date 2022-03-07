@@ -1,0 +1,5 @@
+profile.c:11:6:Profile_Init	16	static
+profile.c:33:7:trapezoidal	40	static
+profile.c:79:6:currProfile	32	static
+profile.c:117:7:calculateDisp	32	static
+profile.c:122:7:invCalculateDisp	64	static

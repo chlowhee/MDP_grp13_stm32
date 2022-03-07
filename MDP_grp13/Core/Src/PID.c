@@ -13,7 +13,7 @@ void PIDController_Init(PIDController *pid) {
 
 }
 
-float PIDController_Update(PIDController *pid, float setpoint, float measurement) {
+float PIDController_Update(PIDController *pid, float setpoint, float measurement, float prePWM) {
 
 	/*
 	* Error signal
@@ -56,7 +56,7 @@ float PIDController_Update(PIDController *pid, float setpoint, float measurement
 	/*
 	* Compute output and apply limits
 	*/
-    pid->out = proportional + pid->integrator;// + pid->differentiator;
+    pid->out = proportional + pid->integrator + prePWM;// + pid->differentiator;
 
     if (pid->out > pid->limMax) {
 

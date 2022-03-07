@@ -1,0 +1,113 @@
+/*
+ * profile.c
+ *
+ *  Created on: 5 Mar 2022
+ *      Author: le
+ */
+
+#include "profile.h"
+#include "stdbool.h"
+
+void Profile_Init(Profile *profile, float vMax, float aMax){
+
+	profile->vMax = vMax;
+	profile->aMax = aMax;
+
+	profile->accTime=0;
+	profile->constTime=0;
+	profile->decTime=0;
+
+	profile->disp=0;
+	profile->vel=0;
+	profile->acc=0;
+
+	profile->accDisp=0;
+	profile->constDisp=0;
+	profile->decDisp=0;
+
+}
+
+/* Calculates the timing and displacement for each 3 stages of the motion profile */
+void trapezoidal(Profile *profile, float totalDisp){
+
+	bool negInput = (totalDisp<0)?true:false;
+	totalDisp = abs(totalDisp);
+	float halfDisp = totalDisp/2.0f;
+
+	profile->acc = profile->aMax;
+
+	/* Compute acceleration period */
+	profile->accTime = profile->vMax/profile->aMax;
+	profile->accDisp = calculateDisp(profile->aMax,0,profile->accTime);
+	if(profile->accDisp>halfDisp){
+		profile->accDisp = halfDisp;
+		profile->accTime = invCalculateDisp(profile->vMax, 0.0, accDisp);
+	}
+
+	/* Final velocity */
+	profile->vel = accTime * profile->vMax;
+
+	/* Compute constant-velocity period */
+	profile->constDisp = max(totalDisp - (2.0 * accTime), 0.0);
+	profile->constTime = profile->accTime + (profile->constDisp>0?(profile->constDisp/vel):0.0); //no constant velocity if profile is only acceleration then decceleration
+
+	/*Compute decceleration period */
+	profile->decDisp = totalDisp;
+	profile->decTime = profile->accTime + profile->constTime;
+
+	if(negInput){
+		profile->vel	   = -(profile->vel);
+		profile->acc 	   = -(profile->aMax);
+		profile->accDisp   = -(profile->accDisp);
+		profile->constDisp = -(profile->constDisp);
+		profile->decDisp   = -(profile->decDisp);
+	}
+}
+
+/* Set the displacement and time according to the current stage */
+void currProfile(Profile *profile, float currTime){
+
+	float currVel;
+	float stageTime;
+	float off;
+
+	if(currTime>=profile->decTime){
+		profile->decDisp = profile->decDisp;
+		profile->vel = 0;
+		profile->acc = 0;
+	}
+
+	if(currTime>=profile->constTime){
+		currVel = profile->vel;
+		profile->acc = -(profile->acc);
+		stageTime = profile->accTime - profile->constTime;
+		off = profile->constDisp;
+	}
+	else if(currTime>=profile->accTime){
+		currVel = profile->vel;
+		profile->acc = 0;
+		stageTime = currTime - profile->accTime;
+		off = profile->accDisp;
+	}
+	else{
+		currVel = 0;
+		profile->acc = profile->acc;
+		stageTime = currTime;
+		off = 0;
+	}
+
+	/* Output displacement and time */
+	profile->
+
+}
+
+
+/*Calculates the displacement of object given constant acceleration and initial velocity for a given time */
+float calculateDisp(float acc, float vel, float time){
+	return (0.5 * acc * pow(time,2) + (vel * time));
+}
+
+/*Calculates the time needed given constant accerlation, initial velocity and displacement*/
+float invCalculateDisp(float acc, float vel, float disp){
+	float root = sqrt(disp + (pow(vel,2) / (2.0*acc)) / (0.5 * acc));
+}

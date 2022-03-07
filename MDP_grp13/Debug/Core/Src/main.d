@@ -44,7 +44,7 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
  ../Middlewares/Third_Party/FreeRTOS/Source/include/list.h \
  ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.h \
  /Users/le/Documents/GitHub/MDP_grp13_stm32/MDP_grp13/PeripheralDrivers/inc/oled.h \
- ../Core/Inc/PID.h
+ ../Core/Inc/PID.h ../Core/Inc/profile.h
 
 ../Core/Inc/main.h:
 
@@ -139,3 +139,5 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
 /Users/le/Documents/GitHub/MDP_grp13_stm32/MDP_grp13/PeripheralDrivers/inc/oled.h:
 
 ../Core/Inc/PID.h:
+
+../Core/Inc/profile.h:

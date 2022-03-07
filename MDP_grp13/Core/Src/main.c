@@ -13,6 +13,13 @@
   * in the root directory of this software component.
   * If no LICENSE file comes with this software, it is provided AS-IS.
   *
+  *openocd -f openocd.cfg
+  *
+  *from connection.STM_Connection import*
+  *stm = STMConnection()
+  *stm.connect_STM()
+  *stm.thread_send(b"0")
+  *
   *sudo sync && sudo systemctl poweroff
   ******************************************************************************
   */
@@ -26,6 +33,7 @@
 #include "oled.h"
 #include "math.h"
 #include "PID.h"
+#include "profile.h"
 #include <time.h>
 /* USER CODE END Includes */
 
@@ -36,10 +44,24 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define CMPERREV 0.01666666667f;
-#define PID_KP 20.0f
-#define PID_KI 0.000f
+/* PID defines */
+#define CMPERREV 0.0132f
+#define CMPERREVTURN 0.0132f
+#define PID_KP 20000.0f
+#define PID_KI 1000.0f
 #define PID_KD 0.0f
+#define LEFT 105
+#define CENTER 149
+#define RIGHT 212
+#define PWMM 54.0f
+#define PWMC 310.0f
+#define TURNRATIO 0.8f
+#define CIRCUM 305.0f
+
+/* Motion profile defines */
+#define AMAX 15.0f //Maximum acceleration
+#define VMAX 30.0f //Maximum velocity
+
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -98,7 +120,7 @@ void motor(void *argument);
 
 /* USER CODE BEGIN PFP */
 void fastestCar();
-void PIDmotor(float,int);
+void PIDmotor(float);
 int motorCont(int speedL, int speedR, char dirL, char dirR, double dist);
 void degTurn(int);
 void forward(int);
@@ -133,14 +155,21 @@ uint32_t adc1;
 uint32_t adc2;
 float outLeft =0;
 float outRight=0;
-float error=0;
+float errorLeft=0;
+float errorRight=0;
 float currDist;
 float velocityLeft=0;
 float velocityRight=0;
 float distanceLeft=0;
 float distanceRight=0;
+float prePWMLeft;
+float prePWMRight;
 float pwmLeft = 1800;
 float pwmRight = 1500;
+float acc;
+float vel;
+float disp;
+float constDisp;
 
 /* Timer variables */
 float startSec;
@@ -269,9 +298,9 @@ void fastestCar(){
 
 		ultraDistCheck();
 		if(uDistFinal<=20){
-			htim1.Instance->CCR4 = 104;
+			htim1.Instance->CCR4 = RIGHT;
 			HAL_Delay(1000);
-			htim1.Instance->CCR4 = 73;
+			htim1.Instance->CCR4 = LEFT;
 			break;
 		}
 	}
@@ -283,13 +312,13 @@ void fastestCar(){
 
 
 		if(irLeft()>=30){
-			htim1.Instance->CCR4 = 56;
+			htim1.Instance->CCR4 = LEFT;
 			HAL_Delay(1000);
-			htim1.Instance->CCR4 = 75;
+			htim1.Instance->CCR4 = CENTER;
 			HAL_Delay(1000);
-			htim1.Instance->CCR4 = 56;
+			htim1.Instance->CCR4 = LEFT;
 			HAL_Delay(1000);
-			htim1.Instance->CCR4 = 75;
+			htim1.Instance->CCR4 = RIGHT;
 			break;
 		}
 
@@ -370,6 +399,8 @@ void correction(){
 		while(irLeft()<=35 && irRight()<=35){
 			__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_1, 600);
 			__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_2, 600);
+			irLeft();
+			irRight();
 		}
 		__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_1, 0);
 		__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_2, 0);
@@ -382,14 +413,14 @@ void correction(){
 	if(mode==1){
 		preCorr();
 		while(irLeft()<=35){
-			htim1.Instance->CCR4 = 104;
+			htim1.Instance->CCR4 = RIGHT;
 			HAL_Delay(100);
 			motorCont(1000, 1000, 'R', 'R', 1);
-			htim1.Instance->CCR4 = 56;
+			htim1.Instance->CCR4 = LEFT;
 			HAL_Delay(100);
 			motorCont(1000, 1000, 'F', 'F', 1);
 			irLeft();
-			htim1.Instance->CCR4 = 76;
+			htim1.Instance->CCR4 = CENTER;
 			HAL_Delay(50);
 			ultraDistCheck();
 			if(uDistFinal<15){
@@ -400,20 +431,20 @@ void correction(){
 				motorCont(1000, 1000, 'F', 'F', 2);
 			}
 		}
-		htim1.Instance->CCR4 = 76;
+		htim1.Instance->CCR4 = CENTER;
 	}
 	else if(mode==2){
 		preCorr();
 		while(irRight()<=35){
-			htim1.Instance->CCR4 =56;
+			htim1.Instance->CCR4 =LEFT;
 
 			HAL_Delay(100);
 			motorCont(1000, 1000, 'R', 'R', 1);
-			htim1.Instance->CCR4 = 104;
+			htim1.Instance->CCR4 = RIGHT;
 			HAL_Delay(100);
 			motorCont(1000, 1000, 'F', 'F', 1);
 			irRight();
-			htim1.Instance->CCR4 = 73;
+			htim1.Instance->CCR4 = CENTER;
 			HAL_Delay(50);
 			ultraDistCheck();
 			if(uDistFinal<15){
@@ -424,7 +455,7 @@ void correction(){
 				motorCont(1000, 1000, 'F', 'F', 2);
 			}
 		}
-		htim1.Instance->CCR4 = 73;
+		htim1.Instance->CCR4 = CENTER;
 		HAL_Delay(50);
 	}
 	HAL_Delay(1000);
@@ -460,27 +491,20 @@ void motorSpeed(float left, float right){
 	__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_2, right);
 }
 
-void readEncoder(){
-	if(__HAL_TIM_IS_TIM_COUNTING_DOWN(&htim2)){
-		currentLeft = __HAL_TIM_GET_COUNTER(&htim2);
-		fLeft = currentLeft *-1*CMPERREV;
-	}
-	else{
-		currentLeft = __HAL_TIM_GET_COUNTER(&htim2);
-		fLeft = currentLeft *CMPERREV;
-	}
-	if(__HAL_TIM_IS_TIM_COUNTING_DOWN(&htim3)){
-		currentRight = __HAL_TIM_GET_COUNTER(&htim3);
-		fRight = currentRight * CMPERREV;
-	}
-	else{
-		currentRight = __HAL_TIM_GET_COUNTER(&htim2);
-		fRight = currentRight * -1 *CMPERREV;
-	}
+/* ========================= PID Functions ========================= */
+
+/* Read current encoder values */
+void readEncoder(){ //Forward = Positive, Backwards = negative
+	currentLeft = __HAL_TIM_GET_COUNTER(&htim2);
+	fLeft = currentLeft *-1*CMPERREV;
+
+	currentRight = __HAL_TIM_GET_COUNTER(&htim3);
+	fRight = currentRight * CMPERREV;
 }
 
+/* Time value functions, in seconds with decimals */
 float getTime(){
-	return __HAL_TIM_GET_COUNTER(&htim5)/1000000;
+	return __HAL_TIM_GET_COUNTER(&htim5)/1e6f;
 }
 
 void timeStart(){
@@ -489,56 +513,194 @@ void timeStart(){
 
 float timeNow(){
 	currSec = getTime() - startSec;
+	return currSec;
 }
 
-//Master function for motor with PID control
-void PIDmotor(float setDist, int time){
+float forwardFeed(float vel){
+	return vel*PWMM+PWMC;
+}
+
+/* Master function for motor with PID control */
+void PIDmotor(float setDist){
+
+	/* Turn servo to extreme end before centering for higher accuracy */
+	htim1.Instance->CCR4 = LEFT;
+	HAL_Delay(500);
+	htim1.Instance->CCR4 = CENTER+3;
+	HAL_Delay(500);
+
 	/* Set UARTBuffer to default value */
 	*aRxBuffer = 'Z';
-	velocityLeft=velocityRight = setDist/time;
+
+	/* Set distance of motors */
+	float setDistLeft  = setDist;
+	float setDistRight = setDist;
 
 	/* Initialise PID Controllers */
-	PIDController pidLeft = {PID_KP,PID_KI,PID_KD,0,-3000,3000,-1000,1000,1.0f};
-	PIDController pidRight ={PID_KP,PID_KI,PID_KD,0,-3000,3000,-1000,1000,1.0f};
+	PIDController pidLeft = {PID_KP,PID_KI,PID_KD,0,-3000,3000,-150,150,prePWMLeft,1.0f};
+	PIDController pidRight ={PID_KP,PID_KI,PID_KD,0,-3000,3000,-150,150,prePWMRight,1.0f};
+	Profile profileLeft;
+	Profile profileRight;
 
-//	/* Initialise Encoder */
+	/* Initialise and set Encoder to 0 */
 	HAL_TIM_Base_Start(&htim5);
 	HAL_TIM_Encoder_Start(&htim2, TIM_CHANNEL_ALL);		//left encoder(MotorA) start
 	HAL_TIM_Encoder_Start(&htim3, TIM_CHANNEL_ALL);		//right encoder(MotorB) start
+	__HAL_TIM_SET_COUNTER(&htim2,0);
+	__HAL_TIM_SET_COUNTER(&htim3,0);
 
+	/* Initialise PID controllers and profiles */
 	PIDController_Init(&pidLeft);
 	PIDController_Init(&pidRight);
+
+	Profile_Init(&profileLeft);
+	Profile_Init(&profileRight);
+	float time = trapezoidal(&profileLeft, setDistLeft, AMAX, VMAX);
+	trapezoidal(&profileRight, setDistRight, AMAX, VMAX);
+	constDisp = profileRight.constDisp;
+
 	timeStart();
-	while(1){
+	while(timeNow()<time){
+
 		/* Take current encoder values */
 		readEncoder();
-		distanceLeft = velocityLeft*timeNow();
-		distanceRight = velocityRight * currSec;
+		currProfile(&profileLeft, currSec);
+		currProfile(&profileRight, currSec);
+
+		/* Calculate feed forward of motors */
+		prePWMLeft=forwardFeed(profileLeft.currVel);
+		prePWMRight=forwardFeed(profileRight.currVel);
+
+		/* For debug purposes */
+		distanceLeft = profileLeft.disp;
+		distanceRight = profileRight.disp;
+		acc = profileLeft.currAcc;
+		vel = profileRight.currVel;
+		disp = profileLeft.currDisp;
 
 		/* Compute new control signal */
-		outLeft = PIDController_Update(&pidLeft, distanceLeft, fLeft);
-		outRight = PIDController_Update(&pidRight, distanceRight, fRight);
+		outLeft = PIDController_Update(&pidLeft, profileLeft.currDisp, fLeft, prePWMLeft);
+		outRight = PIDController_Update(&pidRight, profileRight.currDisp, fRight, prePWMRight);
 
 		/* Update new values to motors */
 		motorSpeed(outLeft, outRight);
-		error = pidLeft.prevError;
-		/* Preventive measures for errors */
-		//if(pidLeft.out>=4000 || pidRight.out>=4000 || pidLeft.out<=4000 || pidRight.out<=4000)break;
+		errorLeft = pidLeft.prevError;
+		errorRight = pidRight.prevError;
 	}
 
+	/* Stop Motor */
 	motorSpeed(0,0);
+
 	/* Reset Encoders value */
 	__HAL_TIM_SET_COUNTER(&htim2,0);
 	__HAL_TIM_SET_COUNTER(&htim3,0);
 }
 
-void pidForward(float velocity, int time){
-	startSec = getTime();
-	while(1){
-		currSec= getTime()-startSec;
+/* Calculate turn ratio */
+float calculateTurn(float dist){
+	//return ((dist / (2 * 3.14)) - 16) / (dist / (2 *3.14));
+	return 0.793;
+}
+
+/* Read encoder values for turn */
+void readEncoderTurn(){ //Forward = Positive, Backwards = negative
+	currentLeft = __HAL_TIM_GET_COUNTER(&htim2);
+	fLeft = currentLeft *-1*CMPERREVTURN;
+
+	currentRight = __HAL_TIM_GET_COUNTER(&htim3);
+	fRight = currentRight * CMPERREVTURN;
+}
+
+void PIDturn(float degree, int turn){
+
+	/* Set UARTBuffer to default value */
+	*aRxBuffer = 'Z';
+
+	/* Calibrate motors */
+	float setDist = CIRCUM * (degree/360);
+	float turnRatio = calculateTurn(CIRCUM);
+
+	/* Initialise PID Controllers */
+	PIDController pidLeft = {PID_KP,PID_KI,PID_KD,0,-3000,3000,-150,150,prePWMLeft,1.0f};
+	PIDController pidRight ={PID_KP,PID_KI,PID_KD,0,-3000,3000,-150,150,prePWMRight,1.0f};
+	Profile profileLeft;
+	Profile profileRight;
+
+	/* Initialise and set Encoder to 0 */
+	HAL_TIM_Base_Start(&htim5);
+	HAL_TIM_Encoder_Start(&htim2, TIM_CHANNEL_ALL);		//left encoder(MotorA) start
+	HAL_TIM_Encoder_Start(&htim3, TIM_CHANNEL_ALL);		//right encoder(MotorB) start
+	__HAL_TIM_SET_COUNTER(&htim2,0);
+	__HAL_TIM_SET_COUNTER(&htim3,0);
+
+	/* Initialise PID controllers and profiles */
+	PIDController_Init(&pidLeft);
+	PIDController_Init(&pidRight);
+
+	/* if right turn does not achieve 90 degree, set a higher set distance */
+	if(turn==2)
+		setDist = setDist * 1.01;
+
+	/* Initialise motion profile and get total time for movement */
+	Profile_Init(&profileLeft);
+	float time = trapezoidal(&profileLeft, setDist, AMAX, VMAX);
+
+
+
+	timeStart();
+	while(timeNow()<time){
+
+		/* Take current encoder values */
+		readEncoderTurn();
+		currProfile(&profileLeft, currSec);
+
+
+
+
+		/* Compute new control signal */
+		if(turn==1){ //Left Turn
+
+			/* Constantly calculate the correct feed forward */
+			prePWMLeft=forwardFeed(profileLeft.currVel * turnRatio);
+			prePWMRight=forwardFeed(profileLeft.currVel);
+
+			/* Reduce inner wheel distance and speed for turning */
+			distanceLeft = profileLeft.currDisp * turnRatio;
+			distanceRight = profileLeft.currDisp;
+
+			outLeft = PIDController_Update(&pidLeft, distanceLeft, fLeft, prePWMLeft);
+			outRight = PIDController_Update(&pidRight, distanceRight, fRight, prePWMRight);
+
+			/* Update new values to motors */
+			motorSpeed(outLeft, outRight);
+			errorLeft = pidLeft.prevError;
+			errorRight = pidRight.prevError;
+		}
+		else{
+
+			prePWMLeft=forwardFeed(profileLeft.currVel);
+			prePWMRight=forwardFeed(profileLeft.currVel * turnRatio);
+			distanceLeft = profileLeft.currDisp;
+			distanceRight = profileLeft.currDisp * turnRatio;
+
+			outLeft = PIDController_Update(&pidLeft, distanceLeft, fLeft, prePWMLeft);
+			outRight = PIDController_Update(&pidRight, distanceRight, fRight, prePWMRight);
+
+			/* Update new values to motors */
+			motorSpeed(outLeft, outRight);
+			errorLeft = pidLeft.prevError;
+			errorRight = pidRight.prevError;
+			}
 	}
 
+	/* Stop Motor */
+	motorSpeed(0,0);
+
+	/* Reset Encoders value */
+	__HAL_TIM_SET_COUNTER(&htim2,0);
+	__HAL_TIM_SET_COUNTER(&htim3,0);
 }
+
 
 //Master function for image recognition motor control
 int motorCont(int speedL, int speedR, char dirL, char dirR, double dist){
@@ -612,17 +774,17 @@ int motorCont(int speedL, int speedR, char dirL, char dirR, double dist){
 void degTurn(int mode){
 	switch(mode){
 	case 1: //Turn left
-			htim1.Instance->CCR4 = 61;
+			htim1.Instance->CCR4 = LEFT;
 			HAL_Delay(100);
 			motorCont(500,2200,'F','F',105*0.57);
-			htim1.Instance->CCR4 = 76;
+			htim1.Instance->CCR4 = CENTER;
 			break;
 	case 2:
-			htim1.Instance->CCR4 = 96;
+			htim1.Instance->CCR4 = RIGHT;
 			HAL_Delay(100);
 			motorCont(2200,500,'F','F',100*0.57);
 			HAL_Delay(50);
-			htim1.Instance->CCR4 = 73;
+			htim1.Instance->CCR4 = CENTER;
 			break;
 	}
 }
@@ -689,32 +851,32 @@ void spotTurn(int mode){
 	float turn4 = turn3;
 	switch(mode){
 	case 1: //Turn left
-		htim1.Instance->CCR4 = 56;
+		htim1.Instance->CCR4 = LEFT;
 		HAL_Delay(500);
 		motorCont(700, 2100, 'F', 'F', turn1*left);
-		htim1.Instance->CCR4 = 104;
+		htim1.Instance->CCR4 = CENTER;
 		HAL_Delay(500);
 		motorCont(2100, 700, 'R', 'R', turn2*left);
-		htim1.Instance->CCR4 = 56;
+		htim1.Instance->CCR4 = LEFT;
 		HAL_Delay(500);
 		motorCont(700, 2100, 'F', 'F', turn3);
 		HAL_Delay(50);
-		htim1.Instance->CCR4 = 76;
+		htim1.Instance->CCR4 = CENTER;
 		HAL_Delay(500);
 		motorCont(1500, 1500, 'F', 'F', 5.5);
 		break;
 	case 2: //Turn right
-		htim1.Instance->CCR4 = 104;
+		htim1.Instance->CCR4 = RIGHT;
 		HAL_Delay(500);
 		motorCont(2100, 700, 'F', 'F', turn1);
-		htim1.Instance->CCR4 = 56;
+		htim1.Instance->CCR4 = LEFT;
 		HAL_Delay(500);
 		motorCont(700, 2100, 'R', 'R', turn2);
-		htim1.Instance->CCR4 = 104;
+		htim1.Instance->CCR4 = RIGHT;
 		HAL_Delay(500);
 		motorCont(2100, 700, 'F', 'F', turn4);
 		HAL_Delay(50);
-		htim1.Instance->CCR4 = 73;
+		htim1.Instance->CCR4 = CENTER;
 		HAL_Delay(500);
 		motorCont(1500, 1500, 'F', 'F', 2);
 		break;
@@ -737,7 +899,7 @@ int main(void)
   /* MCU Configuration--------------------------------------------------------*/
 
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
-	HAL_Init();
+  HAL_Init();
 
   /* USER CODE BEGIN Init */
 
@@ -1018,9 +1180,9 @@ static void MX_TIM1_Init(void)
 
   /* USER CODE END TIM1_Init 1 */
   htim1.Instance = TIM1;
-  htim1.Init.Prescaler = 320;
+  htim1.Init.Prescaler = 160;
   htim1.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim1.Init.Period = 1000;
+  htim1.Init.Period = 2000;
   htim1.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim1.Init.RepetitionCounter = 0;
   htim1.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
@@ -1492,11 +1654,7 @@ void motor(void *argument)
 	HAL_TIM_PWM_Start(&htim8, TIM_CHANNEL_1);
 	HAL_TIM_PWM_Start(&htim8, TIM_CHANNEL_2);
 	HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_4);
-	htim1.Instance->CCR4 = 56;
-	HAL_Delay(500);
-	htim1.Instance->CCR4 = 104;
-	HAL_Delay(500);
-	htim1.Instance->CCR4 = 73;
+
 	*aRxBuffer = '\0';
 	uint8_t toRpiTest[6] = "NiHao";
 		for(;;)
@@ -1518,55 +1676,90 @@ void motor(void *argument)
 				break;
 			//========================Forward========================
 			case '9':
-				forward(0);break;
+				PIDmotor(100);break;
 			case '0':
-				forward(1);break;
+				PIDmotor(10);break;
 			case '1':
-				forward(2);break;
+				PIDmotor(20);break;
 			case '2':
-				forward(3);break;
+				PIDmotor(30);break;
 			case '3':
-				forward(4);break;
+				PIDmotor(40);break;
 			case '4':
-				forward(5);break;
+				PIDmotor(50);break;
 			case '5':
-				forward(6);break;
+				PIDmotor(60);break;
 			case '6':
-				forward(7);break;
+				PIDmotor(70);break;
 			case '7':
-				forward(8);break;
+				PIDmotor(80);break;
 			case '8':
-				forward(9);break;
+				PIDmotor(90);break;
 			//========================Reverse========================
 			case 33:
-				reverse(1);break;
+				PIDmotor(-10);break;
 			case 34:
-				reverse(2);break;
+				PIDmotor(-20);break;
 			case 35:
-				reverse(3);break;
+				PIDmotor(-30);break;
 			case 36:
-				reverse(4);break;
+				PIDmotor(-40);break;
 			case 37:
-				reverse(5);break;
+				PIDmotor(-50);break;
 			case 38:
-				reverse(6);break;
+				PIDmotor(-60);break;
 			case 39:
-				reverse(7);break;
+				PIDmotor(-70);break;
 			case 40:
-				reverse(8);break;
+				PIDmotor(-80);break;
 			case 41:
-				reverse(9);break;
+				PIDmotor(-90);break;
 			case 42:
-				reverse(0);break;
+				PIDmotor(-100);break;
 			//========================Turn========================
 			case 'L':
-				spotTurn(1);break;
+				htim1.Instance->CCR4 = CENTER;
+				HAL_Delay(500);
+				htim1.Instance->CCR4 = LEFT+2;
+				HAL_Delay(500);
+				PIDturn(30,1);
+				htim1.Instance->CCR4 = RIGHT+15;
+				HAL_Delay(500);
+				PIDturn(-28,2);
+				htim1.Instance->CCR4 = LEFT+2;
+				HAL_Delay(500);
+				PIDturn(29,1);
+				PIDmotor(4.5); //Forward to fit into 10x10 grid
+				break;
+
 			case 'R':
-				spotTurn(2);break;
+				htim1.Instance->CCR4 = CENTER;
+				HAL_Delay(500);
+				htim1.Instance->CCR4 = RIGHT+15;
+				HAL_Delay(500);
+				PIDturn(30,2);
+				htim1.Instance->CCR4 = LEFT+2;
+				HAL_Delay(500);
+				PIDturn(-28,1);
+				htim1.Instance->CCR4 = RIGHT+15;
+				HAL_Delay(500);
+				PIDturn(28,2);
+				PIDmotor(4.5); //Forward to fit into 10x10 grid
+				break;
 			case 'Q':
-				degTurn(1);break;
+				htim1.Instance->CCR4 = RIGHT+15;
+				HAL_Delay(500);
+				htim1.Instance->CCR4 = LEFT+3;
+				HAL_Delay(500);
+				PIDturn(90,1);
+				break;
 			case 'E':
-				degTurn(2);break;
+				htim1.Instance->CCR4 = LEFT+2;
+				HAL_Delay(500);
+				htim1.Instance->CCR4 = RIGHT+15;
+				HAL_Delay(500);
+				PIDturn(90,2);
+				break;
 			case 'U':
 				ultraDistCheck();
 				HAL_Delay(200);
@@ -1603,7 +1796,7 @@ void motor(void *argument)
 				correction();
 				break;
 			case 'W':
-				PIDmotor(100,10);
+				PIDmotor(-100);
 				break;
 			case 'X':
 				ultraDistCheck();
