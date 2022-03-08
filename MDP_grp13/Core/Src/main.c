@@ -46,7 +46,7 @@
 /* USER CODE BEGIN PD */
 /* PID defines */
 #define CMPERREV 0.0132f
-#define CMPERREVTURN 0.0132f
+#define CMPERREVTURN 0.0140f
 #define PID_KP 20000.0f
 #define PID_KI 1000.0f
 #define PID_KD 0.0f
@@ -225,19 +225,20 @@ uint16_t HCSR04_Read (void)		//Read Ultrasonic Distance
 	return Distance;
 }
 
-void ultraDistCheck (void)
+uint16_t ultraDistCheck (void)
 {
 	uDistCheck1 = HCSR04_Read();
 	HAL_Delay(100);
 	uDistCheck2 = HCSR04_Read();
 	HAL_Delay(100);
-	while (abs(uDistCheck1 - uDistCheck2) >= 5) { // || uDistCheck2 - uDistCheck1 >= 5) {
+	while (abs(uDistCheck1 - uDistCheck2) >= 5) {
 		uDistCheck1 = HCSR04_Read();
 		HAL_Delay(100);
 		uDistCheck2 = HCSR04_Read();
 		HAL_Delay(100);
 	}
 	uDistFinal = (uDistCheck1 + uDistCheck2)/2;
+	return uDistFinal;
 }
 
 uint32_t irLeft (void) { //ADC1 (a bit more wonky)
@@ -249,7 +250,6 @@ uint32_t irLeft (void) { //ADC1 (a bit more wonky)
 
 	if (V <= 0.5) V = 0.5; //cap at 80 cm
 	else if (V >= 2.84) V = 2.84; //cap at 10 cm
-
 
 	ir1Dist = 34.96332 * pow(V, -1.19878);
 	return ir1Dist;
@@ -265,15 +265,13 @@ uint32_t irRight (void) { //ADC2
 	if (V <= 0.42) V = 0.44; //cap at 80 cm
 	else if (V >= 2.9) V = 2.95; //cap at 10 cm
 
-
 	ir2Dist = 32.6167 * pow(V, -1.0928);
 	return ir2Dist;
 }
 
-void waitCmd (void) {	//not complete
+void waitCmd (void) {
 	//HAL_UART_Transmit_IT(&huart3,(uint8_t *)"OK",2);
 	while (*aRxBuffer == 'Z') {
-		//HAL_UART_Transmit_IT(&huart3,(uint8_t *)"OK",2);
 		HAL_UART_Receive_IT(&huart3, (uint8_t *)aRxBuffer, 1);
 		HAL_Delay(100);
 	}
@@ -345,126 +343,89 @@ void fastestCar(){
 
 }
 
-void preCorr(){
-		while(uDistFinal>15 && uDistFinal<40){
-			HAL_GPIO_WritePin(GPIOA, AIN1_Pin, GPIO_PIN_SET);
-			HAL_GPIO_WritePin(GPIOA, AIN2_Pin, GPIO_PIN_RESET);
-			HAL_GPIO_WritePin(GPIOA, BIN1_Pin, GPIO_PIN_SET);
-			HAL_GPIO_WritePin(GPIOA, BIN2_Pin, GPIO_PIN_RESET);
-			__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_1, 600);
-			__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_2, 600);
-			ultraDistCheck();
+void corrMotor(){
+	for (int i = 0; i<4; i++) {
+		ultraDistCheck();
+		if (uDistFinal > 22 && uDistFinal < 40) {
+			PIDmotor(2);
+		} else if (uDistFinal < 22) {
+			PIDmotor(-2);
 		}
-		__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_1, 0);
-		__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_2, 0);
-
+	}
 }
 
-void corrMotor(int mode){
-	if(mode==1){
-		while(uDistFinal>22 || uDistFinal>40){
-			HAL_GPIO_WritePin(GPIOA, AIN1_Pin, GPIO_PIN_SET);
-			HAL_GPIO_WritePin(GPIOA, AIN2_Pin, GPIO_PIN_RESET);
-			HAL_GPIO_WritePin(GPIOA, BIN1_Pin, GPIO_PIN_SET);
-			HAL_GPIO_WritePin(GPIOA, BIN2_Pin, GPIO_PIN_RESET);
-			__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_1, 600);
-			__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_2, 600);
-			ultraDistCheck();
-
-		}
-		__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_1, 0);
-		__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_2, 0);
+void correctAngle(int mode) {
+	switch(mode) {
+	case 1:	//leftIR detect
+		htim1.Instance->CCR4 = RIGHT;
+		HAL_Delay(100);
+		motorCont(1000, 1000, 'R', 'R', 1);
+		htim1.Instance->CCR4 = LEFT;
+		HAL_Delay(100);
+		motorCont(1000, 1000, 'F', 'F', 1);
+		htim1.Instance->CCR4 = CENTER;
+		break;
+	case 2:	//rightIR detect
+		htim1.Instance->CCR4 =LEFT;
+		HAL_Delay(100);
+		motorCont(1000, 1000, 'R', 'R', 1);
+		htim1.Instance->CCR4 = RIGHT;
+		HAL_Delay(100);
+		motorCont(1000, 1000, 'F', 'F', 1);
+		htim1.Instance->CCR4 = CENTER;
+		break;
 	}
-	else if(mode==2){
-		while(uDistFinal<24){
-			HAL_GPIO_WritePin(GPIOA, AIN1_Pin, GPIO_PIN_RESET);
-			HAL_GPIO_WritePin(GPIOA, AIN2_Pin, GPIO_PIN_SET);
-			HAL_GPIO_WritePin(GPIOA, BIN1_Pin, GPIO_PIN_RESET);
-			HAL_GPIO_WritePin(GPIOA, BIN2_Pin, GPIO_PIN_SET);
-			__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_1, 600);
-			__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_2, 600);
-			ultraDistCheck();
-		}
-		__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_1, 0);
-		__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_2, 0);
+	HAL_Delay(50);
+
+	if(ultraDistCheck() <= 15){
+		PIDmotor(-2);
+	}
+	if(ultraDistCheck() > 15 && uDistFinal < 40){
+		PIDmotor(2);
 	}
 }
 
 void correction(){
 	*aRxBuffer = 'Z';
-	irLeft();
-	irRight();
-	ultraDistCheck();
-	if(uDistFinal>40){
-		while(irLeft()<=35 && irRight()<=35){
-			__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_1, 600);
-			__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_2, 600);
-			irLeft();
-			irRight();
-		}
-		__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_1, 0);
-		__HAL_TIM_SetCompare(&htim8,TIM_CHANNEL_2, 0);
-	}
-	int mode = 0;
-	if(irLeft()<=35 || irRight()<=35){
-		if(irLeft<irRight)mode =1;
-		else mode=2;
-	}
-	if(mode==1){
-		preCorr();
-		while(irLeft()<=35){
-			htim1.Instance->CCR4 = RIGHT;
-			HAL_Delay(100);
-			motorCont(1000, 1000, 'R', 'R', 1);
-			htim1.Instance->CCR4 = LEFT;
-			HAL_Delay(100);
-			motorCont(1000, 1000, 'F', 'F', 1);
-			irLeft();
-			htim1.Instance->CCR4 = CENTER;
-			HAL_Delay(50);
-			ultraDistCheck();
-			if(uDistFinal<15){
-				motorCont(1000, 1000, 'R', 'R', 2);
-				ultraDistCheck();
-			}
-			if(uDistFinal>15 && uDistFinal<40){
-				motorCont(1000, 1000, 'F', 'F', 2);
-			}
-		}
-		htim1.Instance->CCR4 = CENTER;
-	}
-	else if(mode==2){
-		preCorr();
-		while(irRight()<=35){
-			htim1.Instance->CCR4 =LEFT;
+	int mode;
+	irLeft(); irRight();
+	if (irLeft() < 35 || irRight() < 35 || ultraDistCheck() > 40) {
 
-			HAL_Delay(100);
-			motorCont(1000, 1000, 'R', 'R', 1);
-			htim1.Instance->CCR4 = RIGHT;
-			HAL_Delay(100);
-			motorCont(1000, 1000, 'F', 'F', 1);
-			irRight();
-			htim1.Instance->CCR4 = CENTER;
-			HAL_Delay(50);
-			ultraDistCheck();
-			if(uDistFinal<15){
-				motorCont(1000, 1000, 'R', 'R', 2);
-				ultraDistCheck();
+		//--move forward until ir sense || cap 3 movements--
+		for (int i = 0; i<3; i++){
+			irLeft(); irRight();
+			if (irLeft() < 30 || irRight() < 30 || ultraDistCheck() < 20) {
+				break;
 			}
-			if(uDistFinal>15 && uDistFinal<40){
-				motorCont(1000, 1000, 'F', 'F', 2);
+			PIDmotor(5);
+		}
+
+		//--set mode--
+		uint32_t L = irLeft(); 	//to make below coherent
+		uint32_t R = irRight();
+		if (L < 30 && R < 30) {	// both detected
+			//can it judge base on positioning of obstacles on algo?
+		}
+		else if (L < 30 && L < R) {mode = 1;}
+		else if (R < 30 && R < L) {mode = 2;}
+
+		//--start angle correction until no detect || cap 3 movements--
+		int cnt = 4;
+		if (mode == 1) {
+			while (cnt > 0 && irLeft() < 30) {
+				correctAngle(1);
+				cnt--;
+				irLeft();
+			}
+		} else if (mode == 2) {
+			while (cnt > 0 && irRight() < 30) {
+				correctAngle(2);
+				cnt--;
+				irRight();
 			}
 		}
-		htim1.Instance->CCR4 = CENTER;
-		HAL_Delay(50);
 	}
-	HAL_Delay(1000);
-	if(uDistFinal>23 && uDistFinal<40){//Forward until 25
-		corrMotor(1);
-	}
-	else if(uDistFinal<23){
-		corrMotor(2);
-	}
+	corrMotor();
 }
 
 
@@ -645,17 +606,12 @@ void PIDturn(float degree, int turn){
 	Profile_Init(&profileLeft);
 	float time = trapezoidal(&profileLeft, setDist, AMAX, VMAX);
 
-
-
 	timeStart();
 	while(timeNow()<time){
 
 		/* Take current encoder values */
 		readEncoderTurn();
 		currProfile(&profileLeft, currSec);
-
-
-
 
 		/* Compute new control signal */
 		if(turn==1){ //Left Turn
@@ -1601,7 +1557,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 void StartDefaultTask(void *argument)
 {
   /* USER CODE BEGIN 5 */
-	uint8_t test[20] = "Testing Pi";
+	uint8_t test[20] = "Testing";
 	uint8_t ultra[20];
 	uint8_t checkPi[1];
 
@@ -1616,12 +1572,6 @@ void StartDefaultTask(void *argument)
 		HAL_Delay(200);
 		sprintf(ultra, "uDistF: %u\0", uDistFinal);
 		OLED_ShowString(10, 50, ultra);
-
-//		sprintf(ultra, "uDist1: %u\0", uDistCheck1);
-//		OLED_ShowString(10, 25, ultra);
-//
-//		sprintf(ultra, "uDist2: %u\0", uDistCheck2);
-//		OLED_ShowString(10, 35, ultra);
 
 		irLeft();
 		HAL_Delay(100);
@@ -1726,10 +1676,10 @@ void motor(void *argument)
 				htim1.Instance->CCR4 = RIGHT;
 				HAL_Delay(500);
 				PIDturn(-28,2);
-//				htim1.Instance->CCR4 = LEFT;
-//				HAL_Delay(500);
-//				PIDturn(30,1);
-//				PIDmotor(4.5); //Forward to fit into 10x10 grid
+				htim1.Instance->CCR4 = LEFT;
+				HAL_Delay(500);
+				PIDturn(34.6,1);
+				PIDmotor(4.5); //Forward to fit into 10x10 grid
 				break;
 
 			case 'R':
@@ -1743,24 +1693,24 @@ void motor(void *argument)
 				PIDturn(-28,1);
 				htim1.Instance->CCR4 = RIGHT;
 				HAL_Delay(500);
-				PIDturn(28,2);
+				PIDturn(31,2);
 				PIDmotor(4.5); //Forward to fit into 10x10 grid
 				break;
-			case 'Q':
+			case 'Q':	//LEFT
 				htim1.Instance->CCR4 = RIGHT;
 				HAL_Delay(500);
 				htim1.Instance->CCR4 = LEFT;
 				HAL_Delay(500);
 				PIDturn(90,1);
-				PIDmotor(3);
+				PIDmotor(8);
 				break;
-			case 'E':
+			case 'E':	//RIGHT
 				htim1.Instance->CCR4 = LEFT;
 				HAL_Delay(500);
 				htim1.Instance->CCR4 = RIGHT;
 				HAL_Delay(500);
 				PIDturn(90,2);
-				PIDmotor(3);
+				PIDmotor(6);
 				break;
 			case 'U':
 				ultraDistCheck();
@@ -1775,24 +1725,6 @@ void motor(void *argument)
 				osDelay(50);
 				*aRxBuffer = 'Z';
 				break;
-//			case 'S':
-////				irRight();
-//				char reply2[] = "00\n";
-//				reply2[0] += ir2Dist / 10 % 10;
-//				reply2[1] += ir2Dist % 10;
-//				HAL_UART_Transmit_IT(&huart3, (uint8_t *)reply2, strlen(reply2));
-//				osDelay(50);
-//				*aRxBuffer = 'R';
-//				break;
-//			case 'M':
-////				irLeft();
-//				char reply3[] = "00\n";
-//				reply3[0] += ir2Dist / 10 % 10;
-//				reply3[1] += ir2Dist % 10;
-//				HAL_UART_Transmit_IT(&huart3, (uint8_t *)reply2, strlen(reply3));
-//				osDelay(50);
-//				*aRxBuffer = 'R';
-//				break;
 			/* Test Cases */
 			case 'V':
 				correction();
@@ -1815,8 +1747,7 @@ void motor(void *argument)
 				waitCmd();
 				break;
 			default:
-//				*aRxBuffer = 'R';
-				HAL_UART_Receive_IT(&huart3, (uint8_t *)aRxBuffer, 1);
+				*aRxBuffer = 'Z';
 				break;
 			}
 			HAL_Delay(100);

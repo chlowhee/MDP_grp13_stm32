@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <section name="Workbench">
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
-		<item key="selection" value="disp"/>
+		<item key="selection" value="HAL_UART_Transmit_IT"/>
 		<item key="wrap" value="true"/>
 		<item key="casesensitive" value="false"/>
 		<item key="wholeword" value="true"/>
 		<item key="incremental" value="false"/>
 		<item key="isRegEx" value="false"/>
 		<list key="findhistory">
+			<item value="HAL_UART_Transmit_IT"/>
 			<item value="Disp"/>
 			<item value="int"/>
 			<item value="distance"/>
@@ -22,7 +23,6 @@
 			<item value="Fleft"/>
 			<item value="aRxBuffer"/>
 			<item value="pre"/>
-			<item value="preemp"/>
 		</list>
 		<list key="replacehistory">
 		</list>
@@ -30,8 +30,8 @@
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog_dialogBounds">
 		<item key="DIALOG_X_ORIGIN" value="1148"/>
 		<item key="DIALOG_Y_ORIGIN" value="327"/>
-		<item key="DIALOG_WIDTH" value="292"/>
-		<item key="DIALOG_HEIGHT" value="402"/>
-		<item key="DIALOG_FONT_NAME" value="1|.AppleSystemUIFont|11.0|0|COCOA|1|.AppleSystemUIFont"/>
+		<item key="DIALOG_WIDTH" value="336"/>
+		<item key="DIALOG_HEIGHT" value="454"/>
+		<item key="DIALOG_FONT_NAME" value="1|Segoe UI|9.0|0|WINDOWS|1|-15|0|0|0|400|0|0|0|1|0|0|0|0|Segoe UI"/>
 	</section>
 </section>
