@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <section name="Workbench">
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
-		<item key="selection" value="HAL_UART_Transmit_IT"/>
+		<item key="selection" value="AMAX"/>
 		<item key="wrap" value="true"/>
 		<item key="casesensitive" value="false"/>
 		<item key="wholeword" value="true"/>
 		<item key="incremental" value="false"/>
 		<item key="isRegEx" value="false"/>
 		<list key="findhistory">
+			<item value="AMAX"/>
 			<item value="HAL_UART_Transmit_IT"/>
 			<item value="Disp"/>
 			<item value="int"/>
@@ -22,7 +23,6 @@
 			<item value="motorControl"/>
 			<item value="Fleft"/>
 			<item value="aRxBuffer"/>
-			<item value="pre"/>
 		</list>
 		<list key="replacehistory">
 		</list>

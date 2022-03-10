@@ -1,21 +1,21 @@
-22:37:37 **** Incremental Build of configuration Debug for project MDP_grp13 ****
+22:31:01 **** Incremental Build of configuration Debug for project MDP_grp13 ****
 make -j8 all 
 arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F407xx -c -I"C:/Users/limke/OneDrive/Desktop/MDP2/MDP_grp13/PeripheralDrivers/inc" -I"C:/Users/limke/OneDrive/Desktop/MDP2/MDP_grp13/PeripheralDrivers" -I../Core/Inc -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F -I../Drivers/CMSIS/Include -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I/Users/le/Documents/GitHub/MDP_grp13_stm32/MDP_grp13/PIDController -I/MDP_grp13/PIDController/Inc -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
-../Core/Src/main.c:146:27: warning: data definition has no type or storage class
-  146 | uint16_t uDistCheck1 = 0; uDistCheck2 = 0; uDistFinal = 0;
+../Core/Src/main.c:149:27: warning: data definition has no type or storage class
+  149 | uint16_t uDistCheck1 = 0; uDistCheck2 = 0; uDistFinal = 0;
       |                           ^~~~~~~~~~~
-../Core/Src/main.c:146:27: warning: type defaults to 'int' in declaration of 'uDistCheck2' [-Wimplicit-int]
-../Core/Src/main.c:146:44: warning: data definition has no type or storage class
-  146 | uint16_t uDistCheck1 = 0; uDistCheck2 = 0; uDistFinal = 0;
+../Core/Src/main.c:149:27: warning: type defaults to 'int' in declaration of 'uDistCheck2' [-Wimplicit-int]
+../Core/Src/main.c:149:44: warning: data definition has no type or storage class
+  149 | uint16_t uDistCheck1 = 0; uDistCheck2 = 0; uDistFinal = 0;
       |                                            ^~~~~~~~~~
-../Core/Src/main.c:146:44: warning: type defaults to 'int' in declaration of 'uDistFinal' [-Wimplicit-int]
+../Core/Src/main.c:149:44: warning: type defaults to 'int' in declaration of 'uDistFinal' [-Wimplicit-int]
 ../Core/Src/main.c: In function 'ultraDistCheck':
-../Core/Src/main.c:234:9: warning: implicit declaration of function 'abs' [-Wimplicit-function-declaration]
-  234 |  while (abs(uDistCheck1 - uDistCheck2) >= 5) {
+../Core/Src/main.c:237:9: warning: implicit declaration of function 'abs' [-Wimplicit-function-declaration]
+  237 |  while (abs(uDistCheck1 - uDistCheck2) >= 5) {
       |         ^~~
 ../Core/Src/main.c: In function 'fastestCar':
-../Core/Src/main.c:307:6: warning: unused variable 'x' [-Wunused-variable]
-  307 |  int x=0;
+../Core/Src/main.c:309:6: warning: unused variable 'x' [-Wunused-variable]
+  309 |  int x=0;
       |      ^
 ../Core/Src/main.c: In function 'PIDmotor':
 ../Core/Src/main.c:518:2: warning: implicit declaration of function 'Profile_Init' [-Wimplicit-function-declaration]
@@ -102,10 +102,10 @@ arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -D
  1563 |  uint8_t checkPi[1];
       |          ^~~~~~~
 ../Core/Src/main.c: In function 'motor':
-../Core/Src/main.c:1725:53: warning: implicit declaration of function 'strlen' [-Wimplicit-function-declaration]
- 1725 |     HAL_UART_Transmit_IT(&huart3, (uint8_t *)reply, strlen(reply));
+../Core/Src/main.c:1631:53: warning: implicit declaration of function 'strlen' [-Wimplicit-function-declaration]
+ 1631 |     HAL_UART_Transmit_IT(&huart3, (uint8_t *)reply, strlen(reply));
       |                                                     ^~~~~~
-../Core/Src/main.c:1725:53: warning: incompatible implicit declaration of built-in function 'strlen'
+../Core/Src/main.c:1631:53: warning: incompatible implicit declaration of built-in function 'strlen'
 ../Core/Src/main.c:38:1: note: include '<string.h>' or provide a declaration of 'strlen'
    37 | #include <time.h>
   +++ |+#include <string.h>
@@ -121,7 +121,7 @@ arm-none-eabi-size   MDP_grp13.elf
 arm-none-eabi-objdump -h -S  MDP_grp13.elf  > "MDP_grp13.list"
 arm-none-eabi-objcopy  -O ihex  MDP_grp13.elf  "MDP_grp13.hex"
    text	   data	    bss	    dec	    hex	filename
-  58348	    128	  22248	  80724	  13b54	MDP_grp13.elf
+  58268	    128	  22248	  80644	  13b04	MDP_grp13.elf
 Finished building: default.size.stdout
  
 Finished building: MDP_grp13.hex
@@ -129,5 +129,5 @@ Finished building: MDP_grp13.hex
 Finished building: MDP_grp13.list
  
 
-22:37:40 Build Finished. 0 errors, 27 warnings. (took 3s.323ms)
+22:31:07 Build Finished. 0 errors, 27 warnings. (took 5s.102ms)
 
