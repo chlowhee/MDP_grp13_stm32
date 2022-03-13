@@ -281,13 +281,12 @@ void waitCmd (void) {
 
 void fastestCar(){
 	/* (1) Start straight line loop */
+	//maybe can move 40cm first
 	while(1){
 		/* Increase RPM until ??? */
 
-
 		/* Break to new loop for slowing down */
-		ultraDistCheck();
-		if(uDistFinal<=40){
+		if(ultraDistCheck()<=40){
 			break;
 		}
 	}
@@ -296,8 +295,8 @@ void fastestCar(){
 	while(1){
 		//Slow down code
 
-		ultraDistCheck();
-		if(uDistFinal<=20){
+
+		if(ultraDistCheck()<=20){
 			htim1.Instance->CCR4 = RIGHT;
 			HAL_Delay(1000);
 			htim1.Instance->CCR4 = LEFT;
@@ -310,7 +309,7 @@ void fastestCar(){
 	while(1){
 		/* Constant Speed */
 
-
+		irLeft();
 		if(irLeft()>=30){
 			htim1.Instance->CCR4 = LEFT;
 			HAL_Delay(1000);
@@ -1746,7 +1745,7 @@ void motor(void *argument)
 				PIDturn(-29,1);
 				htim1.Instance->CCR4 = RIGHT+3;
 				HAL_Delay(500);
-				PIDturn(20,2);
+				PIDturn(21,2);
 				htim1.Instance->CCR4 = CENTER;
 				break;
 
