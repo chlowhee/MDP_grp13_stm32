@@ -282,13 +282,15 @@ void waitCmd (void) {
 void fastestCar(){
 	/* (1) Start straight line loop */
 	//maybe can move 40cm first
-	while(1){
+	PIDmotor(40);
+
+	while(ultraDistCheck()>40){
 		/* Increase RPM until ??? */
 
 		/* Break to new loop for slowing down */
-		if(ultraDistCheck()<=40){
-			break;
-		}
+//		if(ultraDistCheck()<=40){
+//			break;
+//		}
 	}
 
 	/* (2) Slow down car to prepare for turning */
@@ -296,10 +298,11 @@ void fastestCar(){
 		//Slow down code
 
 
-		if(ultraDistCheck()<=20){
-			htim1.Instance->CCR4 = RIGHT;
-			HAL_Delay(1000);
-			htim1.Instance->CCR4 = LEFT;
+		if(ultraDistCheck()<=20){	//turn right
+//			htim1.Instance->CCR4 = RIGHT;
+//			HAL_Delay(1000);
+//			htim1.Instance->CCR4 = LEFT;
+			fastCarTurn(1);
 			break;
 		}
 	}
@@ -307,41 +310,66 @@ void fastestCar(){
 	/* (3) Move until near end of obstacle's corner */
 	int x=0;
 	while(1){
-		/* Constant Speed */
+		/* Constant Speed & calculate dist moved */
 
 		irLeft();
-		if(irLeft()>=30){
-			htim1.Instance->CCR4 = LEFT;
-			HAL_Delay(1000);
-			htim1.Instance->CCR4 = CENTER;
-			HAL_Delay(1000);
-			htim1.Instance->CCR4 = LEFT;
-			HAL_Delay(1000);
-			htim1.Instance->CCR4 = RIGHT;
+		if(irLeft()>=30){	//turn 180?
+//			htim1.Instance->CCR4 = LEFT;
+//			HAL_Delay(1000);
+//			htim1.Instance->CCR4 = CENTER;
+//			HAL_Delay(1000);
+//			htim1.Instance->CCR4 = LEFT;
+//			HAL_Delay(1000);
+//			htim1.Instance->CCR4 = RIGHT;
+			fastCarTurn(2);
 			break;
 		}
 
 	}
+	//see if nd correct to be straight
+
 	/* (4) Move 50cm */
-	//Move
+	PIDmotor(50);
 
 	/* (5) Move straight until centre of obstacle */
 	//Calculate Dist to move
+	int y = 60 - x - 10;	//extra to make space for turning
 	//Move Dist
+	PIDmotor(y);
 
 	//Turn Right
+	fastCarTurn(1);
 
 	/* (6) Move back to parking spot */
 	while(1){
 		//Move straight
 
-		ultraDistCheck();
-		if(uDistFinal<=20){
+
+		if(ultraDistCheck() <= 20){
 			//Stop
 			break;
 		}
 	}
+}
 
+void fastCarTurn(int mode) {
+	switch (mode) {
+	case 1:	//90 degree
+		htim1.Instance->CCR4 = LEFT;
+		HAL_Delay(500);
+		htim1.Instance->CCR4 = RIGHT;
+		HAL_Delay(500);
+		PIDturn(90,2);
+		PIDmotor(6);
+		break;
+	case 2: //180 degree
+		htim1.Instance->CCR4 = LEFT;
+		HAL_Delay(500);
+		htim1.Instance->CCR4 = RIGHT;
+		HAL_Delay(500);
+//		PIDturn(180,2);
+		break;
+	}
 }
 
 void corrMotor(){
@@ -1763,7 +1791,7 @@ void motor(void *argument)
 				break;
 			case 'Y':
 				HAL_TIM_Encoder_Start(&htim2, TIM_CHANNEL_ALL);		//left encoder(MotorA) start
-					HAL_TIM_Encoder_Start(&htim3, TIM_CHANNEL_ALL);		//right encoder(MotorB) start
+				HAL_TIM_Encoder_Start(&htim3, TIM_CHANNEL_ALL);		//right encoder(MotorB) start
 				while(1){
 				readEncoder();}
 				break;
