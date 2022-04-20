@@ -1,1 +1,1 @@
-Go to TEST branch
+Go to Test branch
