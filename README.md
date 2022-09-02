@@ -1,6 +1,6 @@
 ## Goto: Test branch
 
-# Project
+# Multidisciplinary-Design-Project_STM
 Description: 
 This project consists of 4 components - Android Remote Controller, Algorithms, RPi Comms + Image Processing and Robot Hardware. Current git repo only consists of the Robot Hardware component.
 
